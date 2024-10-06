@@ -10,6 +10,7 @@ void initialize_game(GameState *state) {
     for (int i = 0; i < BOARD_SIZE; ++i)
         for (int j = 0; j < BOARD_SIZE; ++j)
             board[i][j] = L' ';
+    // Set game state to playing and reset player symbol
     *state = GAME_STATE_PLAYING;
     current_player_symbol = L'X';
 }
