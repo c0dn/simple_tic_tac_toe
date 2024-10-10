@@ -11,6 +11,8 @@ int main(void) {
     const notcurses_options opts = {
     };
 
+    // Setup, write log to app.log file
+
     FILE* app_log = fopen("app.log", "w");
 
     if (app_log == NULL) {
@@ -18,7 +20,7 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-
+    // Initialize the TUI rendering library
     struct notcurses* nc = notcurses_init(&opts, NULL);
     if (nc == NULL) {
         fclose(app_log);
@@ -26,15 +28,20 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
+    // This disables the cursor (you know that text input cursor)
+    // and enables us to receive mouse events
     notcurses_cursor_disable(nc);
     notcurses_mice_enable(nc, NCMICE_ALL_EVENTS);
 
 
     struct ncplane* default_plane = notcurses_stdplane(nc);
 
+    // this renders the tic-tac-toe grid on the default plane,
+    // think of it like default (1st) layer on the screen (canvas)
+
     render_grid(default_plane);
 
-
+    // Check if the terminal window supports UTF-8
     if (!notcurses_canutf8(nc)) {
         fprintf(stderr, "Terminal does not support UTF-8 encoding.\n");
         cleanup_and_stop(nc, app_log);
@@ -47,13 +54,17 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
+    // Set the current game state to keep track
+
     GameState current_game_state = GAME_STATE_MENU;
+
+    // Render Game menu
 
     initialize_game(&current_game_state);
 
     ncinput ni;
 
-        while (current_game_state != GAME_STATE_EXIT) {
+    while (current_game_state != GAME_STATE_EXIT) {
         if (notcurses_get_blocking(nc, &ni) == (char32_t)-1) {
             // Error or EOF
             break;
