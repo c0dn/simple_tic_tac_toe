@@ -5,20 +5,14 @@ wchar_t board[BOARD_SIZE][BOARD_SIZE];
 wchar_t current_player_symbol = L'X';
 
 
-
-/**************************************************************/
-/*  function: initialize_game                                 */
-/*                                                            */
-/*  Purpose:                                                  */
-/*     This function initializes the game by:                 */
-/*     - Resetting the game board to its default state (empty) */
-/*     - Setting the player's symbol to 'X'                   */
-/*     - Setting the game state to PLAYING                    */
-/*  Input Parameters:                                          */
-/*     GameState *state - Pointer to the game state variable   */
-/*  Returns:                                                   */
-/*     void                                                    */
-/**************************************************************/
+/**
+* @brief Initializes the game state and sets up the initial conditions.
+*
+* This function initializes the board to be empty (all spaces are set to a space character)
+* and sets the game state to playing, with 'X' as the current player symbol.
+*
+* @param state Pointer to the GameState structure that holds the game's current state and other necessary data.
+*/
 void initialize_game(GameState *state) {
     for (int i = 0; i < BOARD_SIZE; ++i)
         for (int j = 0; j < BOARD_SIZE; ++j)
@@ -27,42 +21,28 @@ void initialize_game(GameState *state) {
     current_player_symbol = L'X';
 }
 
-/**************************************************************/
-/*  function: is_cell_empty                                   */
-/*                                                            */
-/*  Purpose:                                                  */
-/*     This function checks if a specific cell on the game    */
-/*     board is empty.                                        */
-/*                                                            */
-/*  Input Parameters:                                         */
-/*     int row - The row index of the cell to check.          */
-/*     int col - The column index of the cell to check.       */
-/*                                                            */
-/*  Returns:                                                  */
-/*     bool - Returns true if the cell is empty (contains a   */
-/*            blank character ' '), otherwise returns false.  */
-/**************************************************************/
+/**
+* @brief Checks if a cell on the game board is empty.
+*
+* This function checks whether the cell at the specified row and column on the game board is empty, represented by the character `L' '`.
+*
+* @param row The row index of the cell to check.
+* @param col The column index of the cell to check.
+* @return Returns true if the cell is empty (contains a space character), otherwise returns false.
+*/
 bool is_cell_empty(const int row, const int col) {
     return board[row][col] == L' ';
 }
 
-/**************************************************************/
-/*  function: check_win                                       */
-/*                                                            */
-/*  Purpose:                                                  */
-/*     This function checks if the player with the specified  */
-/*     symbol has won the game by evaluating all possible     */
-/*     winning conditions on the game board.                  */
-/*                                                            */
-/*  Input Parameters:                                         */
-/*     wchar_t player_symbol - The symbol representing the    */
-/*                             current player ('X' or 'O').   */
-/*                                                            */
-/*  Returns:                                                  */
-/*     bool - Returns true if the player has won by forming   */
-/*            a line (row, column, or diagonal) with their    */
-/*            symbol, otherwise returns false.                */
-/**************************************************************/
+/**
+ * @brief Check if the given player has won the game.
+ *
+ * This function checks all possible winning combinations on the game board
+ * to determine if the specified player has won the game.
+ *
+ * @param player_symbol The symbol representing the player (e.g., 'X' or 'O').
+ * @return true if the player has won, false otherwise.
+ */
 bool check_win(const wchar_t player_symbol) {
     // Check rows and columns
     for (int i = 0; i < BOARD_SIZE; ++i) {
@@ -91,23 +71,15 @@ bool check_win(const wchar_t player_symbol) {
     return false;
 }
 
-/**************************************************************/
-/*  function: check_draw                                      */
-/*                                                            */
-/*  Purpose:                                                  */
-/*     This function checks if the game is a draw, meaning    */
-/*     there are no empty spaces left on the board and        */
-/*     neither player has won.                                */
-/*                                                            */
-/*  Input Parameters:                                         */
-/*     None                                                   */
-/*                                                            */
-/*  Returns:                                                  */
-/*     bool - Returns true if all cells on the board are      */
-/*            filled (i.e., no spaces are left), indicating   */
-/*            a draw. Returns false if any cell is still      */
-/*            empty.                                          */
-/**************************************************************/
+/**
+ * @brief Checks if the game has ended in a draw.
+ *
+ * This function iterates through all cells of the game board to determine
+ * if there are any empty spaces left. If no empty spaces are found, the
+ * game is considered a draw.
+ *
+ * @return true if the game has ended in a draw, false otherwise.
+ */
 bool check_draw(void) {
     for (int i = 0; i < BOARD_SIZE; ++i)
         for (int j = 0; j < BOARD_SIZE; ++j)

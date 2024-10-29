@@ -1,3 +1,11 @@
+/**
+* @file main.c
+ * @brief Main entry point for the Tic-Tac-Toe game using the Notcurses library.
+ *
+ * This file contains the main game loop, initialization, and event handling
+ * for the Tic-Tac-Toe game implemented with a text-based user interface.
+ */
+
 #include <game.h>
 #include <notcurses/notcurses.h>
 #include <locale.h>
@@ -8,13 +16,12 @@
 int main(void) {
     setlocale(LC_ALL, "");
 
+    // Initialize Notcurses options
     const notcurses_options opts = {
     };
 
-    // Setup, write log to app.log file
-
+    // Setup logging
     FILE* app_log = fopen("app.log", "w");
-
     if (app_log == NULL) {
         fprintf(stderr, "Failed to open application log file.\n");
         return EXIT_FAILURE;
@@ -28,20 +35,16 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-    // This disables the cursor (you know that text input cursor)
-    // and enables us to receive mouse events
+    // Disable cursor and enable mouse events
     notcurses_cursor_disable(nc);
     notcurses_mice_enable(nc, NCMICE_ALL_EVENTS);
 
 
+    // Get the default plane and render the initial game grid
     struct ncplane* default_plane = notcurses_stdplane(nc);
-
-    // this renders the tic-tac-toe grid on the default plane,
-    // think of it like default (1st) layer on the screen (canvas)
-
     render_grid(default_plane);
 
-    // Check if the terminal window supports UTF-8
+    // Check for UTF-8 support
     if (!notcurses_canutf8(nc)) {
         fprintf(stderr, "Terminal does not support UTF-8 encoding.\n");
         cleanup_and_stop(nc, app_log);

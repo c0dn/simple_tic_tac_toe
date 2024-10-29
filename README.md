@@ -1,12 +1,17 @@
-# Simple tic tac toe
-A simple game created for an assignment.
-Game is rendered using notcurses, a TUI rendering library in c
+# Tic-Tac-Toe Game
+
+This is a text-based Tic-Tac-Toe game implemented in C 
+using the Notcurses library for rending user interface.
+
+## Features
+
+- Text-based user interface
+- Two-player gameplay
+- Mouse input support
+- Win/draw detection
+- Game state management
 
 
-## Compatibility notes 
-libnotcurses is not fully compatible with Windows, and its functionality is limited when used with Windows ConHost. 
-For the best experience, it's recommended to use Linux. \
-During development and testing, the application was run using WSL, but due to the limitations of Windows ConHost, the color display was not as vibrant as desired.
+## Building the Game
 
-## Build instructions
 Please see BUILD.md

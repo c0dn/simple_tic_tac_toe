@@ -3,60 +3,46 @@
 #include <game.h>
 #include <render.h>
 
-/**************************************************************/
-/*  function: cleanup_and_stop                                */
-/*                                                            */
-/*  Purpose:                                                  */
-/*     This function handles cleanup operations at the end of */
-/*     the game or when the program needs to stop. It shuts   */
-/*     down the `notcurses` instance and closes the log file. */
-/*                                                            */
-/*  Input Parameters:                                         */
-/*     struct notcurses* nc - Pointer to the `notcurses`      */
-/*                            instance                        */
-/*     FILE* app_log        - File pointer to the application */
-/*                            log                             */
-/*                                                            */
-/*  Returns:                                                  */
-/*     void - This function does not return anything.         */
-/*                                                            */
-/**************************************************************/
+
+/**
+ * @brief Performs cleanup operations and stops the Notcurses interface.
+ *
+ * This function is responsible for gracefully shutting down the application.
+ * It stops the Notcurses interface and closes the application log file.
+ *
+ * @param nc Pointer to the Notcurses context to be stopped.
+ * @param app_log Pointer to the FILE stream of the application log to be closed.
+ */
 void cleanup_and_stop(struct notcurses* nc, FILE* app_log)
 {
     notcurses_stop(nc);
     fclose(app_log);
 }
 
-/**************************************************************/
-/*  function: handle_mouse_click                              */
-/*                                                            */
-/*  Purpose:                                                  */
-/*     This function handles mouse click events in the game.  */
-/*     It determines if the click was inside the game board   */
-/*     and processes the click based on the game state and    */
-/*     current player. If the game is still playing, the      */
-/*     function updates the game board, checks for a win or   */
-/*     a draw, and switches the current player.               */
-/*                                                            */
-/*  Input Parameters:                                         */
-/*     struct ncplane* n    - Pointer to the ncurses plane used */
-/*                            for drawing.                    */
-/*     const int mouse_y    - The y-coordinate of the mouse    */
-/*                            click.                          */
-/*     const int mouse_x    - The x-coordinate of the mouse    */
-/*                            click.                          */
-/*     FILE* app_log        - File pointer for logging game    */
-/*                            events and diagnostics.         */
-/*     GameState *state     - Pointer to the game state,       */
-/*                            which is modified if the game    */
-/*                            ends or continues.              */
-/*                                                            */
-/*  Returns:                                                  */
-/*     void - This function doesn't return anything, but it   */
-/*            modifies the game state and logs relevant       */
-/*            events.                                         */
-/*                                                            */
-/**************************************************************/
+/**
+ * @brief Handles a mouse click event in the Tic-Tac-Toe game.
+ *
+ * This function processes a mouse click event, updating the game state and board
+ * if the click is valid. It checks if the game is in progress, determines the clicked
+ * cell, updates the board if the move is legal, checks for a win or draw condition,
+ * and switches the current player if the game continues.
+ *
+ * @param n Pointer to the ncplane where the game is rendered.
+ * @param mouse_y The y-coordinate of the mouse click.
+ * @param mouse_x The x-coordinate of the mouse click.
+ * @param app_log File pointer for logging game events.
+ * @param state Pointer to the current game state.
+ *
+ * @note This function assumes the existence of global variables and functions such as:
+ *       - START_X, START_Y: The starting coordinates of the game board.
+ *       - CELL_WIDTH, CELL_HEIGHT: The dimensions of each cell in the game board.
+ *       - BOARD_SIZE: The size of the game board (e.g., 3 for a 3x3 grid).
+ *       - board: The 2D array representing the game board.
+ *       - current_player_symbol: The symbol of the current player ('X' or 'O').
+ *       - is_cell_empty(), draw_symbol_in_cell(), check_win(), check_draw(): Helper functions.
+ *
+ * @return This function does not return a value. It updates the game state and board directly.
+ */
 void handle_mouse_click(struct ncplane* n, const int mouse_y, const int mouse_x, FILE* app_log, GameState *state) {
 
     // Check game state before containing, stop execution if not in game
