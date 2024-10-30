@@ -9,5 +9,4 @@ include_directories("${CMAKE_SOURCE_DIR}/include")
 
 add_executable(1103_tic_tac_toe ${SOURCES})
 
-target_link_libraries(1103_tic_tac_toe notcurses)
-target_link_libraries(1103_tic_tac_toe notcurses-core)
+target_link_libraries(1103_tic_tac_toe raylib)

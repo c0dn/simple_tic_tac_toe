@@ -3,7 +3,7 @@
 ## Requirements
 
 - Cmake version 3.13+
-- libnotcurses version 3+
+- libraylib version 5+
 - gcc version 13+
 - WSL with Ubuntu 22.04+
 - MSYS2 version 3.5.4+
@@ -15,35 +15,15 @@ https://documentation.ubuntu.com/wsl/en/latest/guides/install-ubuntu-wsl2/ \
 It is recommended to update Ubuntu to the latest LTS release 
 
 ## Compiling for Windows
-### Compile libnotcurses
+### Installing raylib
 1. Open MSYS2 UCRT64 shell and run the following commands inside it
-2. Install the necessary packages
+2. Run the command
 ```shell
-pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-libdeflate mingw-w64-ucrt-x86_64-libunistring mingw-w64-ucrt-x86_64-ncurses mingw-w64-ucrt-x86_64-ninja mingw-w64-ucrt-x86_64-openimageio mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-ffmpeg
+pacman -S pacman -S ucrt64/mingw-w64-ucrt-x86_64-raylib
 ```
-3. Clone the repo
-```shell
-git clone https://github.com/dankamongmen/notcurses.git
-cd notcurses/
-```
-
-4. Compile
-```shell
-mkdir build
-cd build
-cmake .. -DUSE_DOCTEST=off -DUSE_PANDOC=off -DUSE_MULTIMEDIA=ffmpeg -DCMAKE_BUILD_TYPE=Release
-cmake --build .
-```
-5. Move compiled dlls and header files to proper directories \
-`<MSYS2 install directory>\home\<your username>` is where the cloned git repo is at \
-Assuming your username is `user` and MSYS2 is installed on `C:\msys64` \
-`C:\msys64\home\user\notcurses\include` is where you will find notcurses header files \
-Copy `C:\msys64\home\user\notcurses\include\notcurses` to `C:\msys64\ucrt64\include` \
-Copy `C:\msys64\home\user\notcurses\build\libnotcurses.dll`to `C:\msys64\ucrt64\lib` \
-Copy `C:\msys64\home\user\notcurses\build\libnotcurses-core.dll`to `C:\msys64\ucrt64\lib` 
-6. Ensure include and lib directory is in your PATH
+3. Ensure include and lib directory is in your PATH
 ![img.png](screenshots/build_guide.png)
-7. Build, run commands in powershell
+4. Build, run commands in powershell
 ```pwsh
 mkdir build
 cd build
@@ -52,9 +32,10 @@ cmake --build ./
 ```
 
 ## Compiling for Linux on WSL
-1. Install libnotcurses-dev and build tools on your WSL install if you haven't already
+1. Install libraylib5-dev on your WSL install
 ```shell
-sudo apt-get install libnotcurses-dev build-essential -y
+sudo add-apt-repository ppa:texus/raylib
+sudo apt-get install libraylib5-dev -y
 ```
 2. Build, run commands in project directory
 ```shell
@@ -86,7 +67,9 @@ Codename:       noble
 
 2. Install the necessary packages for cross compilation
 ```shell
-sudo apt-get install crossbuild-essential-arm64 libnotcurses-dev:arm64 build-essential -y
+sudo dpkg --add-architecture arm64
+sudo add-apt-repository ppa:texus/raylib
+sudo apt-get install crossbuild-essential-arm64 libraylib5-dev:arm64 build-essential -y
 ```
 2. Build, run commands in project directory
 ```shell

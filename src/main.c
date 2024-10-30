@@ -1,129 +1,82 @@
 /**
 * @file main.c
- * @brief Main entry point for the Tic-Tac-Toe game using the Notcurses library.
+ * @brief Main entry point for the Tic-Tac-Toe game, game created using raylib
  *
  * This file contains the main game loop, initialization, and event handling
  * for the Tic-Tac-Toe game implemented with a text-based user interface.
  */
 
 #include <game.h>
-#include <notcurses/notcurses.h>
-#include <locale.h>
 #include <render.h>
 #include <handlers.h>
-#include <uchar.h>
+#include <raylib.h>
+#include <stdlib.h>
 
-int main(void) {
-    setlocale(LC_ALL, "");
+int main(void)
+{
+    // Initialization
+    //--------------------------------------------------------------------------------------
+    const int screen_width = 800;
+    const int screen_height = 800;
 
-    // Initialize Notcurses options
-    const notcurses_options opts = {
-    };
+    InitWindow(screen_width, screen_height, "Tic Tae Toe");
 
-    // Setup logging
-    FILE* app_log = fopen("app.log", "w");
-    if (app_log == NULL) {
-        fprintf(stderr, "Failed to open application log file.\n");
-        return EXIT_FAILURE;
-    }
-
-    // Initialize the TUI rendering library
-    struct notcurses* nc = notcurses_init(&opts, NULL);
-    if (nc == NULL) {
-        fclose(app_log);
-        fprintf(stderr, "Failed to initialize notcurses.\n");
-        return EXIT_FAILURE;
-    }
-
-    // Disable cursor and enable mouse events
-    notcurses_cursor_disable(nc);
-    notcurses_mice_enable(nc, NCMICE_ALL_EVENTS);
-
-
-    // Get the default plane and render the initial game grid
-    struct ncplane* default_plane = notcurses_stdplane(nc);
-    render_grid(default_plane);
-
-    // Check for UTF-8 support
-    if (!notcurses_canutf8(nc)) {
-        fprintf(stderr, "Terminal does not support UTF-8 encoding.\n");
-        cleanup_and_stop(nc, app_log);
-        return EXIT_FAILURE;
-    }
-
-    if (notcurses_render(nc) != 0) {
-        fprintf(stderr, "Failed to render\n");
-        cleanup_and_stop(nc, app_log);
-        return EXIT_FAILURE;
-    }
-
-    // Set the current game state to keep track
-
+    SetTargetFPS(60);
     GameState current_game_state = GAME_STATE_MENU;
+    while (!WindowShouldClose()) // Detect window close button or ESC key
+    {
+        // Updates
+        switch (current_game_state)
+        {
+        case GAME_STATE_MENU:
+            if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
+            {
+                initialize_game(&current_game_state);
+            }
+        case GAME_STATE_PLAYING:
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+            {
+                const Vector2 mouse_pos = GetMousePosition();
+                handle_mouse_click(mouse_pos, screen_width, screen_height, &current_game_state);
+            }
 
-    // Render Game menu
+            break;
 
-    initialize_game(&current_game_state);
+        case GAME_STATE_P1_WIN:
+        case GAME_STATE_P2_WIN:
+        case GAME_STATE_DRAW:
+            if (IsKeyPressed(KEY_ENTER)) {
+                initialize_game(&current_game_state);
+            }
+            break;
 
-    ncinput ni;
-
-    while (current_game_state != GAME_STATE_EXIT) {
-        if (notcurses_get_blocking(nc, &ni) == (char32_t)-1) {
-            // Error or EOF
+        default:
             break;
         }
+        // Drawing
+        BeginDrawing();
+        ClearBackground(BLACK);
+        switch (current_game_state)
+        {
+        case GAME_STATE_MENU:
+            render_menu(screen_height, screen_width);
+            break;
+        case GAME_STATE_PLAYING:
+            render_grid(screen_height, screen_width);
+            break;
+        case GAME_STATE_P1_WIN:
+        case GAME_STATE_P2_WIN:
+        case GAME_STATE_DRAW:
+            render_grid(screen_height, screen_width);  // Draw the final board state
+            render_game_over(screen_height, screen_width, current_game_state);
+            break;
 
-        if (ni.id == 'q' || ni.id == 'Q' || ni.id == NCKEY_ESC) {
-            // Exit on q or Esc
-            current_game_state = GAME_STATE_EXIT;
-            continue;
+        default:
+            break;
         }
-
-        switch (current_game_state) {
-            case GAME_STATE_PLAYING:
-                if (ni.id == NCKEY_BUTTON1 && ni.evtype == NCTYPE_PRESS) {
-                    const int mouse_y = ni.y;
-                    const int mouse_x = ni.x;
-
-                    fprintf(app_log, "Mouse click x: %d, y: %d\n", mouse_x, mouse_y);
-                    handle_mouse_click(default_plane, mouse_y, mouse_x, app_log, &current_game_state);
-                    notcurses_render(nc);
-                }
-                break;
-
-            case GAME_STATE_P1_WIN:
-            case GAME_STATE_P2_WIN:
-            case GAME_STATE_DRAW:
-                if (current_game_state == GAME_STATE_P1_WIN) {
-                    display_message(default_plane, L"Player 1 Wins!");
-                } else if (current_game_state == GAME_STATE_P2_WIN) {
-                    display_message(default_plane, L"Player 2 Wins!");
-                } else if (current_game_state == GAME_STATE_DRAW) {
-                    display_message(default_plane, L"It's a Draw!");
-                }
-                notcurses_render(nc);
-
-                if (notcurses_get_blocking(nc, &ni) == (char32_t)-1) {
-                    break;
-                }
-
-                if (ni.id == 'r' || ni.id == 'R') {
-                    // Restart the game
-                    initialize_game(&current_game_state);
-                    ncplane_erase(default_plane);
-                    render_grid(default_plane);
-                    notcurses_render(nc);
-                } else if (ni.id == 'q' || ni.id == 'Q' || ni.id == NCKEY_ESC) {
-                    // Quit
-                    current_game_state = GAME_STATE_EXIT;
-                }
-                break;
-
-            default:
-                break;
-        }
+        EndDrawing();
     }
 
-    cleanup_and_stop(nc, app_log);
+    CloseWindow();
     return EXIT_SUCCESS;
 }

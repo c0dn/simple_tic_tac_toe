@@ -1,7 +1,6 @@
 # Tic-Tac-Toe Game
 
-This is a text-based Tic-Tac-Toe game implemented in C 
-using the Notcurses library for rending user interface.
+This is a simple tic tae toe game created using raylib.
 
 ## Features
 

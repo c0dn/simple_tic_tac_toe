@@ -1,97 +1,53 @@
 #include "handlers.h"
 
-#include <game.h>
-#include <render.h>
-
-
 /**
- * @brief Performs cleanup operations and stops the Notcurses interface.
+ * @brief Handles mouse click events on the game board.
  *
- * This function is responsible for gracefully shutting down the application.
- * It stops the Notcurses interface and closes the application log file.
+ * This function processes the mouse click to determine which cell on the
+ * tic-tac-toe board was clicked. If the clicked cell is valid (within the
+ * board boundaries and empty), it updates the board with the current player's
+ * mark, checks for a win or draw condition, and updates the game state
+ * accordingly.
  *
- * @param nc Pointer to the Notcurses context to be stopped.
- * @param app_log Pointer to the FILE stream of the application log to be closed.
+ * @param mouse_pos A Vector2 struct containing the x and y coordinates of the mouse click.
+ * @param screen_width The width of the screen in pixels.
+ * @param screen_height The height of the screen in pixels.
+ * @param state A pointer to the current GameState which will be updated based on the game progress.
+ *
+ * @details
+ * - The game board is assumed to be a 3x3 grid centered on the screen.
+ * - `current_player` is a global variable representing the current player (either PLAYER_X or PLAYER_O).
+ * - `board` is a global 3x3 array representing the game board state.
+ * - `is_cell_empty(int row, int col)` is a function that checks if the specified cell is empty.
+ * - `check_win(int player)` is a function that checks if the specified player has won.
+ * - `check_draw()` is a function that determines if the board is full without any player winning.
  */
-void cleanup_and_stop(struct notcurses* nc, FILE* app_log)
-{
-    notcurses_stop(nc);
-    fclose(app_log);
-}
+void handle_mouse_click(const Vector2 mouse_pos, const int screen_width, const int screen_height, GameState *state) {
 
-/**
- * @brief Handles a mouse click event in the Tic-Tac-Toe game.
- *
- * This function processes a mouse click event, updating the game state and board
- * if the click is valid. It checks if the game is in progress, determines the clicked
- * cell, updates the board if the move is legal, checks for a win or draw condition,
- * and switches the current player if the game continues.
- *
- * @param n Pointer to the ncplane where the game is rendered.
- * @param mouse_y The y-coordinate of the mouse click.
- * @param mouse_x The x-coordinate of the mouse click.
- * @param app_log File pointer for logging game events.
- * @param state Pointer to the current game state.
- *
- * @note This function assumes the existence of global variables and functions such as:
- *       - START_X, START_Y: The starting coordinates of the game board.
- *       - CELL_WIDTH, CELL_HEIGHT: The dimensions of each cell in the game board.
- *       - BOARD_SIZE: The size of the game board (e.g., 3 for a 3x3 grid).
- *       - board: The 2D array representing the game board.
- *       - current_player_symbol: The symbol of the current player ('X' or 'O').
- *       - is_cell_empty(), draw_symbol_in_cell(), check_win(), check_draw(): Helper functions.
- *
- * @return This function does not return a value. It updates the game state and board directly.
- */
-void handle_mouse_click(struct ncplane* n, const int mouse_y, const int mouse_x, FILE* app_log, GameState *state) {
+    const int grid_size = screen_width < screen_height ? screen_width * 0.6 : screen_height * 0.6;
+    const int cell_size = grid_size / 3;
+    const int start_x = (screen_width - grid_size) / 2;
+    const int start_y = (screen_height - grid_size) / 2;
 
-    // Check game state before containing, stop execution if not in game
-    if (*state != GAME_STATE_PLAYING) {
-        return;
-    }
+    // Convert mouse position to board coordinates
+    const int row = (mouse_pos.y - start_y) / cell_size;
+    const int col = (mouse_pos.x - start_x) / cell_size;
 
+    // Check if click is within board and cell is empty
+    if (row >= 0 && row < 3 && col >= 0 && col < 3 && is_cell_empty(row, col)) {
+        board[row][col] = current_player;
 
-    const int relative_x = mouse_x - START_X;
-    const int relative_y = mouse_y - START_Y;
-
-    // Check if the click is within the grid boundaries, if outside do nothing
-    if (relative_x < 0 || relative_y < 0) {
-        fprintf(app_log, "Click outside the grid.\n");
-        return;
-    }
-
-    // Determine the cell indices
-    const int cell_column = relative_x / CELL_WIDTH;
-    const int cell_row = relative_y / CELL_HEIGHT;
-
-    if (cell_column >= 0 && cell_column < BOARD_SIZE &&
-        cell_row >= 0 && cell_row < BOARD_SIZE) {
-        fprintf(app_log, "Clicked cell row: %d, column: %d\n", cell_row, cell_column);
-
-        if (is_cell_empty(cell_row, cell_column)) {
-            board[cell_row][cell_column] = current_player_symbol;
-
-            draw_symbol_in_cell(n, cell_row, cell_column, current_player_symbol, app_log);
-
-            if (check_win(current_player_symbol)) {
-                fprintf(app_log, "Player %lc wins!\n", current_player_symbol);
-
-                if (current_player_symbol == L'X')
-                    *state = GAME_STATE_P1_WIN;
-                else
-                    *state = GAME_STATE_P2_WIN;
-            }
-            else if (check_draw()) {
-                fprintf(app_log, "Game is a draw.\n");
-                *state = GAME_STATE_DRAW;
-            }
-            else {
-                current_player_symbol = (current_player_symbol == L'X') ? L'O' : L'X';
-            }
-        } else {
-            fprintf(app_log, "Cell is already occupied.\n");
+        // Check win condition
+        if (check_win(current_player)) {
+            *state = current_player == PLAYER_X ? GAME_STATE_P1_WIN : GAME_STATE_P2_WIN;
         }
-        } else {
-            fprintf(app_log, "Click outside the grid cells.\n");
+        // Check draw condition
+        else if (check_draw()) {
+            *state = GAME_STATE_DRAW;
         }
+        // Switch player
+        else {
+            current_player = (current_player == PLAYER_X) ? PLAYER_O : PLAYER_X;
+        }
+    }
 }
