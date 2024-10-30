@@ -1,109 +1,96 @@
 #include "render.h"
+
+#include <game.h>
+#include <raylib.h>
 #include <stdio.h>
 
-/**
- * @brief Renders a 3x3 grid on the given ncplane.
- *
- * This function draws a 3x3 grid using ASCII box-drawing characters.
- * The grid consists of vertical and horizontal lines, with intersections
- * at the crossing points.
- *
- * @param n Pointer to the ncplane on which to render the grid.
- *
- * @details
- * The grid is positioned using the following constants:
- * - START_X: The starting X coordinate of the grid
- * - START_Y: The starting Y coordinate of the grid
- * - CELL_WIDTH: The width of each cell in the grid
- * - CELL_HEIGHT: The height of each cell in the grid
- * - GRID_WIDTH: The total width of the grid
- * - GRID_HEIGHT: The total height of the grid
- *
- * The function draws:
- * 1. Vertical lines using the '│' character
- * 2. Horizontal lines using the '─' character
- * 3. Intersections using the '┼' character
- *
- * If any drawing operation fails, an error message is printed to stderr.
- */
-void render_grid(struct ncplane* n) {
-    // Draw vertical lines
-    for (int i = 1; i <= 2; ++i) {
-        const int x = START_X + i * CELL_WIDTH;
-        for (int y = START_Y; y <= START_Y + GRID_HEIGHT; ++y) {
-            if (ncplane_putwc_yx(n, y, x, L'│') < 0) {
-                fprintf(stderr, "Failed to draw vertical line at (%d, %d)\n", y, x);
-            }
-        }
-    }
 
-    // Draw horizontal lines
-    for (int i = 1; i <= 2; ++i) {
-        const int y = START_Y + i * CELL_HEIGHT;
-        for (int x = START_X; x <= START_X + GRID_WIDTH; ++x) {
-            if (ncplane_putwc_yx(n, y, x, L'─') < 0) {
-                fprintf(stderr, "Failed to draw horizontal line at (%d, %d)\n", y, x);
-            }
-        }
-    }
+void render_grid(const int screen_height, const int screen_width) {
+    // Calculate grid size for a square centered grid
+    const int grid_size = screen_width < screen_height ? screen_width * 0.6 : screen_height * 0.6;
+    const int cell_size = grid_size / 3;
 
-    // Draw intersections
-    for (int i = 1; i <= 2; ++i) {
-        const int y = START_Y + i * CELL_HEIGHT;
-        for (int j = 1; j <= 2; ++j) {
-            const int x = START_X + j * CELL_WIDTH;
-            if (ncplane_putwc_yx(n, y, x, L'┼') < 0) {
-                fprintf(stderr, "Failed to draw intersection at (%d, %d)\n", y, x);
+    // Calculate starting position to center the grid
+    const int start_x = (screen_width - grid_size) / 2;
+    const int start_y = (screen_height - grid_size) / 2;
+
+    // Draw thicker lines using rectangles
+    const int line_thickness = 4;
+
+    // Vertical lines
+    DrawRectangle(start_x + cell_size - line_thickness/2, start_y,
+                  line_thickness, grid_size, RAYWHITE);
+    DrawRectangle(start_x + cell_size * 2 - line_thickness/2, start_y,
+                  line_thickness, grid_size, RAYWHITE);
+
+    // Horizontal lines
+    DrawRectangle(start_x, start_y + cell_size - line_thickness/2,
+                  grid_size, line_thickness, RAYWHITE);
+    DrawRectangle(start_x, start_y + cell_size * 2 - line_thickness/2,
+                  grid_size, line_thickness, RAYWHITE);
+
+    const int symbol_size = cell_size / 2;  // Size of X and O
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
+            if (board[i][j] != L' ') {
+                const char symbol[2] = {(char)board[i][j], '\0'};
+                Vector2 pos = {
+                    start_x + (j * cell_size) + (cell_size - symbol_size)/2,
+                    start_y + (i * cell_size) + (cell_size - symbol_size)/2
+                };
+                DrawText(symbol, pos.x, pos.y, symbol_size, RAYWHITE);
             }
         }
     }
 }
 
-/**
- * @brief Draws a symbol in the center of a specified cell.
- *
- * This function calculates the position to draw a symbol at the center of a given cell
- * and attempts to draw it using the ncurses plane.
- *
- * @param n The ncurses plane to draw on.
- * @param cell_row The row index of the cell.
- * @param cell_column The column index of the cell.
- * @param symbol The wide character symbol to be drawn.
- * @param app_log A file pointer for logging errors.
- */
-void draw_symbol_in_cell(struct ncplane* n, const int cell_row, const int cell_column, const wchar_t symbol, FILE* app_log) {
-    // Calculate the position to draw the symbol (center of the cell)
-    const int symbol_y = START_Y + cell_row * CELL_HEIGHT + CELL_HEIGHT / 2;
-    const int symbol_x = START_X + cell_column * CELL_WIDTH + CELL_WIDTH / 2;
 
-    if (ncplane_putwc_yx(n, symbol_y, symbol_x, symbol) < 0) {
-        fprintf(app_log, "Failed to draw symbol at (%d, %d)\n", symbol_y, symbol_x);
-    }
+
+void render_menu(const int screen_height, const int screen_width) {
+    DrawRectangle(0, 0, screen_width, screen_height, GREEN);
+    DrawText("TITLE SCREEN", 20, 20, 40, DARKGREEN);
+    DrawText("PRESS ENTER to jump to GAMEPLAY SCREEN", 120, 220, 20, DARKGREEN);
 }
 
+void render_game_over(const int screen_height, const int screen_width, const GameState state) {
+    // Draw semi-transparent background
+    DrawRectangle(0, 0, screen_width, screen_height, (Color){0, 0, 0, 200});
 
-/**
- * @brief Displays a centered message on the given ncplane.
- *
- * This function erases the contents of the given ncplane and displays
- * a new message centered both vertically and horizontally.
- *
- * @param n The ncplane on which to display the message.
- * @param message The wide character string message to be displayed.
- */
-void display_message(struct ncplane* n, const wchar_t* message) {
-    // Erase the contents of the plane
-    ncplane_erase(n);
+    // Calculate message box dimensions
+    const int box_width = screen_width * 0.6;
+    const int box_height = screen_height * 0.3;
+    const int box_x = (screen_width - box_width) / 2;
+    const int box_y = (screen_height - box_height) / 2;
 
-    // Get the dimensions of the plane
-    unsigned int y_max, x_max;
-    ncplane_dim_yx(n, &y_max, &x_max);
+    // Draw message box
+    DrawRectangle(box_x, box_y, box_width, box_height, DARKGRAY);
+    DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 4, RAYWHITE);
 
-    // Calculate the position for centering the message
-    const unsigned int msg_length = wcslen(message);
-    const unsigned int msg_x = (x_max - msg_length) / 2;
-    const unsigned int msg_y = y_max / 2;
+    // Prepare and draw message
+    const char* message;
+    switch(state) {
+    case GAME_STATE_P1_WIN:
+        message = "Player 1 Wins!";
+        break;
+    case GAME_STATE_P2_WIN:
+        message = "Player 2 Wins!";
+        break;
+    case GAME_STATE_DRAW:
+        message = "It's a Draw!";
+        break;
+    default:
+        message = "";
+    }
 
-    // Display the message at the calculated position
-    ncplane_putwstr_yx(n, msg_y, msg_x, message);
+    // Center the text in the box
+    const int font_size = 40;
+    const int text_width = MeasureText(message, font_size);
+    const int text_x = box_x + (box_width - text_width) / 2;
+    const int text_y = box_y + (box_height - font_size) / 2;
+
+    DrawText(message, text_x, text_y, font_size, RAYWHITE);
+    DrawText("Press ENTER to play again",
+             box_x + (box_width - MeasureText("Press ENTER to play again", 20)) / 2,
+             text_y + font_size + 10,
+             20, RAYWHITE);
 }
