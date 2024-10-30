@@ -14,5 +14,4 @@ void render_menu(int screen_height, int screen_width);
 void render_game_over(int screen_height, int screen_width, GameState state);
 
 
-
 #endif //RENDER_H

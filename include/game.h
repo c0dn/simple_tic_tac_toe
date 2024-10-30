@@ -1,14 +1,18 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <wchar.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #define BOARD_SIZE 3
 
-extern wchar_t board[BOARD_SIZE][BOARD_SIZE];
+typedef uint8_t player_t;
+#define PLAYER_NONE 0
+#define PLAYER_X 1
+#define PLAYER_O 2
 
-extern wchar_t current_player_symbol;
+extern player_t board[BOARD_SIZE][BOARD_SIZE];
+extern player_t current_player;
 
 typedef enum {
     GAME_STATE_MENU,
@@ -21,11 +25,9 @@ typedef enum {
 
 
 void initialize_game(GameState *state);
-
 bool is_cell_empty(int row, int col);
-
-bool check_win(wchar_t player_symbol);
-
+bool check_win(player_t player);
 bool check_draw(void);
+
 
 #endif // GAME_H

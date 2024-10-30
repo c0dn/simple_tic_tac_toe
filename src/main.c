@@ -9,7 +9,6 @@
 #include <game.h>
 #include <render.h>
 #include <handlers.h>
-#include <uchar.h>
 #include <raylib.h>
 #include <stdlib.h>
 
@@ -54,7 +53,7 @@ int main(void)
         default:
             break;
         }
-        // Draw
+        // Drawing
         BeginDrawing();
         ClearBackground(BLACK);
         switch (current_game_state)

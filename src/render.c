@@ -1,10 +1,21 @@
 #include "render.h"
-
-#include <game.h>
 #include <raylib.h>
-#include <stdio.h>
 
-
+/**
+ * @brief Renders the tic-tac-toe grid and player symbols on the screen.
+ *
+ * This function draws a 3x3 tic-tac-toe grid centered on the screen and
+ * displays the player symbols (X and O) in their respective cells based on
+ * the current game board state.
+ *
+ * @param screen_height The height of the screen in pixels.
+ * @param screen_width The width of the screen in pixels.
+ *
+ * @details
+ * - The grid is drawn as a square, with each cell occupying one-third of the grid size.
+ * - The grid is centrally positioned on the screen, with line thickness used to draw grid lines.
+ * - Vertical and horizontal lines are drawn using rectangles for better visual thickness and clarity.
+ */
 void render_grid(const int screen_height, const int screen_width) {
     // Calculate grid size for a square centered grid
     const int grid_size = screen_width < screen_height ? screen_width * 0.6 : screen_height * 0.6;
@@ -32,9 +43,9 @@ void render_grid(const int screen_height, const int screen_width) {
     const int symbol_size = cell_size / 2;  // Size of X and O
     for (int i = 0; i < BOARD_SIZE; i++) {
         for (int j = 0; j < BOARD_SIZE; j++) {
-            if (board[i][j] != L' ') {
-                const char symbol[2] = {(char)board[i][j], '\0'};
-                Vector2 pos = {
+            if (board[i][j] != PLAYER_NONE) {
+                const char* symbol = (board[i][j] == PLAYER_X) ? "X" : "O";
+                const Vector2 pos = {
                     start_x + (j * cell_size) + (cell_size - symbol_size)/2,
                     start_y + (i * cell_size) + (cell_size - symbol_size)/2
                 };
@@ -45,15 +56,33 @@ void render_grid(const int screen_height, const int screen_width) {
 }
 
 
-
 void render_menu(const int screen_height, const int screen_width) {
     DrawRectangle(0, 0, screen_width, screen_height, GREEN);
     DrawText("TITLE SCREEN", 20, 20, 40, DARKGREEN);
     DrawText("PRESS ENTER to jump to GAMEPLAY SCREEN", 120, 220, 20, DARKGREEN);
 }
 
+/**
+ * @brief Renders the game over screen based on the game's final state.
+ *
+ * This function displays a semi-transparent overlay and a message box
+ * indicating the result of the tic-tac-toe game such as Player 1 winning,
+ * Player 2 winning, or a draw.
+ * It also prompts the user to press ENTER
+ * to restart the game.
+ *
+ * @param screen_height The height of the screen in pixels.
+ * @param screen_width The width of the screen in pixels.
+ * @param state The final GameState that indicates the outcome (e.g., win or draw).
+ *
+ * @details
+ * - The message box is drawn in the center of the screen with a dark gray
+ *   background and white borderlines.
+ *   The box occupies 60% of the screen's width and 30% of its height.
+ * - Text including the game outcome and a prompt to play again are centered within the message box.
+ */
 void render_game_over(const int screen_height, const int screen_width, const GameState state) {
-    // Draw semi-transparent background
+    // Draw a semi-transparent background
     DrawRectangle(0, 0, screen_width, screen_height, (Color){0, 0, 0, 200});
 
     // Calculate message box dimensions
