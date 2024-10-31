@@ -23,7 +23,7 @@ int main(void)
 
     SetTargetFPS(60);
     GameState current_game_state = GAME_STATE_MENU;
-    while (!WindowShouldClose()) // Detect window close button or ESC key
+    while (!WindowShouldClose()) // Detect window close button
     {
         // Updates
         switch (current_game_state)
@@ -67,7 +67,7 @@ int main(void)
         case GAME_STATE_P1_WIN:
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
-            render_grid(screen_height, screen_width);  // Draw the final board state
+            render_grid(screen_height, screen_width);
             render_game_over(screen_height, screen_width, current_game_state);
             break;
 

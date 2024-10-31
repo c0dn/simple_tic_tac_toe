@@ -75,12 +75,6 @@ bool check_win(const player_t player) {
         }
     }
 
-    // Check diagonals
-    if (board[0][0] == player &&
-        board[1][1] == player &&
-        board[2][2] == player)
-        return true;
-
     // Check diagonals - only if center is matched
     if (board[1][1] == player) {
         if ((board[0][0] == player && board[2][2] == player) ||
