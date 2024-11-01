@@ -2,19 +2,17 @@
 #include <raylib.h>
 
 /**
- * @brief Renders the tic-tac-toe grid and player symbols on the screen.
+ * @brief Renders the tic-tac-toe grid and player symbols.
  *
- * This function draws a 3x3 tic-tac-toe grid centered on the screen and
- * displays the player symbols (X and O) in their respective cells based on
- * the current game board state.
- *
- * @param screen_height The height of the screen in pixels.
- * @param screen_width The width of the screen in pixels.
+ * @param screen_height Height of the game window in pixels
+ * @param screen_width Width of the game window in pixels
  *
  * @details
- * - The grid is drawn as a square, with each cell occupying one-third of the grid size.
- * - The grid is centrally positioned on the screen, with line thickness used to draw grid lines.
- * - Vertical and horizontal lines are drawn using rectangles for better visual thickness and clarity.
+ * Renders the game board with the following elements:
+ * - A centered square grid scaled to 60% of the smaller screen dimension
+ * - Grid lines drawn as white rectangles with specified thickness
+ * - Player symbols (X/O) drawn in their respective positions
+ * - Symbols are sized relative to cell size for consistent appearance
  */
 void render_grid(const int screen_height, const int screen_width) {
     // Calculate grid size for a square centered grid
@@ -40,14 +38,15 @@ void render_grid(const int screen_height, const int screen_width) {
     DrawRectangle(start_x, start_y + cell_size * 2 - line_thickness/2,
                   grid_size, line_thickness, RAYWHITE);
 
-    const int symbol_size = cell_size / 2;  // Size of X and O
+    const int symbol_size = cell_size / 2;
     for (int i = 0; i < BOARD_SIZE; i++) {
         for (int j = 0; j < BOARD_SIZE; j++) {
-            if (board[i][j] != PLAYER_NONE) {
-                const char* symbol = (board[i][j] == PLAYER_X) ? "X" : "O";
+            const player_t cell = get_cell(i, j);
+            if (cell != PLAYER_NONE) {
+                const char* symbol = cell == PLAYER_X ? "X" : "O";
                 const Vector2 pos = {
-                    start_x + (j * cell_size) + (cell_size - symbol_size)/2,
-                    start_y + (i * cell_size) + (cell_size - symbol_size)/2
+                    start_x + j * cell_size + (cell_size - symbol_size)/2,
+                    start_y + i * cell_size + (cell_size - symbol_size)/2
                 };
                 DrawText(symbol, pos.x, pos.y, symbol_size, RAYWHITE);
             }
@@ -62,24 +61,20 @@ void render_menu(const int screen_height, const int screen_width) {
     DrawText("PRESS ENTER to jump to GAMEPLAY SCREEN", 120, 220, 20, DARKGREEN);
 }
 
+
 /**
- * @brief Renders the game over screen based on the game's final state.
+ * @brief Renders the game over screen with the result message.
  *
- * This function displays a semi-transparent overlay and a message box
- * indicating the result of the tic-tac-toe game such as Player 1 winning,
- * Player 2 winning, or a draw.
- * It also prompts the user to press ENTER
- * to restart the game.
- *
- * @param screen_height The height of the screen in pixels.
- * @param screen_width The width of the screen in pixels.
- * @param state The final GameState that indicates the outcome (e.g., win or draw).
+ * @param screen_height Height of the game window in pixels
+ * @param screen_width Width of the game window in pixels
+ * @param state Current game state indicating the result (P1_WIN/P2_WIN/DRAW)
  *
  * @details
- * - The message box is drawn in the center of the screen with a dark gray
- *   background and white borderlines.
- *   The box occupies 60% of the screen's width and 30% of its height.
- * - Text including the game outcome and a prompt to play again are centered within the message box.
+ * Displays:
+ * - Semi-transparent black overlay covering the game board
+ * - Centered message box (60% width, 30% height of screen)
+ * - Result message ("Player 1 Wins!", "Player 2 Wins!", or "It's a Draw!")
+ * - All text is automatically centered within the message box
  */
 void render_game_over(const int screen_height, const int screen_width, const GameState state) {
     // Draw a semi-transparent background
@@ -95,7 +90,6 @@ void render_game_over(const int screen_height, const int screen_width, const Gam
     DrawRectangle(box_x, box_y, box_width, box_height, DARKGRAY);
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 4, RAYWHITE);
 
-    // Prepare and draw message
     const char* message;
     switch(state) {
     case GAME_STATE_P1_WIN:
