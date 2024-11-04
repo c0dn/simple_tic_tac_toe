@@ -14,7 +14,8 @@
  * - Player symbols (X/O) drawn in their respective positions
  * - Symbols are sized relative to cell size for consistent appearance
  */
-void render_grid(const int screen_height, const int screen_width) {
+void render_grid(const int screen_height, const int screen_width)
+{
     // Calculate grid size for a square centered grid
     const int grid_size = screen_width < screen_height ? screen_width * 0.6 : screen_height * 0.6;
     const int cell_size = grid_size / 3;
@@ -27,26 +28,29 @@ void render_grid(const int screen_height, const int screen_width) {
     const int line_thickness = 4;
 
     // Vertical lines
-    DrawRectangle(start_x + cell_size - line_thickness/2, start_y,
+    DrawRectangle(start_x + cell_size - line_thickness / 2, start_y,
                   line_thickness, grid_size, RAYWHITE);
-    DrawRectangle(start_x + cell_size * 2 - line_thickness/2, start_y,
+    DrawRectangle(start_x + cell_size * 2 - line_thickness / 2, start_y,
                   line_thickness, grid_size, RAYWHITE);
 
     // Horizontal lines
-    DrawRectangle(start_x, start_y + cell_size - line_thickness/2,
+    DrawRectangle(start_x, start_y + cell_size - line_thickness / 2,
                   grid_size, line_thickness, RAYWHITE);
-    DrawRectangle(start_x, start_y + cell_size * 2 - line_thickness/2,
+    DrawRectangle(start_x, start_y + cell_size * 2 - line_thickness / 2,
                   grid_size, line_thickness, RAYWHITE);
 
     const int symbol_size = cell_size / 2;
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        for (int j = 0; j < BOARD_SIZE; j++) {
+    for (int i = 0; i < BOARD_SIZE; i++)
+    {
+        for (int j = 0; j < BOARD_SIZE; j++)
+        {
             const player_t cell = get_cell(i, j);
-            if (cell != PLAYER_NONE) {
+            if (cell != PLAYER_NONE)
+            {
                 const char* symbol = cell == PLAYER_X ? "X" : "O";
                 const Vector2 pos = {
-                    start_x + j * cell_size + (cell_size - symbol_size)/2,
-                    start_y + i * cell_size + (cell_size - symbol_size)/2
+                    start_x + j * cell_size + (cell_size - symbol_size) / 2,
+                    start_y + i * cell_size + (cell_size - symbol_size) / 2
                 };
                 DrawText(symbol, pos.x, pos.y, symbol_size, RAYWHITE);
             }
@@ -55,7 +59,8 @@ void render_grid(const int screen_height, const int screen_width) {
 }
 
 
-void render_menu(const int screen_height, const int screen_width) {
+void render_menu(const int screen_height, const int screen_width)
+{
     DrawRectangle(0, 0, screen_width, screen_height, GREEN);
     DrawText("TITLE SCREEN", 20, 20, 40, DARKGREEN);
     DrawText("PRESS ENTER to jump to GAMEPLAY SCREEN", 120, 220, 20, DARKGREEN);
@@ -76,7 +81,8 @@ void render_menu(const int screen_height, const int screen_width) {
  * - Result message ("Player 1 Wins!", "Player 2 Wins!", or "It's a Draw!")
  * - All text is automatically centered within the message box
  */
-void render_game_over(const int screen_height, const int screen_width, const GameState state) {
+void render_game_over(const int screen_height, const int screen_width, const GameState state)
+{
     // Draw a semi-transparent background
     DrawRectangle(0, 0, screen_width, screen_height, (Color){0, 0, 0, 200});
 
@@ -91,7 +97,8 @@ void render_game_over(const int screen_height, const int screen_width, const Gam
     DrawRectangleLinesEx((Rectangle){box_x, box_y, box_width, box_height}, 4, RAYWHITE);
 
     const char* message;
-    switch(state) {
+    switch (state)
+    {
     case GAME_STATE_P1_WIN:
         message = "Player 1 Wins!";
         break;

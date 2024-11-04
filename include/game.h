@@ -20,7 +20,8 @@ typedef uint8_t player_t;
 
 extern player_t current_player;
 
-typedef enum {
+typedef enum
+{
     GAME_STATE_MENU,
     GAME_STATE_PLAYING,
     GAME_STATE_P1_WIN,
@@ -30,7 +31,7 @@ typedef enum {
 } GameState;
 
 
-void initialize_game(GameState *state);
+void initialize_game(GameState* state);
 bool is_cell_empty(int row, int col);
 bool check_win(player_t player);
 bool check_draw(void);
