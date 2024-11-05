@@ -20,15 +20,18 @@ typedef uint8_t player_t;
 
 extern player_t current_player;
 
-typedef enum
-{
+typedef enum {
     GAME_STATE_MENU,
+    GAME_STATE_DIFF_CHOICE,
     GAME_STATE_PLAYING,
     GAME_STATE_P1_WIN,
     GAME_STATE_P2_WIN,
     GAME_STATE_DRAW,
+    GAME_STATE_INSTRUCTIONS,
+    GAME_STATE_SETTINGS,
     GAME_STATE_EXIT
 } GameState;
+
 
 
 void initialize_game(GameState* state);
