@@ -1,6 +1,0 @@
-# ninja log v6
-10	151	7523357680018267	CMakeFiles/1103_tic_tac_toe.dir/src/main.c.obj	f234dfb1d739f146
-1	154	7523357679934694	CMakeFiles/1103_tic_tac_toe.dir/src/game.c.obj	e9babc52ec24c6ce
-6	154	7523357679978229	CMakeFiles/1103_tic_tac_toe.dir/src/handlers.c.obj	2a2399c5ad77c403
-16	157	7523357680068292	CMakeFiles/1103_tic_tac_toe.dir/src/render.c.obj	aef5487cb1335ef1
-157	303	7523357681479684	1103_tic_tac_toe.exe	447ca080303d3927
