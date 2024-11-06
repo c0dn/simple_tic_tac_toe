@@ -10,6 +10,14 @@
 #include <game.h>
 #include <menu.h>
 
+
+typedef struct {
+    Rectangle rect;
+    const char* text;
+    Color color;
+    void (*action)(const GameResources*, const GameState*);
+} Button;
+
 void render_grid(float screen_height, float screen_width);
 void render_menu(float screen_height, float screen_width,
                  GameResources* resources, GameState* state);
