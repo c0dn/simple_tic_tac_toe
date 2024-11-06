@@ -29,11 +29,13 @@ int main(void)
     SetTargetFPS(60);
     PlayMusicStream(resources.background_music);
     GameState current_game_state = GAME_STATE_MENU;
-    while (!WindowShouldClose()) // Detect window close button
+    bool exit_flag = false;
+    while (!exit_flag) // Detect window close button
     {
         UpdateMusicStream(resources.background_music);
         const Vector2 mouse_pos = GetMousePosition();
         // Updates
+        if (WindowShouldClose()) exit_flag = true;
         switch (current_game_state)
         {
         case GAME_STATE_MENU:
@@ -67,7 +69,7 @@ int main(void)
 
         case GAME_STATE_EXIT:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                handle_exit_menu_click(mouse_pos, &resources, &current_game_state);
+                handle_exit_menu_click(mouse_pos, &resources, &current_game_state, &exit_flag);
             }
             break;
 

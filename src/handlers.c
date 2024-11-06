@@ -58,11 +58,6 @@ static void start_hard_mode(const GameResources* res, GameState* game_state) {
     *game_state = GAME_STATE_PLAYING;
 }
 
-static void close_window(const GameResources* res, GameState* game_state) {
-    PlaySound(res->fx_click);
-    *game_state = GAME_STATE_EXIT;
-}
-
 static void return_to_menu(const GameResources* res, GameState* game_state) {
     PlaySound(res->fx_click);
     *game_state = GAME_STATE_MENU;
@@ -137,16 +132,11 @@ void handle_settings_menu_click(const Vector2 mouse_pos, const GameResources* re
     }
 }
 
-void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameState* state) {
+void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameState* state, bool* exit_flag) {
     static const float btn_width = 330.0f;
     static const float btn_height = 100.0f;
     static const float FIRST_BUTTON_OFFSET = -40.0f;
     static const int BUTTON_SPACING = 130;
-
-    const Button buttons[] = {
-        { .action = close_window },  // Yes
-        { .action = return_to_menu } // No
-    };
 
     const float start_y = (float)GetScreenHeight() / 2 - btn_height / 2 + FIRST_BUTTON_OFFSET;
 
@@ -159,9 +149,16 @@ void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resour
         };
 
         if (CheckCollisionPointRec(mouse_pos, btnRect) &&
-            IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-            buttons[i].action) {
-            buttons[i].action(resources, state);
+            IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            PlaySound(resources->fx_click);
+            switch(i) {
+            case 0: // Close window
+                *exit_flag = true;
+                break;
+            case 1: // Back to main menu
+                *state = GAME_STATE_MENU;
+                break;
+            }
         }
     }
 }
