@@ -8,10 +8,24 @@
 #define GRID_WIDTH (CELL_WIDTH * 3)
 #define GRID_HEIGHT (CELL_HEIGHT * 3)
 #include <game.h>
-
-void render_grid(int screen_height, int screen_width);
-void render_menu(int screen_height, int screen_width);
-void render_game_over(int screen_height, int screen_width, GameState state);
+#include <menu.h>
 
 
+typedef struct {
+    Rectangle rect;
+    const char* text;
+    Color color;
+    void (*action)(const GameResources*, GameState*);
+} Button;
+
+void render_grid(const GameResources* resources);
+void render_menu(
+    const GameResources* resources);
+void render_game_over(
+    const GameState* state);
+void render_instructions(
+    const GameResources* resources);
+void render_settings(void);
+void render_exit(void);
+void render_game_mode_choice(void);
 #endif //RENDER_H

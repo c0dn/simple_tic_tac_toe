@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <menu.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -20,18 +21,21 @@ typedef uint8_t player_t;
 
 extern player_t current_player;
 
-typedef enum
-{
+typedef enum {
     GAME_STATE_MENU,
+    MENU_DIFF_CHOICE,
     GAME_STATE_PLAYING,
     GAME_STATE_P1_WIN,
     GAME_STATE_P2_WIN,
     GAME_STATE_DRAW,
+    MENU_INSTRUCTIONS,
+    MENU_SETTINGS,
     GAME_STATE_EXIT
 } GameState;
 
 
-void initialize_game(GameState* state);
+
+void initialize_game(const GameResources* res, GameState* state);
 bool is_cell_empty(int row, int col);
 bool check_win(player_t player);
 bool check_draw(void);

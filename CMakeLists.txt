@@ -10,3 +10,4 @@ include_directories("${CMAKE_SOURCE_DIR}/include")
 add_executable(1103_tic_tac_toe ${SOURCES})
 
 target_link_libraries(1103_tic_tac_toe raylib)
+file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})

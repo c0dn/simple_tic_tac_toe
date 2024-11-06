@@ -15,7 +15,7 @@ player_t current_player;
  * - Initializes game state to GAME_STATE_PLAYING
  * - Sets current_player to PLAYER_X to start the game
  */
-void initialize_game(GameState* state)
+void initialize_game(const GameResources* res, GameState* state)
 {
     x_board = 0;
     o_board = 0;
