@@ -15,20 +15,17 @@ typedef struct {
     Rectangle rect;
     const char* text;
     Color color;
-    void (*action)(const GameResources*, const GameState*);
+    void (*action)(const GameResources*, GameState*);
 } Button;
 
-void render_grid(float screen_height, float screen_width);
-void render_menu(float screen_height, float screen_width,
-                 GameResources* resources, GameState* state);
-void render_game_over(float screen_height, float screen_width,
-                      GameResources* resources, GameState* state);
-void render_instructions(float screen_height, float screen_width,
-                         GameResources* resources, GameState* game_state);
-void render_settings(float screen_height, float screen_width,
-                     GameResources* resources, GameState* state);
-void render_exit(float screen_height, float screen_width,
-                 GameResources* resources, GameState* state);
-void render_game_mode_choice(float screen_height, float screen_width,
-                             GameResources* resources, GameState* state);
+void render_grid(const GameResources* resources);
+void render_menu(
+    const GameResources* resources);
+void render_game_over(
+    const GameState* state);
+void render_instructions(
+    const GameResources* resources);
+void render_settings(void);
+void render_exit(void);
+void render_game_mode_choice(void);
 #endif //RENDER_H

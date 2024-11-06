@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <menu.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -34,7 +35,7 @@ typedef enum {
 
 
 
-void initialize_game(GameState* state);
+void initialize_game(const GameResources* res, GameState* state);
 bool is_cell_empty(int row, int col);
 bool check_win(player_t player);
 bool check_draw(void);
