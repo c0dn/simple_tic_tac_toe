@@ -21,12 +21,11 @@ int main(void)
     const float screen_height = 1000;
 
     InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
-    SetWindowState(FLAG_VSYNC_HINT);
     InitAudioDevice();
 
     const GameResources resources = load_game_resources((int)screen_width, (int)screen_height);
 
-    SetTargetFPS(60);
+    SetTargetFPS(15);
     PlayMusicStream(resources.background_music);
     GameState current_game_state = GAME_STATE_MENU;
     bool exit_flag = false;
@@ -46,7 +45,6 @@ int main(void)
         case GAME_STATE_PLAYING:
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
             {
-
                 handle_game_click(mouse_pos, screen_width, screen_height,
                 &resources, &current_game_state);
             }
