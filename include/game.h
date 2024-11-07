@@ -19,6 +19,7 @@ typedef uint8_t player_t;
 #define PLAYER_X 1
 #define PLAYER_O 2
 
+
 extern player_t current_player;
 
 typedef enum {
@@ -32,6 +33,22 @@ typedef enum {
     MENU_SETTINGS,
     GAME_STATE_EXIT
 } GameState;
+
+
+typedef enum
+{
+    TWO_PLAYER,
+    ONE_PLAYER_EASY,
+    ONE_PLAYER_MEDIUM,
+    ONE_PLAYER_HARD
+} GameMode;
+
+
+typedef struct {
+    bool needs_redraw;
+    GameState state;
+    GameMode selected_game_mode;
+} GameContext;
 
 
 

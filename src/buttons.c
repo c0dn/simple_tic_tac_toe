@@ -64,7 +64,7 @@ Button SETTINGS_BUTTONS[4] = {
     {
         .text = "Play",
         .color = LIGHTGRAY,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 100.0f,
         .first_render_offset = -200.0f,
@@ -75,7 +75,7 @@ Button SETTINGS_BUTTONS[4] = {
     {
         .text = "Pause",
         .color = LIGHTGRAY,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 100.0f,
         .first_render_offset = -200.0f,
@@ -86,7 +86,7 @@ Button SETTINGS_BUTTONS[4] = {
     {
         .text = "Stop",
         .color = LIGHTGRAY,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 100.0f,
         .first_render_offset = -200.0f,
@@ -97,7 +97,7 @@ Button SETTINGS_BUTTONS[4] = {
     {
         .text = "Back",
         .color = BLUE,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 100.0f,
         .first_render_offset = -200.0f,
@@ -110,7 +110,7 @@ Button GAME_MODE_BUTTONS[3] = {
     {
         .text = "Easy",
         .color = YELLOW,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 300.0f,
         .height = 50.0f,
         .first_render_offset = -50.0f,
@@ -122,7 +122,7 @@ Button GAME_MODE_BUTTONS[3] = {
     {
         .text = "Medium",
         .color = YELLOW,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 300.0f,
         .height = 50.0f,
         .first_render_offset = -50.0f,
@@ -134,7 +134,7 @@ Button GAME_MODE_BUTTONS[3] = {
     {
         .text = "Hard",
         .color = YELLOW,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 300.0f,
         .height = 50.0f,
         .first_render_offset = -50.0f,
@@ -149,7 +149,7 @@ Button EXIT_CONFIRMATION_BUTTONS[] = {
     {
         .text = "Yes",
         .color = YELLOW,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 100.0f,
         .first_render_offset = -40.0f,
@@ -160,7 +160,7 @@ Button EXIT_CONFIRMATION_BUTTONS[] = {
     {
         .text = "No",
         .color = YELLOW,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 100.0f,
         .first_render_offset = -40.0f,
@@ -174,7 +174,7 @@ Button INSTRUCTIONS_BUTTONS[] = {
     {
         .text = "Back",
         .color = BLUE,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 100.0f,
         .padding = PaddingY(10.0f),
@@ -189,7 +189,7 @@ Button GAME_OVER_BUTTONS[] = {
     {
         .text = "Restart Game",
         .color = YELLOW,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 200,
         .height = 60,
         .first_render_offset = 0,
@@ -201,7 +201,7 @@ Button GAME_OVER_BUTTONS[] = {
     {
         .text = "Back to Menu",
         .color = YELLOW,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 200,
         .height = 60,
         .first_render_offset = 0,
@@ -217,7 +217,7 @@ Button MAIN_MENU_BUTTONS[] = {
     {
         .text = "1 Player",
         .color = BLUE,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 70.0f,
         .first_render_offset = -300.0f,
@@ -229,7 +229,7 @@ Button MAIN_MENU_BUTTONS[] = {
     {
         .text = "2 Player",
         .color = BLUE,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 70.0f,
         .first_render_offset = -300.0f,
@@ -241,7 +241,7 @@ Button MAIN_MENU_BUTTONS[] = {
     {
         .text = "How To Play",
         .color = BLUE,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 70.0f,
         .first_render_offset = -300.0f,
@@ -253,7 +253,7 @@ Button MAIN_MENU_BUTTONS[] = {
     {
         .text = "Settings",
         .color = BLUE,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 70.0f,
         .first_render_offset = -300.0f,
@@ -265,7 +265,7 @@ Button MAIN_MENU_BUTTONS[] = {
     {
         .text = "Exit",
         .color = BLUE,
-        .hoverColor = DARKBLUE,
+        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 70.0f,
         .first_render_offset = -300.0f,

@@ -18,7 +18,7 @@ static void render_buttons(
         // Hover effect
         if (CheckCollisionPointRec(GetMousePosition(), buttons[i].rect))
         {
-            buttonColor = buttons[i].hoverColor;
+            buttonColor = buttons[i].clickColor;
         }
 
         // Draw button

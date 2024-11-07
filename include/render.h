@@ -36,7 +36,7 @@ typedef struct {
     const float width;
     const float height;
     const float first_render_offset;
-    const Color hoverColor;
+    const Color clickColor;
     const ComponentPadding padding;
     const bool rounded;
     const int font_size;

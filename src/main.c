@@ -20,33 +20,40 @@ int main(void)
     const float screen_width = 1000;
     const float screen_height = 1000;
 
+    GameContext context = {
+        .needs_redraw = true,
+        .state = GAME_STATE_MENU,
+        .selected_game_mode = TWO_PLAYER,
+    };
+
     InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
     InitAudioDevice();
 
     const GameResources resources = load_game_resources((int)screen_width, (int)screen_height);
 
-    SetTargetFPS(15);
+    SetTargetFPS(60);
     PlayMusicStream(resources.background_music);
-    GameState current_game_state = GAME_STATE_MENU;
     bool exit_flag = false;
     while (!exit_flag) // Detect window close button
     {
         UpdateMusicStream(resources.background_music);
-        const Vector2 mouse_pos = GetMousePosition();
         // Updates
+        const Vector2 mouse_pos = GetMousePosition();
         if (WindowShouldClose()) exit_flag = true;
-        switch (current_game_state)
+        switch (context.state)
         {
         case GAME_STATE_MENU:
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                handle_menu_click(mouse_pos, &resources, &current_game_state);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                context.needs_redraw = true;
+                handle_menu_click(mouse_pos, &resources, &context.state);
             }
             break;
         case GAME_STATE_PLAYING:
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || IsGestureDetected(GESTURE_TAP))
             {
-                handle_game_click(mouse_pos, screen_width, screen_height,
-                &resources, &current_game_state);
+                context.needs_redraw = true;
+                handle_game_click(mouse_pos, &resources, &context.state);
             }
 
             break;
@@ -54,40 +61,49 @@ int main(void)
         case GAME_STATE_P1_WIN:
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                handle_game_over_menu_click(mouse_pos, &resources, &current_game_state);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                context.needs_redraw = true;
+                handle_game_over_menu_click(mouse_pos, &resources, &context.state);
             }
             break;
 
         case MENU_SETTINGS:
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                handle_settings_menu_click(mouse_pos, &resources, &current_game_state);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                context.needs_redraw = true;
+                handle_settings_menu_click(mouse_pos, &resources, &context.state);
             }
             break;
 
         case GAME_STATE_EXIT:
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                handle_exit_menu_click(mouse_pos, &resources, &current_game_state, &exit_flag);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                context.needs_redraw = true;
+                handle_exit_menu_click(mouse_pos, &resources, &context.state, &exit_flag);
             }
             break;
 
         case MENU_DIFF_CHOICE:
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                handle_game_mode_menu_click(mouse_pos, &resources, &current_game_state);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                context.needs_redraw = true;
+                handle_game_mode_menu_click(mouse_pos, &resources, &context.state);
             }
             break;
         case MENU_INSTRUCTIONS:
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                handle_instructions_menu_click(mouse_pos, &resources, &current_game_state);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                context.needs_redraw = true;
+                handle_instructions_menu_click(mouse_pos, &resources, &context.state);
             }
             break;
         default:
             break;
         }
-        // Drawing
         BeginDrawing();
         ClearBackground(LIME);
-        switch (current_game_state)
+        switch (context.state)
         {
         case GAME_STATE_MENU:
             render_menu(&resources);
@@ -99,7 +115,7 @@ int main(void)
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
             render_grid(&resources);
-            render_game_over(&current_game_state);
+            render_game_over(&context.state);
             break;
 
         case MENU_INSTRUCTIONS:
