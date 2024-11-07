@@ -2,6 +2,7 @@
 #include <buttons.h>
 #include "handlers.h"
 #include <raylib.h>
+#include <stddef.h>
 #include <utils.h>
 
 static void render_buttons(

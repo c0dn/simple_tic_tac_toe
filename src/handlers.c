@@ -3,7 +3,7 @@
 #include <buttons.h>
 #include <menu.h>
 #include <render.h>
-#include <utils.h>
+#include <stddef.h>
 
 
 void handle_game_click(const Vector2 mouse_pos, const float screen_width, const float screen_height,
