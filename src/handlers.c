@@ -6,13 +6,12 @@
 #include <stddef.h>
 
 
-void handle_game_click(const Vector2 mouse_pos, const float screen_width, const float screen_height,
-                       const GameResources* resources, GameState* state)
+void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, GameState* state)
 {
-    const float grid_size = screen_width < screen_height ? screen_width * 0.6f : screen_height * 0.6f;
+    const float grid_size = (float)GetScreenWidth() < (float)GetScreenHeight() ? (float)GetScreenWidth() * 0.6f : (float)GetScreenHeight() * 0.6f;
     const int cell_size = (int)grid_size / 3;
-    const int start_x = (int)(screen_width - grid_size) / 2;
-    const int start_y = (int)(screen_height - grid_size) / 2;
+    const int start_x = (int)((float)GetScreenWidth() - grid_size) / 2;
+    const int start_y = (int)((float)GetScreenHeight() - grid_size) / 2;
 
     // Convert mouse position to board coordinates
     const int row = ((int)mouse_pos.y - start_y) / cell_size;

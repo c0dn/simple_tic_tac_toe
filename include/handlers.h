@@ -4,8 +4,8 @@
 #include <menu.h>
 #include <raylib.h>
 
-void handle_game_click(Vector2 mouse_pos, float screen_width, float screen_height,
-    const GameResources* resources, GameState* state);
+void handle_game_click(Vector2 mouse_pos,
+                       const GameResources* resources, GameState* state);
 
 void handle_menu_click(Vector2 mouse_pos, const GameResources* resources, GameState* state);
 void handle_settings_menu_click(Vector2 mouse_pos, const GameResources* resources, GameState* state);
