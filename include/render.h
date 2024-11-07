@@ -40,7 +40,7 @@ typedef struct {
     const ComponentPadding padding;
     const bool rounded;
     const int font_size;
-    void (*action)(const GameResources*, GameState*);
+    void (*action)(const GameResources*, GameContext*);
 } Button;
 
 
@@ -48,7 +48,7 @@ void render_grid(const GameResources* resources);
 void render_menu(
     const GameResources* resources);
 void render_game_over(
-    const GameState* state);
+    const GameContext* context);
 void render_instructions(
     const GameResources* resources);
 void render_settings(void);

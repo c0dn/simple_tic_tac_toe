@@ -131,12 +131,13 @@ void render_menu(const GameResources* resources)
 }
 
 
-void render_game_over(const GameState* state)
+void render_game_over(const GameContext* context)
 {
     // Constants
-    static const char* const PLAYER1_WIN_MSG = "Player 1 Wins!";
-    static const char* const PLAYER2_WIN_MSG = "Player 2 Wins!";
-    static const char* const DRAW_MSG = "It's a Draw!";
+    static const char PLAYER1_WIN_MSG[] = "Player 1 Wins!";
+    static const char PLAYER2_WIN_MSG[] = "Player 2 Wins!";
+    static const char DRAW_MSG[] = "A draw. How droll.";
+    static const char LOSE_MSG[] = "You lose!";
 
     // Draw a semi-transparent background
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, 200});
@@ -152,7 +153,7 @@ void render_game_over(const GameState* state)
 
     // Determine the message based on game state
     const char* message;
-    switch (*state)
+    switch (context->state)
     {
     case GAME_STATE_P1_WIN: message = PLAYER1_WIN_MSG;
         break;
@@ -163,6 +164,11 @@ void render_game_over(const GameState* state)
     default:
         TraceLog(LOG_WARNING, "Invalid game state in render_game_over");
         message = "";
+    }
+
+    if (is_computer_win(context))
+    {
+        message = LOSE_MSG;
     }
 
     const struct Cords text_c = calculate_text_xy_offset(
