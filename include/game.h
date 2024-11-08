@@ -48,16 +48,21 @@ typedef struct {
     bool needs_redraw;
     GameState state;
     GameMode selected_game_mode;
+    player_t player_1;
+    bool computer_enabled;
 } GameContext;
 
 
 
-void initialize_game(const GameResources* res, GameState* state);
+void initialize_game(const GameResources* res, GameContext* context);
 bool is_cell_empty(int row, int col);
 bool check_win(player_t player);
 bool check_draw(void);
 player_t get_cell(int row, int col);
 void set_cell(int row, int col, player_t player);
+bool is_computer_win(const GameContext* context);
+player_t get_human_player(const GameContext* context);
+player_t get_computer_player(const GameContext* context);
 
 
 #endif // GAME_H

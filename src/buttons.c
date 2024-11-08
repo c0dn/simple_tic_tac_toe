@@ -1,62 +1,70 @@
 #include "buttons.h"
 
 // Button click handlers
-static void start_easy_mode(const GameResources* res, GameState* game_state)
+static void start_easy_mode(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
-    initialize_game(res, game_state);
-    *game_state = GAME_STATE_PLAYING;
+    context->selected_game_mode = ONE_PLAYER_EASY;
+    context->computer_enabled = true;
+    initialize_game(res, context);
+    context->state = GAME_STATE_PLAYING;
 }
 
-static void start_medium_mode(const GameResources* res, GameState* game_state)
+static void start_medium_mode(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
-    initialize_game(res, game_state);
-    *game_state = GAME_STATE_PLAYING;
+    context->selected_game_mode = ONE_PLAYER_MEDIUM;
+    context->computer_enabled = true;
+    initialize_game(res, context);
+    context->state = GAME_STATE_PLAYING;
 }
 
-static void start_hard_mode(const GameResources* res, GameState* game_state)
+static void start_hard_mode(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
-    initialize_game(res, game_state);
-    *game_state = GAME_STATE_PLAYING;
+    context->selected_game_mode = ONE_PLAYER_HARD;
+    context->computer_enabled = true;
+    initialize_game(res, context);
+    context->state = GAME_STATE_PLAYING;
 }
 
-static void return_to_menu(const GameResources* res, GameState* game_state)
+static void return_to_menu(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
-    *game_state = GAME_STATE_MENU;
+    context->state = GAME_STATE_MENU;
 }
 
-static void start_1player(const GameResources* res, GameState* game_state)
+static void start_1player(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
-    *game_state = MENU_DIFF_CHOICE;
+    context->state = MENU_DIFF_CHOICE;
 }
 
-static void start_2player(const GameResources* res, GameState* game_state)
+static void start_2player(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
-    initialize_game(res, game_state);
-    *game_state = GAME_STATE_PLAYING;
+    context->selected_game_mode = TWO_PLAYER;
+    context->computer_enabled = false;
+    initialize_game(res, context);
+    context->state = GAME_STATE_PLAYING;
 }
 
-static void show_instructions(const GameResources* res, GameState* game_state)
+static void show_instructions(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
-    *game_state = MENU_INSTRUCTIONS;
+    context->state = MENU_INSTRUCTIONS;
 }
 
-static void show_settings(const GameResources* res, GameState* game_state)
+static void show_settings(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
-    *game_state = MENU_SETTINGS;
+    context->state = MENU_SETTINGS;
 }
 
-static void show_exit_confirmation(const GameResources* res, GameState* game_state)
+static void show_exit_confirmation(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
-    *game_state = GAME_STATE_EXIT;
+    context->state = GAME_STATE_EXIT;
 }
 
 

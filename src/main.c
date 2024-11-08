@@ -24,6 +24,8 @@ int main(void)
         .needs_redraw = true,
         .state = GAME_STATE_MENU,
         .selected_game_mode = TWO_PLAYER,
+        .player_1 = PLAYER_X,
+        .computer_enabled = false
     };
 
     InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
@@ -46,14 +48,14 @@ int main(void)
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 context.needs_redraw = true;
-                handle_menu_click(mouse_pos, &resources, &context.state);
+                handle_menu_click(mouse_pos, &resources, &context);
             }
             break;
         case GAME_STATE_PLAYING:
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || IsGestureDetected(GESTURE_TAP))
             {
                 context.needs_redraw = true;
-                handle_game_click(mouse_pos, &resources, &context.state);
+                handle_game_click(mouse_pos, &resources, &context);
             }
 
             break;
@@ -64,7 +66,7 @@ int main(void)
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 context.needs_redraw = true;
-                handle_game_over_menu_click(mouse_pos, &resources, &context.state);
+                handle_game_over_menu_click(mouse_pos, &resources, &context);
             }
             break;
 
@@ -72,7 +74,7 @@ int main(void)
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 context.needs_redraw = true;
-                handle_settings_menu_click(mouse_pos, &resources, &context.state);
+                handle_settings_menu_click(mouse_pos, &resources, &context);
             }
             break;
 
@@ -80,7 +82,7 @@ int main(void)
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 context.needs_redraw = true;
-                handle_exit_menu_click(mouse_pos, &resources, &context.state, &exit_flag);
+                handle_exit_menu_click(mouse_pos, &resources, &context, &exit_flag);
             }
             break;
 
@@ -88,14 +90,14 @@ int main(void)
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 context.needs_redraw = true;
-                handle_game_mode_menu_click(mouse_pos, &resources, &context.state);
+                handle_game_mode_menu_click(mouse_pos, &resources, &context);
             }
             break;
         case MENU_INSTRUCTIONS:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 context.needs_redraw = true;
-                handle_instructions_menu_click(mouse_pos, &resources, &context.state);
+                handle_instructions_menu_click(mouse_pos, &resources, &context);
             }
             break;
         default:
@@ -115,7 +117,7 @@ int main(void)
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
             render_grid(&resources);
-            render_game_over(&context.state);
+            render_game_over(&context);
             break;
 
         case MENU_INSTRUCTIONS:

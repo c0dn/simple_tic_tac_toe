@@ -5,21 +5,12 @@ uint16_t o_board;
 player_t current_player;
 
 
-/**
- * @brief Initializes the game by clearing bitboards and setting the initial state.
- *
- * @param state Pointer to GameState that will be set to GAME_STATE_PLAYING.
- *
- * @details
- * Sets both x_board and o_board bitboards to 0 (empty)
- * - Initializes game state to GAME_STATE_PLAYING
- * - Sets current_player to PLAYER_X to start the game
- */
-void initialize_game(const GameResources* res, GameState* state)
+
+void initialize_game(const GameResources* res, GameContext* context)
 {
     x_board = 0;
     o_board = 0;
-    *state = GAME_STATE_PLAYING;
+    context->state = GAME_STATE_PLAYING;
     current_player = PLAYER_X;
 }
 
@@ -135,4 +126,46 @@ void set_cell(const int row, const int col, const player_t player)
     {
         o_board |= pos;
     }
+}
+
+/**
+ * @brief Checks if the computer has won the game
+ *
+ * @param context Pointer to the current game context
+ * @return true if the computer is enabled and has won the game
+ * @return false if the computer is not enabled or has not won
+ *
+ * @details
+ * Verifies if computer mode is active before
+ * - Checking if the game state indicates a Player 2 (computer) victory
+ *
+ * @note Assumes computer is always Player 2 in single-player modes
+ */
+bool is_computer_win(const GameContext* context) {
+    return context->computer_enabled &&
+           context->state == GAME_STATE_P2_WIN;
+}
+
+/**
+ * @brief Determines the human player based on game context
+ *
+ * @param context Pointer to the current game context
+ * @return player_t The player representing the human (either PLAYER_X or PLAYER_O)
+ *
+ * @note Returns the player set as player_1 in the game context
+ */
+player_t get_human_player(const GameContext* context) {
+    return context->player_1;
+}
+
+/**
+ * @brief Determines the computer player based on game context
+ *
+ * @param context Pointer to the current game context
+ * @return player_t The player representing the computer (opposite of player_1)
+ *
+ * @note Returns the player not set as player_1 in the game context
+ */
+player_t get_computer_player(const GameContext* context) {
+    return context->player_1 == PLAYER_X ? PLAYER_O : PLAYER_X;
 }

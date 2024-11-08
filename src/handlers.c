@@ -1,14 +1,16 @@
 #include "handlers.h"
 
 #include <buttons.h>
+#include <computer.h>
 #include <menu.h>
 #include <render.h>
 #include <stddef.h>
 
-
-void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, GameState* state)
+void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
-    const float grid_size = (float)GetScreenWidth() < (float)GetScreenHeight() ? (float)GetScreenWidth() * 0.6f : (float)GetScreenHeight() * 0.6f;
+    const float grid_size = (float)GetScreenWidth() < (float)GetScreenHeight()
+                                ? (float)GetScreenWidth() * 0.6f
+                                : (float)GetScreenHeight() * 0.6f;
     const int cell_size = (int)grid_size / 3;
     const int start_x = (int)((float)GetScreenWidth() - grid_size) / 2;
     const int start_y = (int)((float)GetScreenHeight() - grid_size) / 2;
@@ -25,22 +27,51 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
 
         if (check_draw())
         {
-            *state = GAME_STATE_DRAW;
+            context->state = GAME_STATE_DRAW;
             PlaySound(resources->fx_draw);
         }
         else if (check_win(current_player))
         {
-            *state = current_player == PLAYER_X ? GAME_STATE_P1_WIN : GAME_STATE_P2_WIN;
-            PlaySound(resources->fx_win);
+            context->state = current_player == PLAYER_X
+                ? GAME_STATE_P1_WIN
+                : GAME_STATE_P2_WIN;
+
+            if (!is_computer_win(context))
+            {
+                PlaySound(resources->fx_win);
+            }
+
         }
         else
         {
             current_player = current_player == PLAYER_X ? PLAYER_O : PLAYER_X;
         }
     }
+
+    if (context->computer_enabled &&
+        current_player == get_computer_player(context))
+    {
+        computer_move(context);
+        PlaySound(resources->fx_symbol);
+
+        if (check_draw())
+        {
+            context->state = GAME_STATE_DRAW;
+            PlaySound(resources->fx_draw);
+        }
+        else if (check_win(PLAYER_O))
+        {
+            context->state = GAME_STATE_P2_WIN;
+            PlaySound(resources->fx_win);
+        }
+        else
+        {
+            current_player = PLAYER_X;
+        }
+    }
 }
 
-void handle_settings_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameState* state)
+void handle_settings_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
     const size_t button_count = sizeof(SETTINGS_BUTTONS) / sizeof(Button);
     for (int i = 0; i < button_count; i++)
@@ -69,14 +100,14 @@ void handle_settings_menu_click(const Vector2 mouse_pos, const GameResources* re
                 }
                 break;
             case 3: // Back
-                *state = GAME_STATE_MENU;
+                context->state = GAME_STATE_MENU;
                 break;
             }
         }
     }
 }
 
-void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameState* state, bool* exit_flag)
+void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context, bool* exit_flag)
 {
     const size_t button_count = sizeof(EXIT_CONFIRMATION_BUTTONS) / sizeof(Button);
 
@@ -94,14 +125,14 @@ void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resour
                 *exit_flag = true;
                 break;
             case 1: // Back to main menu
-                *state = GAME_STATE_MENU;
+                context->state = GAME_STATE_MENU;
                 break;
             }
         }
     }
 }
 
-void handle_game_mode_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameState* state)
+void handle_game_mode_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
     for (int i = 0; i < button_count; i++)
@@ -111,12 +142,12 @@ void handle_game_mode_menu_click(const Vector2 mouse_pos, const GameResources* r
             IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
             btn.action)
         {
-            btn.action(resources, state);
+            btn.action(resources, context);
         }
     }
 }
 
-void handle_instructions_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameState* state)
+void handle_instructions_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
     static const float btn_width = 330.0f;
     static const float btn_height = 100.0f;
@@ -133,12 +164,12 @@ void handle_instructions_menu_click(const Vector2 mouse_pos, const GameResources
         IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
         PlaySound(resources->fx_click);
-        *state = GAME_STATE_MENU;
+        context->state = GAME_STATE_MENU;
     }
 }
 
 
-void handle_game_over_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameState* state)
+void handle_game_over_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
     const size_t button_count = sizeof(GAME_OVER_BUTTONS) / sizeof(Button);
 
@@ -150,12 +181,12 @@ void handle_game_over_menu_click(const Vector2 mouse_pos, const GameResources* r
             IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
             btn.action)
         {
-            btn.action(resources, state);
+            btn.action(resources, context);
         }
     }
 }
 
-void handle_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameState* state)
+void handle_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
     const size_t button_count = sizeof(MAIN_MENU_BUTTONS) / sizeof(Button);
 
@@ -167,7 +198,7 @@ void handle_menu_click(const Vector2 mouse_pos, const GameResources* resources, 
             IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
             btn.action)
         {
-            btn.action(resources, state);
+            btn.action(resources, context);
         }
     }
 }
