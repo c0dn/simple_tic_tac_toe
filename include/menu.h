@@ -10,9 +10,9 @@ typedef struct {
     Sound fx_symbol;
     Sound fx_win;
     Sound fx_draw;
-    Texture2D background_texture;
-    Texture2D instructions_texture1;
-    Texture2D instructions_texture2;
+    Texture2D main_menu_img;
+    Texture2D instructions_1;
+    Texture2D instructions_2;
 } GameResources;
 
 GameResources load_game_resources(int screen_width, int screen_height);

@@ -104,7 +104,7 @@ int main(void)
             break;
         }
         BeginDrawing();
-        ClearBackground(LIME);
+        ClearBackground(RAYWHITE);
         switch (context.state)
         {
         case GAME_STATE_MENU:

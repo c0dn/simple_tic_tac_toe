@@ -1,9 +1,9 @@
 #include "utils.h"
 #include <raylib.h>
 
-struct BoxDimensions calculate_centered_box_dimensions(const float width_percentage, const float height_percentage)
+BoxDimensions calculate_centered_box_dimensions(const float width_percentage, const float height_percentage)
 {
-    struct BoxDimensions box;
+    BoxDimensions box;
     box.width = (float)GetScreenWidth() * width_percentage;
     box.height = (float)GetScreenHeight() * height_percentage;
     box.x = ((float)GetScreenWidth() - box.width) / 2;
@@ -32,7 +32,7 @@ Rectangle calculate_button_rectangle(
 
 
 
-struct Cords calculate_centered_text_xy(
+Coords calculate_centered_text_xy(
     const char* message,
     const int font_size,
     const float ref_x,
@@ -41,14 +41,14 @@ struct Cords calculate_centered_text_xy(
     const float ref_height
 ) {
     const int text_width = MeasureText(message, font_size);
-    struct Cords cord;
+    Coords cord;
     cord.x = ref_x + (ref_width - (float)text_width) / 2;
     cord.y = ref_y + (ref_height - (float)font_size) / 2;
     return cord;
 }
 
 
-struct Cords calculate_text_xy_offset(
+Coords calculate_text_xy_offset(
     const char* message,
     const int font_size,
     const float ref_x,
@@ -59,7 +59,7 @@ struct Cords calculate_text_xy_offset(
     const float horizontal_offset_percent
 ) {
     const int text_width = MeasureText(message, font_size);
-    struct Cords cord;
+    Coords cord;
     cord.x = ref_x + ref_width * horizontal_offset_percent - (float)text_width / 2;
     cord.y = ref_y + ref_height * vertical_offset_percent - (float)font_size / 2;
     return cord;

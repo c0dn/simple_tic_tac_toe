@@ -3,19 +3,20 @@
 #include <raylib.h>
 #include <render.h>
 
-struct BoxDimensions
+typedef struct
 {
     float width;
     float height;
     float x;
     float y;
-};
+} BoxDimensions;
 
-struct Cords
+typedef struct
 {
     float x;
     float y;
-};
+} Coords;
+
 
 Rectangle calculate_button_rectangle(
     float btn_width,
@@ -25,9 +26,9 @@ Rectangle calculate_button_rectangle(
     int index
 );
 
-struct BoxDimensions calculate_centered_box_dimensions(float width_percentage, float height_percentage);
+BoxDimensions calculate_centered_box_dimensions(float width_percentage, float height_percentage);
 
-struct Cords calculate_centered_text_xy(
+Coords calculate_centered_text_xy(
     const char* message,
     int font_size,
     float ref_x,
@@ -36,7 +37,7 @@ struct Cords calculate_centered_text_xy(
     float ref_height
 );
 
-struct Cords calculate_text_xy_offset(
+Coords calculate_text_xy_offset(
     const char* message,
     int font_size,
     float ref_x,

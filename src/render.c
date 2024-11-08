@@ -34,7 +34,7 @@ static void render_buttons(
         }
 
         // Center text
-        const struct Cords cords = calculate_centered_text_xy(
+        const Coords cords = calculate_centered_text_xy(
             buttons[i].text,
             buttons[i].font_size,
             buttons[i].rect.x,
@@ -50,7 +50,7 @@ static void render_buttons(
 
 void render_grid(const GameResources* resources)
 {
-    const Texture background_texture = resources->background_texture;
+    const Texture background_texture = resources->main_menu_img;
     DrawTexture(background_texture, 0, 0, WHITE);
     DrawRectangleLines(GetScreenWidth() / 2 - background_texture.width / 2,
                        GetScreenHeight() / 2 - background_texture.height / 2,
@@ -107,15 +107,8 @@ void render_menu(const GameResources* resources)
     static const int FONT_SIZE = 70;
 
 
-    // Draw background
-    const Texture background_texture = resources->background_texture;
-    DrawTexture(background_texture, 0, 0, WHITE);
-    DrawRectangleLines(GetScreenWidth() / 2 - background_texture.width / 2,
-                       GetScreenHeight() / 2 - background_texture.height / 2,
-                       background_texture.width, background_texture.height, LIME);
-
     // Title rendering
-    const struct Cords title_c = calculate_centered_text_xy(
+    const Coords title_c = calculate_centered_text_xy(
         TITLE,
         FONT_SIZE,
         0,
@@ -144,7 +137,7 @@ void render_game_over(const GameContext* context)
 
 
     // Calculate message box dimensions
-    const struct BoxDimensions box = calculate_centered_box_dimensions(0.5f, 0.4f);
+    const BoxDimensions box = calculate_centered_box_dimensions(0.5f, 0.4f);
 
     // Draw message box
     DrawRectangle((int)box.x, (int)box.y, (int)box.width, (int)box.height, DARKGRAY);
@@ -171,7 +164,7 @@ void render_game_over(const GameContext* context)
         message = LOSE_MSG;
     }
 
-    const struct Cords text_c = calculate_text_xy_offset(
+    const Coords text_c = calculate_text_xy_offset(
         message,
         40,
         box.x,
@@ -202,7 +195,7 @@ void render_instructions(const GameResources* resources)
     };
 
     // Title rendering
-    const struct Cords title_c = calculate_centered_text_xy(
+    const Coords title_c = calculate_centered_text_xy(
         TITLE,
         FONT_SIZE,
         0,
@@ -222,9 +215,9 @@ void render_instructions(const GameResources* resources)
     const int instructions_x = (int)((float)GetScreenWidth() / 2 * 0.3f);
 
     // Render instruction image
-    DrawTexture(resources->instructions_texture1,
+    DrawTexture(resources->instructions_1,
                 instructions_x, (int)((float)GetScreenHeight() / 2 * 0.7f), WHITE);
-    DrawTexture(resources->instructions_texture2,
+    DrawTexture(resources->instructions_2,
                 instructions_x, (int)((float)GetScreenHeight() / 2 * 1.08f), WHITE);
 
     render_buttons(INSTRUCTIONS_BUTTONS, 1);
@@ -237,7 +230,7 @@ void render_settings(void)
     static const char TITLE[] = "SETTINGS";
 
     // Title rendering
-    const struct Cords title_c = calculate_centered_text_xy(
+    const Coords title_c = calculate_centered_text_xy(
         TITLE,
         70,
         0,
@@ -256,14 +249,14 @@ void render_settings(void)
 void render_exit(void)
 {
     // Calculate message box dimensions
-    const struct BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.3f);
+    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.3f);
     // Draw message box
     DrawRectangle((int)box_dim.x, (int)box_dim.y, (int)box_dim.width, (int)box_dim.height, DARKGRAY);
     DrawRectangleLinesEx((Rectangle){box_dim.x, box_dim.y, box_dim.width, box_dim.height}, 4, RAYWHITE);
 
     // Draw message
     const char message[] = "Do you want to exit?";
-    const struct Cords text_cords = calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width,
+    const Coords text_cords = calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width,
                                                                box_dim.height);
 
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
@@ -276,7 +269,7 @@ void render_exit(void)
 void render_game_mode_choice(void)
 {
     // Calculate message box dimensions
-    const struct BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f);
+    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f);
 
     // Draw message box
     DrawRectangle((int)box_dim.x, (int)box_dim.y, (int)box_dim.width, (int)box_dim.height, DARKGRAY);
@@ -284,7 +277,7 @@ void render_game_mode_choice(void)
 
     // Draw message
     const char message[] = "Choose game mode!";
-    const struct Cords text_cords = calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width,
+    const Coords text_cords = calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width,
                                                                box_dim.height);
 
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
