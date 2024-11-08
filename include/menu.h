@@ -15,6 +15,10 @@ typedef struct {
     Texture2D instructions_2;
 } GameResources;
 
+typedef struct {
+    Color background_color;
+} UiOptions;
+
 GameResources load_game_resources(int screen_width, int screen_height);
 void unload_game_resources(const GameResources* resources);
 

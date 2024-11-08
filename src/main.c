@@ -28,6 +28,10 @@ int main(void)
         .computer_enabled = false
     };
 
+    const UiOptions render_options = {
+        .background_color = { 226, 232, 240, 255 },
+    };
+
     InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
     InitAudioDevice();
 
@@ -104,36 +108,35 @@ int main(void)
             break;
         }
         BeginDrawing();
-        ClearBackground(RAYWHITE);
         switch (context.state)
         {
         case GAME_STATE_MENU:
-            render_menu(&resources);
+            render_menu(&resources, &render_options);
             break;
         case GAME_STATE_PLAYING:
-            render_grid(&resources);
+            render_grid(&resources, &render_options);
             break;
         case GAME_STATE_P1_WIN:
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
-            render_grid(&resources);
-            render_game_over(&context);
+            render_grid(&resources, &render_options);
+            render_game_over(&context, &render_options);
             break;
 
         case MENU_INSTRUCTIONS:
-            render_instructions(&resources);
+            render_instructions(&resources, &render_options);
             break;
 
         case MENU_SETTINGS:
-            render_settings();
+            render_settings(&render_options);
             break;
 
         case GAME_STATE_EXIT:
-            render_exit();
+            render_exit(&render_options);
             break;
 
         case MENU_DIFF_CHOICE:
-            render_game_mode_choice();
+            render_game_mode_choice(&render_options);
             break;
 
         default:

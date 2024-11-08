@@ -16,19 +16,29 @@ Rectangle calculate_button_rectangle(
     const ComponentPadding btn_padding,
     const float btn_height,
     const float first_button_offset,
-    const int index
+    const int index, const int buttons_per_row
+
 ) {
     const float btn_spacing = btn_padding.up + btn_padding.down;
+    const float horizontal_spacing = btn_padding.left + btn_padding.right;
     const float start_y = (float)GetScreenHeight() / 2 - btn_height / 2 + first_button_offset;
-    const float btn_x = (float)GetScreenWidth() / 2.0f - (btn_width + btn_padding.left + btn_padding.right) / 2.0f;
+
+    // Calculate total width of all buttons in a row including spacing
+    const float total_row_width = (float)buttons_per_row * btn_width + ((float)buttons_per_row - 1) * horizontal_spacing;
+    const float base_x = (float)GetScreenWidth() / 2.0f - total_row_width / 2;
+
+    // Calculate row and column based on buttons_per_row
+    const int row = index / buttons_per_row;
+    const int col = index % buttons_per_row;
 
     return (Rectangle){
-        btn_x + btn_padding.left,
-        start_y + index * btn_spacing + index * btn_height,
+        base_x + col * (btn_width + horizontal_spacing),
+        start_y + row * (btn_height + btn_spacing),
         btn_width,
         btn_height
     };
 }
+
 
 
 

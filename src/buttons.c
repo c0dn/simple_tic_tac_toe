@@ -68,7 +68,7 @@ static void show_exit_confirmation(const GameResources* res, GameContext* contex
 }
 
 
-Button SETTINGS_BUTTONS[4] = {
+Button SETTINGS_BUTTONS[] = {
     {
         .text = "Play",
         .color = LIGHTGRAY,
@@ -114,7 +114,7 @@ Button SETTINGS_BUTTONS[4] = {
         .font_size = 30,
     }
 };
-Button GAME_MODE_BUTTONS[3] = {
+Button GAME_MODE_BUTTONS[] = {
     {
         .text = "Easy",
         .color = YELLOW,
@@ -224,60 +224,48 @@ Button GAME_OVER_BUTTONS[] = {
 Button MAIN_MENU_BUTTONS[] = {
     {
         .text = "1 Player",
-        .color = BLUE,
+        .color = GOLD,
         .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 70.0f,
-        .first_render_offset = -300.0f,
-        .padding = PaddingY(30.0f),
+        .width = 200.0f,
+        .height = 60.0f,
+        .first_render_offset = 100.0f,
+        .padding = {20, 20, 10, 10},
         .rounded = true,
         .font_size = 30,
         .action = start_1player
     },
     {
         .text = "2 Player",
-        .color = BLUE,
+        .color = GOLD,
         .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 70.0f,
-        .first_render_offset = -300.0f,
-        .padding = PaddingY(30.0f),
+        .width = 200.0f,
+        .height = 60.0f,
+        .first_render_offset = 100.0f,
+        .padding = {20, 20, 10, 10},
         .rounded = true,
         .font_size = 30,
         .action = start_2player
     },
     {
         .text = "How To Play",
-        .color = BLUE,
+        .color = GOLD,
         .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 70.0f,
-        .first_render_offset = -300.0f,
-        .padding = PaddingY(30.0f),
+        .width = 200.0f,
+        .height = 60.0f,
+        .first_render_offset = 120.0f,
+        .padding = {20, 20, 10, 10},
         .rounded = true,
         .font_size = 30,
         .action = show_instructions
     },
     {
-        .text = "Settings",
-        .color = BLUE,
-        .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 70.0f,
-        .first_render_offset = -300.0f,
-        .padding = PaddingY(30.0f),
-        .rounded = true,
-        .font_size = 30,
-        .action = show_settings
-    },
-    {
         .text = "Exit",
-        .color = BLUE,
+        .color = GOLD,
         .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 70.0f,
-        .first_render_offset = -300.0f,
-        .padding = PaddingY(30.0f),
+        .width = 200.0f,
+        .height = 60.0f,
+        .first_render_offset = 120.0f,
+        .padding = {20, 20, 10, 10},
         .rounded = true,
         .font_size = 30,
         .action = show_exit_confirmation

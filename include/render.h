@@ -44,14 +44,14 @@ typedef struct {
 } Button;
 
 
-void render_grid(const GameResources* resources);
+void render_grid(const GameResources* resources, const UiOptions* render_opts);
 void render_menu(
-    const GameResources* resources);
+    const GameResources* resources, const UiOptions* render_opts);
 void render_game_over(
-    const GameContext* context);
+    const GameContext* context, const UiOptions* render_opts);
 void render_instructions(
-    const GameResources* resources);
-void render_settings(void);
-void render_exit(void);
-void render_game_mode_choice(void);
+    const GameResources* resources, const UiOptions* render_opts);
+void render_settings(const UiOptions* render_opts);
+void render_exit(const UiOptions* render_opts);
+void render_game_mode_choice(const UiOptions* render_opts);
 #endif //RENDER_H

@@ -7,13 +7,14 @@
 
 static void render_buttons(
     Button* buttons,
-    const size_t button_count)
+    const size_t button_count,
+    const int buttons_per_row)
 {
     for (int i = 0; i < button_count; i++)
     {
         Color buttonColor = buttons[i].color;
         buttons[i].rect = calculate_button_rectangle(
-            buttons[i].width, buttons[i].padding, buttons[i].height, buttons[i].first_render_offset, i
+            buttons[i].width, buttons[i].padding, buttons[i].height, buttons[i].first_render_offset, i, buttons_per_row
         );
         // Hover effect
         if (CheckCollisionPointRec(GetMousePosition(), buttons[i].rect))
@@ -48,8 +49,9 @@ static void render_buttons(
 }
 
 
-void render_grid(const GameResources* resources)
+void render_grid(const GameResources* resources, const UiOptions* render_opts)
 {
+    ClearBackground(render_opts->background_color);
     const Texture background_texture = resources->main_menu_img;
     DrawTexture(background_texture, 0, 0, WHITE);
     DrawRectangleLines(GetScreenWidth() / 2 - background_texture.width / 2,
@@ -100,11 +102,13 @@ void render_grid(const GameResources* resources)
 }
 
 
-void render_menu(const GameResources* resources)
+void render_menu(const GameResources* resources, const UiOptions* render_opts)
 {
     // Constants
     static const char TITLE[] = "TIC-TAC-TOE";
     static const int FONT_SIZE = 70;
+
+    ClearBackground(render_opts->background_color);
 
 
     // Title rendering
@@ -118,14 +122,26 @@ void render_menu(const GameResources* resources)
     );
     DrawText(TITLE, (int)title_c.x, (int)title_c.y, FONT_SIZE, DARKPURPLE);
 
+    const float image_scale = 0.3f;
+    const float scaled_width = (float)resources->main_menu_img.width * image_scale;
+    const float scaled_height = (float)resources->main_menu_img.height * image_scale;
+    const Vector2 image_pos = {
+        (GetScreenWidth() - scaled_width) / 2,
+        (GetScreenHeight() - scaled_height) / 4
+    };
+
+
+    DrawTextureEx(resources->main_menu_img, image_pos, 0.0f, image_scale, WHITE);
+
     const size_t button_count = sizeof(MAIN_MENU_BUTTONS) / sizeof(Button);
 
-    render_buttons(MAIN_MENU_BUTTONS, button_count);
+    render_buttons(MAIN_MENU_BUTTONS, button_count, 2);
 }
 
 
-void render_game_over(const GameContext* context)
+void render_game_over(const GameContext* context, const UiOptions* render_opts)
 {
+    ClearBackground(render_opts->background_color);
     // Constants
     static const char PLAYER1_WIN_MSG[] = "Player 1 Wins!";
     static const char PLAYER2_WIN_MSG[] = "Player 2 Wins!";
@@ -178,12 +194,13 @@ void render_game_over(const GameContext* context)
 
     DrawText(message, (int)text_c.x, (int)text_c.y, 40, RAYWHITE);
     const size_t button_count = sizeof(GAME_OVER_BUTTONS) / sizeof(Button);
-    render_buttons(GAME_OVER_BUTTONS, button_count);
+    render_buttons(GAME_OVER_BUTTONS, button_count, 1);
 }
 
 
-void render_instructions(const GameResources* resources)
+void render_instructions(const GameResources* resources, const UiOptions* render_opts)
 {
+    ClearBackground(render_opts->background_color);
     // Constants
     static const char TITLE[] = "INSTRUCTIONS";
     static const int FONT_SIZE = 70;
@@ -220,12 +237,13 @@ void render_instructions(const GameResources* resources)
     DrawTexture(resources->instructions_2,
                 instructions_x, (int)((float)GetScreenHeight() / 2 * 1.08f), WHITE);
 
-    render_buttons(INSTRUCTIONS_BUTTONS, 1);
+    render_buttons(INSTRUCTIONS_BUTTONS, 1, 1);
 }
 
 
-void render_settings(void)
+void render_settings(const UiOptions* render_opts)
 {
+    ClearBackground(render_opts->background_color);
     // Constants
     static const char TITLE[] = "SETTINGS";
 
@@ -242,12 +260,13 @@ void render_settings(void)
 
     const size_t button_count = sizeof(SETTINGS_BUTTONS) / sizeof(Button);
 
-    render_buttons(SETTINGS_BUTTONS, button_count);
+    render_buttons(SETTINGS_BUTTONS, button_count, 1);
 }
 
 
-void render_exit(void)
+void render_exit(const UiOptions* render_opts)
 {
+    ClearBackground(render_opts->background_color);
     // Calculate message box dimensions
     const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.3f);
     // Draw message box
@@ -262,12 +281,13 @@ void render_exit(void)
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
 
     const size_t button_count = sizeof(EXIT_CONFIRMATION_BUTTONS) / sizeof(Button);
-    render_buttons(EXIT_CONFIRMATION_BUTTONS, button_count);
+    render_buttons(EXIT_CONFIRMATION_BUTTONS, button_count, 1);
 }
 
 
-void render_game_mode_choice(void)
+void render_game_mode_choice(const UiOptions* render_opts)
 {
+    ClearBackground(render_opts->background_color);
     // Calculate message box dimensions
     const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f);
 
@@ -284,5 +304,5 @@ void render_game_mode_choice(void)
 
 
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
-    render_buttons(GAME_MODE_BUTTONS, button_count);
+    render_buttons(GAME_MODE_BUTTONS, button_count, 1);
 }

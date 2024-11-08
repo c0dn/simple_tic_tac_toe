@@ -23,7 +23,7 @@ Rectangle calculate_button_rectangle(
     ComponentPadding btn_padding,
     float btn_height,
     float first_button_offset,
-    int index
+    int index, int buttons_per_row
 );
 
 BoxDimensions calculate_centered_box_dimensions(float width_percentage, float height_percentage);
