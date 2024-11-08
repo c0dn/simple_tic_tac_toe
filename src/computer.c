@@ -1,11 +1,11 @@
 #include "computer.h"
 
 
-MiniMaxResult minimax(const player_t current_player) {
+EvalResult minimax(const player_t current_player) {
     // Check win conditions
-    if (check_win(PLAYER_X)) return (MiniMaxResult){-1, -1};
-    if (check_win(PLAYER_O)) return (MiniMaxResult){1, -1};
-    if (check_draw()) return (MiniMaxResult){0, -1};
+    if (check_win(PLAYER_X)) return (EvalResult){-1, -1};
+    if (check_win(PLAYER_O)) return (EvalResult){1, -1};
+    if (check_draw()) return (EvalResult){0, -1};
 
     int bestScore = (current_player == PLAYER_O) ? -2 : 2;
     int bestMove = -1;
@@ -20,7 +20,7 @@ MiniMaxResult minimax(const player_t current_player) {
 
         set_cell(row, col, current_player);
 
-        const MiniMaxResult result = minimax(
+        const EvalResult result = minimax(
             current_player == PLAYER_X ? PLAYER_O : PLAYER_X
         );
 
@@ -41,12 +41,12 @@ MiniMaxResult minimax(const player_t current_player) {
         legal_moves &= ~(1 << move);
     }
 
-    return (MiniMaxResult){bestScore, bestMove};
+    return (EvalResult){bestScore, bestMove};
 }
 
 void computer_move(const GameContext* context) {
     const player_t computer_player = get_computer_player(context);
-    const MiniMaxResult result = minimax(computer_player);
+    const EvalResult result = minimax(computer_player);
 
     if (result.move != -1) {
         const int row = result.move / 3;
