@@ -75,15 +75,15 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts)
 
     // Vertical lines
     DrawRectangle(start_x + cell_size - line_thickness / 2, start_y,
-                  line_thickness, grid_size, RAYWHITE);
+                  line_thickness, grid_size, BLACK);
     DrawRectangle(start_x + cell_size * 2 - line_thickness / 2, start_y,
-                  line_thickness, grid_size, RAYWHITE);
+                  line_thickness, grid_size, BLACK);
 
     // Horizontal lines
     DrawRectangle(start_x, start_y + cell_size - line_thickness / 2,
-                  grid_size, line_thickness, RAYWHITE);
+                  grid_size, line_thickness, BLACK);
     DrawRectangle(start_x, start_y + cell_size * 2 - line_thickness / 2,
-                  grid_size, line_thickness, RAYWHITE);
+                  grid_size, line_thickness, BLACK);
 
     const int symbol_size = cell_size / 2;
     for (int i = 0; i < BOARD_SIZE; i++)
@@ -96,7 +96,7 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts)
                 const char* symbol = cell == PLAYER_X ? "X" : "O";
                 const int draw_x = start_x + j * cell_size + (cell_size - symbol_size) / 2;
                 const int draw_y = start_y + i * cell_size + (cell_size - symbol_size) / 2;
-                const Color symbol_color = (cell == PLAYER_X) ? RED : DARKBLUE;
+                const Color symbol_color = (cell == PLAYER_X) ? SKYBLUE : GOLD;
 
                 DrawText(symbol, draw_x, draw_y, symbol_size, symbol_color);
             }
