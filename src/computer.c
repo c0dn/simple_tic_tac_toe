@@ -1,6 +1,19 @@
 #include "computer.h"
 
-
+/**
+ * @brief Minimax algorithm for AI decision making
+ *
+ * Recursively evaluates game tree to find optimal move
+ *
+ * @param current_player Current player (X or O)
+ * @return EvalResult containing score and best move
+ *
+ * Algorithm characteristics:
+ * - Recursive depth-first search
+ * - Maximizes computer's score
+ * - Minimizes player's score
+ * - Handles win, lose, and draw scenarios
+ */
 EvalResult minimax(const player_t current_player) {
     // Check win conditions
     if (check_win(PLAYER_X)) return (EvalResult){-1, -1};
@@ -44,10 +57,18 @@ EvalResult minimax(const player_t current_player) {
     return (EvalResult){bestScore, bestMove};
 }
 
+/**
+ * @brief Execute computer's move using minimax algorithm
+ *
+ * Selects and places optimal move on game board
+ *
+ * @param context Current game context
+ */
 void computer_move(const GameContext* context) {
     const player_t computer_player = get_computer_player(context);
     const EvalResult result = minimax(computer_player);
 
+    // TODO: Add support for other algorithms here, switch between various game mode set in context
     if (result.move != -1) {
         const int row = result.move / 3;
         const int col = result.move % 3;

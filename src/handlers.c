@@ -6,6 +6,15 @@
 #include <render.h>
 #include <stddef.h>
 
+/**
+ * @brief Handle mouse clicks during active game play
+ *
+ * Manages player moves, game state transitions, and computer turns
+ *
+ * @param mouse_pos Current mouse position
+ * @param resources Game asset resources
+ * @param context Current game context
+ */
 void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
     const float grid_size = (float)GetScreenWidth() < (float)GetScreenHeight()
@@ -70,7 +79,14 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
     }
 }
 
-
+/**
+ * @brief Handle clicks in the exit confirmation menu
+ *
+ * @param mouse_pos Current mouse position
+ * @param resources Game asset resources
+ * @param context Current game context
+ * @param exit_flag Pointer to flag controlling game exit
+ */
 void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context,
                             bool* exit_flag)
 {
@@ -97,6 +113,13 @@ void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resour
     }
 }
 
+/**
+ * @brief Handle game mode selection menu interactions
+ *
+ * @param mouse_pos Current mouse position
+ * @param resources Game asset resources
+ * @param context Current game context
+ */
 void handle_game_mode_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
@@ -112,6 +135,13 @@ void handle_game_mode_menu_click(const Vector2 mouse_pos, const GameResources* r
     }
 }
 
+/**
+ * @brief Handle clicks in the instructions menu
+ *
+ * @param mouse_pos Current mouse position
+ * @param resources Game asset resources
+ * @param context Current game context
+ */
 void handle_instructions_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
     static const float btn_width = 330.0f;
@@ -134,6 +164,13 @@ void handle_instructions_menu_click(const Vector2 mouse_pos, const GameResources
 }
 
 
+/**
+ * @brief Handle interactions in game over screen
+ *
+ * @param mouse_pos Current mouse position
+ * @param resources Game asset resources
+ * @param context Current game context
+ */
 void handle_game_over_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
     const size_t button_count = sizeof(GAME_OVER_BUTTONS) / sizeof(Button);
@@ -165,6 +202,13 @@ void handle_music_toggle(const GameResources* resources, GameContext* context)
     }
 }
 
+/**
+ * @brief Handle main menu interactions
+ *
+ * @param mouse_pos Current mouse position
+ * @param resources Game asset resources
+ * @param context Current game context
+ */
 void handle_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
     const size_t button_count = sizeof(MAIN_MENU_BUTTONS) / sizeof(Button);
