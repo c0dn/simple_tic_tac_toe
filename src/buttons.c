@@ -55,12 +55,6 @@ static void show_instructions(const GameResources* res, GameContext* context)
     context->state = MENU_INSTRUCTIONS;
 }
 
-static void show_settings(const GameResources* res, GameContext* context)
-{
-    PlaySound(res->fx_click);
-    context->state = MENU_SETTINGS;
-}
-
 static void show_exit_confirmation(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
@@ -68,57 +62,9 @@ static void show_exit_confirmation(const GameResources* res, GameContext* contex
 }
 
 
-Button SETTINGS_BUTTONS[4] = {
-    {
-        .text = "Play",
-        .color = LIGHTGRAY,
-        .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 100.0f,
-        .first_render_offset = -200.0f,
-        .padding = PaddingY(10.0f),
-        .rounded = true,
-        .font_size = 30,
-    },
-    {
-        .text = "Pause",
-        .color = LIGHTGRAY,
-        .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 100.0f,
-        .first_render_offset = -200.0f,
-        .padding = PaddingY(10.0f),
-        .rounded = true,
-        .font_size = 30,
-    },
-    {
-        .text = "Stop",
-        .color = LIGHTGRAY,
-        .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 100.0f,
-        .first_render_offset = -200.0f,
-        .padding = PaddingY(10.0f),
-        .rounded = true,
-        .font_size = 30,
-    },
-    {
-        .text = "Back",
-        .color = BLUE,
-        .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 100.0f,
-        .first_render_offset = -200.0f,
-        .padding = PaddingY(10.0f),
-        .rounded = true,
-        .font_size = 30,
-    }
-};
-Button GAME_MODE_BUTTONS[3] = {
+Button GAME_MODE_BUTTONS[] = {
     {
         .text = "Easy",
-        .color = YELLOW,
-        .clickColor = DARKBLUE,
         .width = 300.0f,
         .height = 50.0f,
         .first_render_offset = -50.0f,
@@ -129,8 +75,6 @@ Button GAME_MODE_BUTTONS[3] = {
     },
     {
         .text = "Medium",
-        .color = YELLOW,
-        .clickColor = DARKBLUE,
         .width = 300.0f,
         .height = 50.0f,
         .first_render_offset = -50.0f,
@@ -141,8 +85,6 @@ Button GAME_MODE_BUTTONS[3] = {
     },
     {
         .text = "Hard",
-        .color = YELLOW,
-        .clickColor = DARKBLUE,
         .width = 300.0f,
         .height = 50.0f,
         .first_render_offset = -50.0f,
@@ -156,8 +98,6 @@ Button GAME_MODE_BUTTONS[3] = {
 Button EXIT_CONFIRMATION_BUTTONS[] = {
     {
         .text = "Yes",
-        .color = YELLOW,
-        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 100.0f,
         .first_render_offset = -40.0f,
@@ -167,8 +107,6 @@ Button EXIT_CONFIRMATION_BUTTONS[] = {
     },
     {
         .text = "No",
-        .color = YELLOW,
-        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 100.0f,
         .first_render_offset = -40.0f,
@@ -181,8 +119,6 @@ Button EXIT_CONFIRMATION_BUTTONS[] = {
 Button INSTRUCTIONS_BUTTONS[] = {
     {
         .text = "Back",
-        .color = BLUE,
-        .clickColor = DARKBLUE,
         .width = 330.0f,
         .height = 100.0f,
         .padding = PaddingY(10.0f),
@@ -196,8 +132,6 @@ Button INSTRUCTIONS_BUTTONS[] = {
 Button GAME_OVER_BUTTONS[] = {
     {
         .text = "Restart Game",
-        .color = YELLOW,
-        .clickColor = DARKBLUE,
         .width = 200,
         .height = 60,
         .first_render_offset = 0,
@@ -208,8 +142,6 @@ Button GAME_OVER_BUTTONS[] = {
     },
     {
         .text = "Back to Menu",
-        .color = YELLOW,
-        .clickColor = DARKBLUE,
         .width = 200,
         .height = 60,
         .first_render_offset = 0,
@@ -224,60 +156,40 @@ Button GAME_OVER_BUTTONS[] = {
 Button MAIN_MENU_BUTTONS[] = {
     {
         .text = "1 Player",
-        .color = BLUE,
-        .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 70.0f,
-        .first_render_offset = -300.0f,
-        .padding = PaddingY(30.0f),
+        .width = 200.0f,
+        .height = 60.0f,
+        .first_render_offset = 100.0f,
+        .padding = {20, 20, 10, 10},
         .rounded = true,
         .font_size = 30,
         .action = start_1player
     },
     {
         .text = "2 Player",
-        .color = BLUE,
-        .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 70.0f,
-        .first_render_offset = -300.0f,
-        .padding = PaddingY(30.0f),
+        .width = 200.0f,
+        .height = 60.0f,
+        .first_render_offset = 100.0f,
+        .padding = {20, 20, 10, 10},
         .rounded = true,
         .font_size = 30,
         .action = start_2player
     },
     {
         .text = "How To Play",
-        .color = BLUE,
-        .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 70.0f,
-        .first_render_offset = -300.0f,
-        .padding = PaddingY(30.0f),
+        .width = 200.0f,
+        .height = 60.0f,
+        .first_render_offset = 120.0f,
+        .padding = {20, 20, 10, 10},
         .rounded = true,
         .font_size = 30,
         .action = show_instructions
     },
     {
-        .text = "Settings",
-        .color = BLUE,
-        .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 70.0f,
-        .first_render_offset = -300.0f,
-        .padding = PaddingY(30.0f),
-        .rounded = true,
-        .font_size = 30,
-        .action = show_settings
-    },
-    {
         .text = "Exit",
-        .color = BLUE,
-        .clickColor = DARKBLUE,
-        .width = 330.0f,
-        .height = 70.0f,
-        .first_render_offset = -300.0f,
-        .padding = PaddingY(30.0f),
+        .width = 200.0f,
+        .height = 60.0f,
+        .first_render_offset = 120.0f,
+        .padding = {20, 20, 10, 10},
         .rounded = true,
         .font_size = 30,
         .action = show_exit_confirmation

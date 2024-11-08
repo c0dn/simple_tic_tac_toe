@@ -22,3 +22,4 @@ Please see BUILD.md
 - The pixel perfect flat icon for tic-tac-toe is provided by Freepik.
 - Some sound effects were sourced from [Fesliyan Studios](https://www.fesliyanstudios.com).
 - Background music "8 Bit Retro Funk" by David Renda, available for royalty-free download.
+- Music off/on icons by FontAwesome Free 6.6

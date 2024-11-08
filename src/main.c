@@ -25,7 +25,14 @@ int main(void)
         .state = GAME_STATE_MENU,
         .selected_game_mode = TWO_PLAYER,
         .player_1 = PLAYER_X,
-        .computer_enabled = false
+        .computer_enabled = false,
+        .audio_disabled = false,
+    };
+
+    const UiOptions render_options = {
+        .background_color = { 226, 232, 240, 255 },
+        .btn_clicked_color = ORANGE,
+        .primary_btn_color = GOLD
     };
 
     InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
@@ -70,13 +77,6 @@ int main(void)
             }
             break;
 
-        case MENU_SETTINGS:
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-            {
-                context.needs_redraw = true;
-                handle_settings_menu_click(mouse_pos, &resources, &context);
-            }
-            break;
 
         case GAME_STATE_EXIT:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -104,36 +104,31 @@ int main(void)
             break;
         }
         BeginDrawing();
-        ClearBackground(LIME);
         switch (context.state)
         {
         case GAME_STATE_MENU:
-            render_menu(&resources);
+            render_menu(&resources, &render_options, &context);
             break;
         case GAME_STATE_PLAYING:
-            render_grid(&resources);
+            render_grid(&resources, &render_options);
             break;
         case GAME_STATE_P1_WIN:
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
-            render_grid(&resources);
-            render_game_over(&context);
+            render_grid(&resources, &render_options);
+            render_game_over(&context, &render_options);
             break;
 
         case MENU_INSTRUCTIONS:
-            render_instructions(&resources);
-            break;
-
-        case MENU_SETTINGS:
-            render_settings();
+            render_instructions(&resources, &render_options);
             break;
 
         case GAME_STATE_EXIT:
-            render_exit();
+            render_exit(&render_options);
             break;
 
         case MENU_DIFF_CHOICE:
-            render_game_mode_choice();
+            render_game_mode_choice(&render_options);
             break;
 
         default:

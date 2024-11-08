@@ -33,14 +33,13 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
         else if (check_win(current_player))
         {
             context->state = current_player == PLAYER_X
-                ? GAME_STATE_P1_WIN
-                : GAME_STATE_P2_WIN;
+                                 ? GAME_STATE_P1_WIN
+                                 : GAME_STATE_P2_WIN;
 
             if (!is_computer_win(context))
             {
                 PlaySound(resources->fx_win);
             }
-
         }
         else
         {
@@ -71,43 +70,9 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
     }
 }
 
-void handle_settings_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
-{
-    const size_t button_count = sizeof(SETTINGS_BUTTONS) / sizeof(Button);
-    for (int i = 0; i < button_count; i++)
-    {
-        if (CheckCollisionPointRec(mouse_pos, SETTINGS_BUTTONS[i].rect) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
-            PlaySound(resources->fx_click);
-            switch (i)
-            {
-            case 0: // Play
-                if (!IsMusicStreamPlaying(resources->background_music))
-                {
-                    PlayMusicStream(resources->background_music);
-                }
-                break;
-            case 1: // Pause
-                if (IsMusicStreamPlaying(resources->background_music))
-                {
-                    PauseMusicStream(resources->background_music);
-                }
-                break;
-            case 2: // Stop
-                if (IsMusicStreamPlaying(resources->background_music))
-                {
-                    StopMusicStream(resources->background_music);
-                }
-                break;
-            case 3: // Back
-                context->state = GAME_STATE_MENU;
-                break;
-            }
-        }
-    }
-}
 
-void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context, bool* exit_flag)
+void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context,
+                            bool* exit_flag)
 {
     const size_t button_count = sizeof(EXIT_CONFIRMATION_BUTTONS) / sizeof(Button);
 
@@ -186,9 +151,29 @@ void handle_game_over_menu_click(const Vector2 mouse_pos, const GameResources* r
     }
 }
 
+void handle_music_toggle(const GameResources* resources, GameContext* context)
+{
+    context->audio_disabled = !context->audio_disabled;
+
+    if (context->audio_disabled)
+    {
+        StopMusicStream(resources->background_music);
+    }
+    else
+    {
+        PlayMusicStream(resources->background_music);
+    }
+}
+
 void handle_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
     const size_t button_count = sizeof(MAIN_MENU_BUTTONS) / sizeof(Button);
+    const Rectangle audio_ico_rect = calc_music_icon_rect(context, resources);
+    if (CheckCollisionPointRec(mouse_pos, audio_ico_rect) &&
+        IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        handle_music_toggle(resources, context);
+    }
 
     for (int i = 0; i < button_count; i++)
     {
