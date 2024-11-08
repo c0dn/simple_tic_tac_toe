@@ -55,11 +55,6 @@ static void render_buttons(
 void render_grid(const GameResources* resources, const UiOptions* render_opts)
 {
     ClearBackground(render_opts->background_color);
-    const Texture background_texture = resources->main_menu_img;
-    DrawTexture(background_texture, 0, 0, WHITE);
-    DrawRectangleLines(GetScreenWidth() / 2 - background_texture.width / 2,
-                       GetScreenHeight() / 2 - background_texture.height / 2,
-                       background_texture.width, background_texture.height, LIME);
     // Calculate grid size for a square centered grid
     const int grid_size = GetScreenWidth() < GetScreenHeight()
                               ? (float)GetScreenWidth() * 0.6f
