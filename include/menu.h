@@ -17,6 +17,8 @@ typedef struct {
 
 typedef struct {
     Color background_color;
+    Color primary_btn_color;
+    Color btn_clicked_color;
 } UiOptions;
 
 GameResources load_game_resources(int screen_width, int screen_height);

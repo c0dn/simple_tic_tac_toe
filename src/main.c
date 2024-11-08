@@ -30,6 +30,8 @@ int main(void)
 
     const UiOptions render_options = {
         .background_color = { 226, 232, 240, 255 },
+        .btn_clicked_color = ORANGE,
+        .primary_btn_color = GOLD
     };
 
     InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
@@ -74,13 +76,6 @@ int main(void)
             }
             break;
 
-        case MENU_SETTINGS:
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-            {
-                context.needs_redraw = true;
-                handle_settings_menu_click(mouse_pos, &resources, &context);
-            }
-            break;
 
         case GAME_STATE_EXIT:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -125,10 +120,6 @@ int main(void)
 
         case MENU_INSTRUCTIONS:
             render_instructions(&resources, &render_options);
-            break;
-
-        case MENU_SETTINGS:
-            render_settings(&render_options);
             break;
 
         case GAME_STATE_EXIT:

@@ -37,6 +37,7 @@ typedef struct {
     const float height;
     const float first_render_offset;
     const Color clickColor;
+    const bool override_default_colors;
     const ComponentPadding padding;
     const bool rounded;
     const int font_size;
@@ -51,7 +52,6 @@ void render_game_over(
     const GameContext* context, const UiOptions* render_opts);
 void render_instructions(
     const GameResources* resources, const UiOptions* render_opts);
-void render_settings(const UiOptions* render_opts);
 void render_exit(const UiOptions* render_opts);
 void render_game_mode_choice(const UiOptions* render_opts);
 #endif //RENDER_H

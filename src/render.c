@@ -8,19 +8,22 @@
 static void render_buttons(
     Button* buttons,
     const size_t button_count,
-    const int buttons_per_row)
+    const int buttons_per_row,
+    const UiOptions* render_opts)
 {
     for (int i = 0; i < button_count; i++)
     {
-        Color buttonColor = buttons[i].color;
+        const bool overwrite_default_colors = buttons[i].override_default_colors;
+        const bool is_hovering = CheckCollisionPointRec(GetMousePosition(), buttons[i].rect);
+        const Color buttonColor = is_hovering
+                                      ? (overwrite_default_colors
+                                             ? buttons[i].clickColor
+                                             : render_opts->btn_clicked_color)
+                                      : overwrite_default_colors ? buttons[i].color : render_opts->primary_btn_color;
+
         buttons[i].rect = calculate_button_rectangle(
             buttons[i].width, buttons[i].padding, buttons[i].height, buttons[i].first_render_offset, i, buttons_per_row
         );
-        // Hover effect
-        if (CheckCollisionPointRec(GetMousePosition(), buttons[i].rect))
-        {
-            buttonColor = buttons[i].clickColor;
-        }
 
         // Draw button
         if (buttons[i].rounded)
@@ -135,7 +138,7 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts)
 
     const size_t button_count = sizeof(MAIN_MENU_BUTTONS) / sizeof(Button);
 
-    render_buttons(MAIN_MENU_BUTTONS, button_count, 2);
+    render_buttons(MAIN_MENU_BUTTONS, button_count, 2, render_opts);
 }
 
 
@@ -194,7 +197,7 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
 
     DrawText(message, (int)text_c.x, (int)text_c.y, 40, RAYWHITE);
     const size_t button_count = sizeof(GAME_OVER_BUTTONS) / sizeof(Button);
-    render_buttons(GAME_OVER_BUTTONS, button_count, 1);
+    render_buttons(GAME_OVER_BUTTONS, button_count, 1, render_opts);
 }
 
 
@@ -237,31 +240,9 @@ void render_instructions(const GameResources* resources, const UiOptions* render
     DrawTexture(resources->instructions_2,
                 instructions_x, (int)((float)GetScreenHeight() / 2 * 1.08f), WHITE);
 
-    render_buttons(INSTRUCTIONS_BUTTONS, 1, 1);
+    render_buttons(INSTRUCTIONS_BUTTONS, 1, 1, render_opts);
 }
 
-
-void render_settings(const UiOptions* render_opts)
-{
-    ClearBackground(render_opts->background_color);
-    // Constants
-    static const char TITLE[] = "SETTINGS";
-
-    // Title rendering
-    const Coords title_c = calculate_centered_text_xy(
-        TITLE,
-        70,
-        0,
-        0,
-        (float)GetScreenWidth(),
-        (float)70
-    );
-    DrawText(TITLE, (int)title_c.x, (int)title_c.y, 70, DARKPURPLE);
-
-    const size_t button_count = sizeof(SETTINGS_BUTTONS) / sizeof(Button);
-
-    render_buttons(SETTINGS_BUTTONS, button_count, 1);
-}
 
 
 void render_exit(const UiOptions* render_opts)
@@ -276,12 +257,12 @@ void render_exit(const UiOptions* render_opts)
     // Draw message
     const char message[] = "Do you want to exit?";
     const Coords text_cords = calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width,
-                                                               box_dim.height);
+                                                         box_dim.height);
 
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
 
     const size_t button_count = sizeof(EXIT_CONFIRMATION_BUTTONS) / sizeof(Button);
-    render_buttons(EXIT_CONFIRMATION_BUTTONS, button_count, 1);
+    render_buttons(EXIT_CONFIRMATION_BUTTONS, button_count, 1, render_opts);
 }
 
 
@@ -298,11 +279,11 @@ void render_game_mode_choice(const UiOptions* render_opts)
     // Draw message
     const char message[] = "Choose game mode!";
     const Coords text_cords = calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width,
-                                                               box_dim.height);
+                                                         box_dim.height);
 
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
 
 
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
-    render_buttons(GAME_MODE_BUTTONS, button_count, 1);
+    render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts);
 }

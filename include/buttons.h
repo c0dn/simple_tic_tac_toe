@@ -2,7 +2,6 @@
 #define BUTTONS_H
 #include "render.h"
 
-extern Button SETTINGS_BUTTONS[4];
 extern Button GAME_MODE_BUTTONS[3];
 extern Button EXIT_CONFIRMATION_BUTTONS[2];
 extern Button INSTRUCTIONS_BUTTONS[1];
