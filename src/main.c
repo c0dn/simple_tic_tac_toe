@@ -25,7 +25,8 @@ int main(void)
         .state = GAME_STATE_MENU,
         .selected_game_mode = TWO_PLAYER,
         .player_1 = PLAYER_X,
-        .computer_enabled = false
+        .computer_enabled = false,
+        .audio_disabled = false,
     };
 
     const UiOptions render_options = {
@@ -106,7 +107,7 @@ int main(void)
         switch (context.state)
         {
         case GAME_STATE_MENU:
-            render_menu(&resources, &render_options);
+            render_menu(&resources, &render_options, &context);
             break;
         case GAME_STATE_PLAYING:
             render_grid(&resources, &render_options);

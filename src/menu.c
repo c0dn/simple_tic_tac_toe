@@ -11,7 +11,7 @@ GameResources load_game_resources(int screen_width, int screen_height) {
     resources.fx_draw = LoadSound("assets/game_draw.mp3");
 
     // Load and resize background
-    Image background = LoadImage("assets/background.png");
+    Image background = LoadImage("assets/main1.png");
     ImageResize(&background, screen_width, screen_height);
     resources.main_menu_img = LoadTextureFromImage(background);
     UnloadImage(background);
@@ -27,6 +27,15 @@ GameResources load_game_resources(int screen_width, int screen_height) {
     resources.instructions_2 = LoadTextureFromImage(instructions2);
     UnloadImage(instructions2);
 
+
+    Image music_on = LoadImage("assets/music_on.png");
+    resources.music_on = LoadTextureFromImage(music_on);
+    UnloadImage(music_on);
+
+    Image music_off = LoadImage("assets/music_off.png");
+    resources.music_off = LoadTextureFromImage(music_off);
+    UnloadImage(music_off);
+
     return resources;
 }
 
@@ -39,4 +48,6 @@ void unload_game_resources(const GameResources* resources) {
     UnloadTexture(resources->main_menu_img);
     UnloadTexture(resources->instructions_1);
     UnloadTexture(resources->instructions_2);
+    UnloadTexture(resources->music_off);
+    UnloadTexture(resources->music_on);
 }

@@ -50,6 +50,7 @@ typedef struct {
     GameMode selected_game_mode;
     player_t player_1;
     bool computer_enabled;
+    bool audio_disabled;
 } GameContext;
 
 

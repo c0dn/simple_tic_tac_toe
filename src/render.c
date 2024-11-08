@@ -100,14 +100,13 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts)
 }
 
 
-void render_menu(const GameResources* resources, const UiOptions* render_opts)
+void render_menu(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
 {
     // Constants
     static const char TITLE[] = "TIC-TAC-TOE";
     static const int FONT_SIZE = 70;
 
     ClearBackground(render_opts->background_color);
-
 
     // Title rendering
     const Coords title_c = calculate_centered_text_xy(
@@ -124,16 +123,51 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts)
     const float scaled_width = (float)resources->main_menu_img.width * image_scale;
     const float scaled_height = (float)resources->main_menu_img.height * image_scale;
     const Vector2 image_pos = {
-        (GetScreenWidth() - scaled_width) / 2,
-        (GetScreenHeight() - scaled_height) / 4
+        ((float)GetScreenWidth() - scaled_width) / 2,
+        ((float)GetScreenHeight() - scaled_height) / 4
     };
-
 
     DrawTextureEx(resources->main_menu_img, image_pos, 0.0f, image_scale, WHITE);
 
     const size_t button_count = sizeof(MAIN_MENU_BUTTONS) / sizeof(Button);
 
     render_buttons(MAIN_MENU_BUTTONS, button_count, 2, render_opts);
+
+    const Rectangle audio_ico_rect = calc_music_icon_rect(context, resources);
+
+    // Music toggle icon
+    const Texture2D music_icon = context->audio_disabled
+        ? resources->music_off
+        : resources->music_on;
+
+    const float icon_scale = 0.08f;
+    const Vector2 icon_pos = {
+        audio_ico_rect.x,
+        audio_ico_rect.y
+    };
+
+    DrawTextureEx(music_icon, icon_pos, 0.0f, icon_scale, WHITE);
+}
+
+
+Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* resources)
+{
+    const Texture2D music_icon = context->audio_disabled
+        ? resources->music_off
+        : resources->music_on;
+
+    const float icon_scale = 0.08f;
+    const Vector2 icon_pos = {
+        (float)GetScreenWidth() - (float)music_icon.width * icon_scale - 20,
+        20
+    };
+
+    return (Rectangle){
+        icon_pos.x,
+        icon_pos.y,
+        music_icon.width * icon_scale,
+        music_icon.height * icon_scale
+    };
 }
 
 
@@ -242,7 +276,6 @@ void render_instructions(const GameResources* resources, const UiOptions* render
 
 void render_exit(const UiOptions* render_opts)
 {
-    ClearBackground(render_opts->background_color);
     // Calculate message box dimensions
     const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.3f);
     // Draw message box
@@ -263,7 +296,6 @@ void render_exit(const UiOptions* render_opts)
 
 void render_game_mode_choice(const UiOptions* render_opts)
 {
-    ClearBackground(render_opts->background_color);
     // Calculate message box dimensions
     const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f);
 

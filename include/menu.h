@@ -12,6 +12,8 @@ typedef struct {
     Sound fx_draw;
     Texture2D main_menu_img;
     Texture2D instructions_1;
+    Texture2D music_on;
+    Texture2D music_off;
     Texture2D instructions_2;
 } GameResources;
 
