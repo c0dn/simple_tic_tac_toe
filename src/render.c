@@ -81,21 +81,20 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts)
                   grid_size, line_thickness, BLACK);
 
     const int symbol_size = cell_size / 2;
-    for (int i = 0; i < BOARD_SIZE; i++)
-    {
-        for (int j = 0; j < BOARD_SIZE; j++)
-        {
-            const player_t cell = get_cell(i, j);
-            if (cell != PLAYER_NONE)
-            {
-                const char* symbol = cell == PLAYER_X ? "X" : "O";
-                const int draw_x = start_x + j * cell_size + (cell_size - symbol_size) / 2;
-                const int draw_y = start_y + i * cell_size + (cell_size - symbol_size) / 2;
-                const Color symbol_color = (cell == PLAYER_X) ? SKYBLUE : GOLD;
+    uint16_t mask = 1;
+    for(int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
+        const int row = i / BOARD_SIZE;
+        const int col = i % BOARD_SIZE;
+        const int draw_x = start_x + col * cell_size + (cell_size - symbol_size) / 2;
+        const int draw_y = start_y + row * cell_size + (cell_size - symbol_size) / 2;
 
-                DrawText(symbol, draw_x, draw_y, symbol_size, symbol_color);
-            }
+        if(x_board & mask) {
+            DrawText("X", draw_x, draw_y, symbol_size, SKYBLUE);
         }
+        else if(o_board & mask) {
+            DrawText("O", draw_x, draw_y, symbol_size, GOLD);
+        }
+        mask <<= 1;
     }
 }
 
