@@ -1,14 +1,18 @@
+#include "computer.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <tgmath.h>
 
-#include "C:\Users\limxu\OneDrive\Documents\a SIT Y1.1\Group Project\simple_tic_tac_toe\include\computer.h"
-#include "C:\Users\limxu\OneDrive\Documents\a SIT Y1.1\Group Project\simple_tic_tac_toe\include\neuralnetwork.h"  // Include neural network header
 
-void load_model(NeuralNetwork *nn, const char *nn_weights)
+NeuralNetwork* load_model()
 {
-    FILE *file = fopen(nn_weights, "rb");
+    const static char weights_path[] = "assets/nn_weights.dat";
+    NeuralNetwork* nn = malloc(sizeof(NeuralNetwork));
+    FILE* file = fopen(weights_path, "rb");
     if (file == NULL)
     {
         printf("Failed to open file for loading model.\n");
-        return;
+        return NULL;
     }
 
     // Read weights and biases from the file and load them into the network
@@ -18,54 +22,12 @@ void load_model(NeuralNetwork *nn, const char *nn_weights)
     fread(nn->bias_output, sizeof(double), OUTPUT_NODES, file);
 
     fclose(file);
-    printf("Model loaded successfully from '%s'.\n", nn_weights);
+    TraceLog(LOG_INFO, "Model loaded successfully from '%s'.\n", weights_path);
+    return nn;
 }
 
-void initialize_network(NeuralNetwork *nn)
-{
-    for (int i = 0; i < HIDDEN_NODES; i++)
-    {
-        for (int j = 0; j < INPUT_NODES; j++)
-        {
-            nn->weights[i][j] = ((double)rand() / RAND_MAX) * 2 - 1;
-        }
-        nn->bias_hidden[i] = ((double)rand() / RAND_MAX) * 2 - 1;
-    }
 
-    for (int i = 0; i < OUTPUT_NODES; i++)
-    {
-        for (int j = 0; j < HIDDEN_NODES; j++)
-        {
-            nn->output_weights[i][j] = ((double)rand() / RAND_MAX) * 2 - 1;
-        }
-        nn->bias_output[i] = ((double)rand() / RAND_MAX) * 2 - 1;
-    }
-
-    // Initialize Adam-specific moment terms to 0
-    for (int i = 0; i < HIDDEN_NODES; i++)
-    {
-        for (int j = 0; j < INPUT_NODES; j++)
-        {
-            nn->m_weights[i][j] = 0.0;
-            nn->v_weights[i][j] = 0.0;
-        }
-        nn->m_bias_hidden[i] = 0.0;
-        nn->v_bias_hidden[i] = 0.0;
-    }
-
-    for (int i = 0; i < OUTPUT_NODES; i++)
-    {
-        for (int j = 0; j < HIDDEN_NODES; j++)
-        {
-            nn->m_output_weights[i][j] = 0.0;
-            nn->v_output_weights[i][j] = 0.0;
-        }
-        nn->m_bias_output[i] = 0.0;
-        nn->v_bias_output[i] = 0.0;
-    }
-}
-
-void forward_pass(NeuralNetwork *nn, double input[])
+void forward_pass(NeuralNetwork* nn, const double input[])
 {
     for (int i = 0; i < HIDDEN_NODES; i++)
     {
@@ -90,37 +52,44 @@ void forward_pass(NeuralNetwork *nn, double input[])
     }
 }
 
-void nn_move(NeuralNetwork *nn, int board[INPUT_NODES]) {
+EvalResult nn_move(NeuralNetwork* nn) {
     int best_move = -1;
     double best_score = -1;
 
-    for (int i = 0; i < INPUT_NODES; i++) {
-        if (board[i] == EMPTY) {
-            board[i] = PLAYER_O; 
-            double input[INPUT_NODES];
-            for (int j = 0; j < INPUT_NODES; j++) {
-                input[j] = (board[j] == PLAYER_X) ? 1.0 : (board[j] == PLAYER_O) ? -1.0 : 0.0;
-            }
+    const uint16_t occupied = x_board | o_board;
+    uint16_t legal_moves = ~occupied & 0b111111111;
 
-            forward_pass(nn, input);
-            double score = nn->output_layer[0];
+    while(legal_moves) {
+        const int move = __builtin_ctz(legal_moves);
+        o_board |= (1 << move); // Try move
 
-            board[i] = EMPTY;
-
-            if (score > best_score) {
-                best_score = score;
-                best_move = i;
-            }
+        double input[INPUT_NODES];
+        for(int i = 0; i < INPUT_NODES; i++) {
+            if(x_board & (1 << i)) input[i] = 1.0;
+            else if(o_board & (1 << i)) input[i] = -1.0;
+            else input[i] = 0.0;
         }
+
+        forward_pass(nn, input);
+        const double score = nn->output_layer[0];
+
+        o_board &= ~(1 << move); // Undo move
+
+        if(score > best_score) {
+            best_score = score;
+            best_move = move;
+        }
+
+        legal_moves &= ~(1 << move);
     }
 
-    if (best_move != -1) {
-        board[best_move] = PLAYER_O;
-    }
+    return (EvalResult){(int)best_score, best_move};
 }
 
 
-EvalResult minimax(const player_t current_player) {
+
+EvalResult minimax(const player_t current_player)
+{
     // Check win conditions
     if (check_win(PLAYER_X)) return (EvalResult){-1, -1};
     if (check_win(PLAYER_O)) return (EvalResult){1, -1};
@@ -132,7 +101,8 @@ EvalResult minimax(const player_t current_player) {
     const uint16_t occupied_board = x_board | o_board;
     uint16_t legal_moves = ~occupied_board & 0b111111111;
 
-    while (legal_moves) {
+    while (legal_moves)
+    {
         const int move = __builtin_ctz(legal_moves);
         const int row = move / 3;
         const int col = move % 3;
@@ -144,18 +114,22 @@ EvalResult minimax(const player_t current_player) {
         );
 
         // Undo move
-        if (current_player == PLAYER_X) {
+        if (current_player == PLAYER_X)
+        {
             x_board &= ~BIT_POS(row, col);
-        } else {
+        }
+        else
+        {
             o_board &= ~BIT_POS(row, col);
         }
 
         // Update best score and move
         if ((current_player == PLAYER_O && result.score > bestScore) ||
-            (current_player == PLAYER_X && result.score < bestScore)) {
+            (current_player == PLAYER_X && result.score < bestScore))
+        {
             bestScore = result.score;
             bestMove = move;
-            }
+        }
 
         legal_moves &= ~(1 << move);
     }
@@ -169,12 +143,30 @@ EvalResult minimax(const player_t current_player) {
  * Selects and places optimal move on game board
  *
  * @param context Current game context
+ * @param models
  */
-void computer_move(const GameContext* context) {
+void computer_move(const GameContext* context, const AiModels* models) {
     const player_t computer_player = get_computer_player(context);
-    const EvalResult result = minimax(computer_player);
-    // TODO: Add support for other algorithms here, switch between various game mode set in context
-    if (result.move != -1) {
+    EvalResult result;
+
+    switch(context->selected_game_mode) {
+    case ONE_PLAYER_EASY:
+        // Implement easy mode logic
+            break;
+
+    case ONE_PLAYER_MEDIUM:
+        result = nn_move(models->neural_network);
+        break;
+
+    case ONE_PLAYER_HARD:
+        result = minimax(computer_player);
+        break;
+
+    default:
+        return;
+    }
+
+    if(result.move != -1) {
         const int row = result.move / 3;
         const int col = result.move % 3;
         set_cell(row, col, computer_player);

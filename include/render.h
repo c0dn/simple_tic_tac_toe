@@ -9,6 +9,7 @@
 #define GRID_HEIGHT (CELL_HEIGHT * 3)
 #include <game.h>
 #include <menu.h>
+#include <raylib.h>
 
 
 typedef struct

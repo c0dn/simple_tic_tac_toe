@@ -59,7 +59,7 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
     if (context->computer_enabled &&
         current_player == get_computer_player(context))
     {
-        computer_move(context);
+        computer_move(context, resources->models);
         PlaySound(resources->fx_symbol);
 
         if (check_draw())
