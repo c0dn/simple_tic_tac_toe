@@ -1,4 +1,5 @@
 #include <menu.h>
+#include <stdlib.h>
 
 GameResources load_game_resources(int screen_width, int screen_height) {
     GameResources resources = { 0 };
@@ -36,10 +37,13 @@ GameResources load_game_resources(int screen_width, int screen_height) {
     resources.music_off = LoadTextureFromImage(music_off);
     UnloadImage(music_off);
 
+    NeuralNetwork* neural_network = load_model();
+    resources.models = malloc(sizeof(AiModels));
+    resources.models->neural_network = neural_network;
     return resources;
 }
 
-void unload_game_resources(const GameResources* resources) {
+void unload_game_resources(GameResources* resources) {
     UnloadMusicStream(resources->background_music);
     UnloadSound(resources->fx_click);
     UnloadSound(resources->fx_symbol);
@@ -50,4 +54,7 @@ void unload_game_resources(const GameResources* resources) {
     UnloadTexture(resources->instructions_2);
     UnloadTexture(resources->music_off);
     UnloadTexture(resources->music_on);
+    free(resources->models->neural_network);
+    free(resources->models);
+    resources->models = NULL;
 }
