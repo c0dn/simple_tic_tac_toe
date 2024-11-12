@@ -15,6 +15,7 @@ typedef struct {
     Texture2D music_on;
     Texture2D music_off;
     Texture2D instructions_2;
+
 } GameResources;
 
 typedef struct {

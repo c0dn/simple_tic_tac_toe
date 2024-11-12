@@ -50,4 +50,5 @@ void unload_game_resources(const GameResources* resources) {
     UnloadTexture(resources->instructions_2);
     UnloadTexture(resources->music_off);
     UnloadTexture(resources->music_on);
+
 }

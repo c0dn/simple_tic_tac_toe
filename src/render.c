@@ -49,8 +49,8 @@ static void render_buttons(
 
         DrawText(buttons[i].text, (int)cords.x, (int)cords.y, buttons[i].font_size, BLACK);
     }
-}
 
+}
 
 void render_grid(const GameResources* resources, const UiOptions* render_opts)
 {
@@ -97,6 +97,8 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts)
             }
         }
     }
+    render_buttons(HOME ,1, 1, render_opts);
+    display_score();
 }
 
 
@@ -147,6 +149,7 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
     };
 
     DrawTextureEx(music_icon, icon_pos, 0.0f, icon_scale, WHITE);
+    reset_score();
 }
 
 

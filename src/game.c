@@ -3,8 +3,8 @@
 uint16_t x_board;
 uint16_t o_board;
 player_t current_player;
-
-
+int p1_score =0;
+int p2_score =0;
 
 void initialize_game(const GameResources* res, GameContext* context)
 {
@@ -59,7 +59,6 @@ bool check_win(const player_t player)
         0b001010100 // Diagonal (top right to bottom left)
     };
 
-
     // Get the current player's board
     const uint16_t current = player == PLAYER_X ? x_board : o_board;
 
@@ -68,10 +67,16 @@ bool check_win(const player_t player)
     {
         if ((current & WIN_PATTERNS[i]) == WIN_PATTERNS[i])
         {
+            if (player == PLAYER_X){
+                p1_score++;
+            }
+            else if(player == PLAYER_O)
+            {
+                p2_score++;
+            }
             return true;
         }
     }
-
     return false;
 }
 
@@ -168,4 +173,15 @@ player_t get_human_player(const GameContext* context) {
  */
 player_t get_computer_player(const GameContext* context) {
     return context->player_1 == PLAYER_X ? PLAYER_O : PLAYER_X;
+}
+void display_score()
+{
+    DrawText(TextFormat("Player 1: %d",p1_score), 10,0,40,BLACK);
+    DrawText(TextFormat("Player 2: %d",p2_score), 760,0,40,BLACK);
+}
+
+void reset_score()
+{
+    p1_score =0;
+    p2_score =0;
 }

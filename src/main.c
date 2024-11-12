@@ -64,9 +64,7 @@ int main(void)
                 context.needs_redraw = true;
                 handle_game_click(mouse_pos, &resources, &context);
             }
-
             break;
-
         case GAME_STATE_P1_WIN:
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
@@ -117,6 +115,7 @@ int main(void)
         case GAME_STATE_DRAW:
             render_grid(&resources, &render_options);
             render_game_over(&context, &render_options);
+            display_score();
             break;
 
         case MENU_INSTRUCTIONS:
