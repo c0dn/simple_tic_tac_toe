@@ -86,10 +86,12 @@ bool check_win(const player_t player)
  * - Compares result with full board pattern (0b111111111)
  * - Draw occurs when all nine spots are occupied (all bits set)
  */
+#ifndef USE_ASM_CHECK_DRAW
 bool check_draw(void)
 {
     return (x_board | o_board) == 0b111111111;
 }
+#endif
 
 
 /**
