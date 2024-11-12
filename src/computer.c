@@ -151,11 +151,10 @@ void computer_move(const GameContext* context, const AiModels* models) {
 
     switch(context->selected_game_mode) {
     case ONE_PLAYER_EASY:
-        // Implement easy mode logic
-            break;
+        result = nn_move(models->neural_network);
+        break;
 
     case ONE_PLAYER_MEDIUM:
-        result = nn_move(models->neural_network);
         break;
 
     case ONE_PLAYER_HARD:
