@@ -90,7 +90,7 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
     }
     
     render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts);
-    display_score(context); // Call display_score with context
+    display_score(context); 
 }
 
 
