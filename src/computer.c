@@ -26,7 +26,6 @@ NeuralNetwork* load_model()
     return nn;
 }
 
-
 void forward_pass(NeuralNetwork* nn, const double input[])
 {
     for (int i = 0; i < HIDDEN_NODES; i++)
@@ -86,8 +85,6 @@ EvalResult nn_move(NeuralNetwork* nn) {
     return (EvalResult){(int)best_score, best_move};
 }
 
-
-
 EvalResult minimax(const player_t current_player)
 {
     // Check win conditions
@@ -143,7 +140,7 @@ EvalResult minimax(const player_t current_player)
  * Selects and places optimal move on game board
  *
  * @param context Current game context
- * @param models
+ * @param models 
  */
 void computer_move(const GameContext* context, const AiModels* models) {
     const player_t computer_player = get_computer_player(context);

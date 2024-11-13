@@ -130,7 +130,7 @@ Button INSTRUCTIONS_BUTTONS[] = {
 
 Button GAME_OVER_BUTTONS[] = {
     {
-        .text = "Contiue Playing",
+        .text = "Continue Playing",
         .width = 200,
         .height = 60,
         .first_render_offset = 0,

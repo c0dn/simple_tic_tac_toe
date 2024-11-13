@@ -172,7 +172,7 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
     // Constants
     static const char PLAYER1_WIN_MSG[] = "Player 1 Wins!";
     static const char PLAYER2_WIN_MSG[] = "Player 2 Wins!";
-    static const char DRAW_MSG[] = "A draw. How droll.";
+    static const char DRAW_MSG[] = "It's a DRAW";
     static const char LOSE_MSG[] = "You lose!";
 
     // Draw a semi-transparent background
