@@ -38,7 +38,7 @@ int main(void)
     InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
     InitAudioDevice();
 
-    const GameResources resources = load_game_resources((int)screen_width, (int)screen_height);
+    GameResources resources = load_game_resources((int)screen_width, (int)screen_height);
 
     SetTargetFPS(60);
     PlayMusicStream(resources.background_music);

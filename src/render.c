@@ -82,14 +82,14 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
                 const char* symbol = cell == PLAYER_X ? "X" : "O";
                 const int draw_x = start_x + j * cell_size + (cell_size - symbol_size) / 2;
                 const int draw_y = start_y + i * cell_size + (cell_size - symbol_size) / 2;
-                const Color symbol_color = (cell == PLAYER_X) ? SKYBLUE : GOLD;
+                const Color symbol_color = cell == PLAYER_X ? SKYBLUE : GOLD;
 
                 DrawText(symbol, draw_x, draw_y, symbol_size, symbol_color);
             }
         }
     }
     
-    render_buttons(HOME, 1, 1, render_opts);
+    render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts);
     display_score(context); // Call display_score with context
 }
 

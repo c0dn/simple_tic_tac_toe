@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <menu.h>
+#include "menu.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -49,6 +49,7 @@ typedef struct {
     GameState state;
     GameMode selected_game_mode;
     player_t player_1;
+    NeuralNetwork nn;
     bool computer_enabled;
     bool audio_disabled;
     int p1_score;

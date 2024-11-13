@@ -42,22 +42,34 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
         {
             current_player = current_player == PLAYER_X ? PLAYER_O : PLAYER_X;
         }
-    }
-
-    // Handle computer move if enabled
-    if (context->computer_enabled &&
-        current_player == get_computer_player(context))
-    {
-        computer_move(context);
-        PlaySound(resources->fx_symbol);
-        
-        // Update game state and score after computer move
-        update_game_state_and_score(context);
-
-        // Toggle to the next player if the game is still ongoing
-        if (context->state == GAME_STATE_PLAYING)
+        // Handle computer move if enabled
+        if (context->computer_enabled &&
+            current_player == get_computer_player(context))
         {
-            current_player = PLAYER_X;
+            computer_move(context, resources->models);
+            PlaySound(resources->fx_symbol);
+
+            // Update game state and score after computer move
+            update_game_state_and_score(context);
+
+            // Toggle to the next player if the game is still ongoing
+            if (context->state == GAME_STATE_PLAYING)
+            {
+                current_player = PLAYER_X;
+            }
+        }
+    } else
+    {
+        const size_t button_count = sizeof(IN_GAME_BUTTONS) / sizeof(Button);
+
+        for (int i = 0; i < button_count; i++)
+        {
+            const Button btn = IN_GAME_BUTTONS[i];
+            if (CheckCollisionPointRec(mouse_pos, btn.rect) &&
+                IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                btn.action(resources, context);
+            }
         }
     }
 }

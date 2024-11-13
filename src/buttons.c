@@ -195,15 +195,15 @@ Button MAIN_MENU_BUTTONS[] = {
     }
 };
 
-Button HOME[] = {
-        {
-                .text = "Return to menu",
-                .width = 330.0f,
-                .height = 100.0f,
-                .padding = PaddingY(10.0f),
-                .first_render_offset = 400.0f,
-                .rounded = true,
-                .font_size = 40,
-                .action = return_to_menu
-        }
+Button IN_GAME_BUTTONS[] = {
+    {
+        .text = "Return to menu",
+        .width = 330.0f,
+        .height = 100.0f,
+        .padding = PaddingY(10.0f),
+        .first_render_offset = 400.0f,
+        .rounded = true,
+        .font_size = 40,
+        .action = return_to_menu
+    }
 };
