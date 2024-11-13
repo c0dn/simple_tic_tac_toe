@@ -130,7 +130,7 @@ Button INSTRUCTIONS_BUTTONS[] = {
 
 Button GAME_OVER_BUTTONS[] = {
     {
-        .text = "Restart Game",
+        .text = "Contiue Playing",
         .width = 200,
         .height = 60,
         .first_render_offset = 0,
@@ -140,7 +140,7 @@ Button GAME_OVER_BUTTONS[] = {
         .action = initialize_game
     },
     {
-        .text = "Back to Menu",
+        .text = "End Game",
         .width = 200,
         .height = 60,
         .first_render_offset = 0,
