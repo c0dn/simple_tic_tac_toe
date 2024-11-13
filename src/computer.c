@@ -11,7 +11,7 @@ NeuralNetwork* load_model()
     FILE* file = fopen(weights_path, "rb");
     if (file == NULL)
     {
-        printf("Failed to open file for loading model.\n");
+        TraceLog(LOG_ERROR, "Failed to open file for loading model.\n");
         return NULL;
     }
 
