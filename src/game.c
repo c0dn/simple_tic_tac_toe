@@ -3,8 +3,10 @@
 uint16_t x_board;
 uint16_t o_board;
 player_t current_player;
-int p1_score =0;
-int p2_score =0;
+int p1_score = 0;
+int p2_score = 0;
+
+
 
 void initialize_game(const GameResources* res, GameContext* context)
 {
@@ -59,6 +61,7 @@ bool check_win(const player_t player)
         0b001010100 // Diagonal (top right to bottom left)
     };
 
+
     // Get the current player's board
     const uint16_t current = player == PLAYER_X ? x_board : o_board;
 
@@ -67,16 +70,10 @@ bool check_win(const player_t player)
     {
         if ((current & WIN_PATTERNS[i]) == WIN_PATTERNS[i])
         {
-            if (player == PLAYER_X){
-                p1_score++;
-            }
-            else if(player == PLAYER_O)
-            {
-                p2_score++;
-            }
             return true;
         }
     }
+
     return false;
 }
 
@@ -174,14 +171,50 @@ player_t get_human_player(const GameContext* context) {
 player_t get_computer_player(const GameContext* context) {
     return context->player_1 == PLAYER_X ? PLAYER_O : PLAYER_X;
 }
-void display_score()
-{
-    DrawText(TextFormat("Player 1: %d",p1_score), 10,0,40,BLACK);
-    DrawText(TextFormat("Player 2: %d",p2_score), 760,0,40,BLACK);
+
+
+void update_score(player_t winner, const GameContext* context) {
+    if (context->computer_enabled) {
+        // One-player mode
+        if (winner == context->player_1) {
+            p1_score++; // Human score
+        } else if (winner == get_computer_player(context)) {
+            p2_score++; // Computer score
+        }
+    } else {
+        // Two-player mode
+        if (winner == PLAYER_X) {
+            p1_score++;
+        } else if (winner == PLAYER_O) {
+            p2_score++;
+        }
+    }
 }
 
-void reset_score()
+void display_score(const GameContext* context) {
+    if (context->computer_enabled) {
+        DrawText(TextFormat("Human: %d", p1_score), 10, 0, 40, BLACK);
+        DrawText(TextFormat("Computer: %d", p2_score), 760, 0, 40, BLACK);
+    } else {
+        DrawText(TextFormat("Player 1: %d", p1_score), 10, 0, 40, BLACK);
+        DrawText(TextFormat("Player 2: %d", p2_score), 760, 0, 40, BLACK);
+    }
+}
+
+void update_game_state_and_score(GameContext* context)
 {
-    p1_score =0;
-    p2_score =0;
+    if (check_win(PLAYER_X)) {
+        context->state = GAME_STATE_P1_WIN;
+        update_score(PLAYER_X, context);
+    } else if (check_win(PLAYER_O)) {
+        context->state = GAME_STATE_P2_WIN;
+        update_score(PLAYER_O, context);
+    } else if (check_draw()) {
+        context->state = GAME_STATE_DRAW;
+    }
+}
+
+void reset_score() {
+    p1_score = 0;
+    p2_score = 0;
 }

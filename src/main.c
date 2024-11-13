@@ -108,14 +108,14 @@ int main(void)
             render_menu(&resources, &render_options, &context);
             break;
         case GAME_STATE_PLAYING:
-            render_grid(&resources, &render_options);
+            render_grid(&resources, &render_options, &context);
             break;
         case GAME_STATE_P1_WIN:
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
-            render_grid(&resources, &render_options);
+            render_grid(&resources, &render_options,&context);
             render_game_over(&context, &render_options);
-            display_score();
+            display_score(&context);
             break;
 
         case MENU_INSTRUCTIONS:

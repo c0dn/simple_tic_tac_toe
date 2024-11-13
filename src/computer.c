@@ -14,7 +14,7 @@
  * - Minimizes player's score
  * - Handles win, lose, and draw scenarios
  */
-EvalResult minimax(const player_t current_player) {
+EvalResult minimax(const player_t current_player, const GameContext* context) {
     // Check win conditions
     if (check_win(PLAYER_X)) return (EvalResult){-1, -1};
     if (check_win(PLAYER_O)) return (EvalResult){1, -1};
@@ -31,32 +31,34 @@ EvalResult minimax(const player_t current_player) {
         const int row = move / 3;
         const int col = move % 3;
 
+        // Make the move
         set_cell(row, col, current_player);
 
+        // Recursive call with the next player
         const EvalResult result = minimax(
-            current_player == PLAYER_X ? PLAYER_O : PLAYER_X
+            (current_player == PLAYER_X ? PLAYER_O : PLAYER_X), context
         );
 
-        // Undo move
+        // Undo the move
         if (current_player == PLAYER_X) {
             x_board &= ~BIT_POS(row, col);
         } else {
             o_board &= ~BIT_POS(row, col);
         }
 
-        // Update best score and move
+        // Update best score and move based on the current player
         if ((current_player == PLAYER_O && result.score > bestScore) ||
             (current_player == PLAYER_X && result.score < bestScore)) {
             bestScore = result.score;
             bestMove = move;
-            }
+        }
 
+        // Remove the current move from legal_moves
         legal_moves &= ~(1 << move);
     }
 
     return (EvalResult){bestScore, bestMove};
 }
-
 /**
  * @brief Execute computer's move using minimax algorithm
  *
@@ -66,7 +68,7 @@ EvalResult minimax(const player_t current_player) {
  */
 void computer_move(const GameContext* context) {
     const player_t computer_player = get_computer_player(context);
-    const EvalResult result = minimax(computer_player);
+    const EvalResult result = minimax(computer_player, context);
 
     // TODO: Add support for other algorithms here, switch between various game mode set in context
     if (result.move != -1) {

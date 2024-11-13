@@ -40,8 +40,6 @@ Rectangle calculate_button_rectangle(
 }
 
 
-
-
 Coords calculate_centered_text_xy(
     const char* message,
     const int font_size,

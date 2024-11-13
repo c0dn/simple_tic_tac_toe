@@ -8,7 +8,7 @@ typedef struct {
     int move;
 } EvalResult;
 
-EvalResult minimax(player_t current_player);
+EvalResult minimax(const player_t current_player, const GameContext* context);
 
 void computer_move(const GameContext* context);
 

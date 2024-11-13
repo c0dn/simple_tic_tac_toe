@@ -33,46 +33,29 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
     {
         PlaySound(resources->fx_symbol);
         set_cell(row, col, current_player);
+        
+        // Update game state and score after player move
+        update_game_state_and_score(context);
 
-        if (check_draw())
-        {
-            context->state = GAME_STATE_DRAW;
-            PlaySound(resources->fx_draw);
-        }
-        else if (check_win(current_player))
-        {
-            context->state = current_player == PLAYER_X
-                                 ? GAME_STATE_P1_WIN
-                                 : GAME_STATE_P2_WIN;
-
-            if (!is_computer_win(context))
-            {
-                PlaySound(resources->fx_win);
-            }
-        }
-        else
+        // Toggle to the next player if the game is still ongoing
+        if (context->state == GAME_STATE_PLAYING)
         {
             current_player = current_player == PLAYER_X ? PLAYER_O : PLAYER_X;
         }
     }
 
+    // Handle computer move if enabled
     if (context->computer_enabled &&
         current_player == get_computer_player(context))
     {
         computer_move(context);
         PlaySound(resources->fx_symbol);
+        
+        // Update game state and score after computer move
+        update_game_state_and_score(context);
 
-        if (check_draw())
-        {
-            context->state = GAME_STATE_DRAW;
-            PlaySound(resources->fx_draw);
-        }
-        else if (check_win(PLAYER_O))
-        {
-            context->state = GAME_STATE_P2_WIN;
-            PlaySound(resources->fx_win);
-        }
-        else
+        // Toggle to the next player if the game is still ongoing
+        if (context->state == GAME_STATE_PLAYING)
         {
             current_player = PLAYER_X;
         }

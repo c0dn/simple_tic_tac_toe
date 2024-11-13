@@ -52,33 +52,24 @@ static void render_buttons(
 
 }
 
-void render_grid(const GameResources* resources, const UiOptions* render_opts)
+void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
 {
     ClearBackground(render_opts->background_color);
-    // Calculate grid size for a square centered grid
+    
     const int grid_size = GetScreenWidth() < GetScreenHeight()
                               ? (float)GetScreenWidth() * 0.6f
                               : (float)GetScreenHeight() * 0.6f;
     const int cell_size = grid_size / 3;
-
-    // Calculate starting position to center the grid
+    
     const int start_x = (GetScreenWidth() - grid_size) / 2;
     const int start_y = (GetScreenHeight() - grid_size) / 2;
-
-    // Draw thicker lines using rectangles
+    
     const int line_thickness = 4;
-
-    // Vertical lines
-    DrawRectangle(start_x + cell_size - line_thickness / 2, start_y,
-                  line_thickness, grid_size, BLACK);
-    DrawRectangle(start_x + cell_size * 2 - line_thickness / 2, start_y,
-                  line_thickness, grid_size, BLACK);
-
-    // Horizontal lines
-    DrawRectangle(start_x, start_y + cell_size - line_thickness / 2,
-                  grid_size, line_thickness, BLACK);
-    DrawRectangle(start_x, start_y + cell_size * 2 - line_thickness / 2,
-                  grid_size, line_thickness, BLACK);
+    
+    DrawRectangle(start_x + cell_size - line_thickness / 2, start_y, line_thickness, grid_size, BLACK);
+    DrawRectangle(start_x + cell_size * 2 - line_thickness / 2, start_y, line_thickness, grid_size, BLACK);
+    DrawRectangle(start_x, start_y + cell_size - line_thickness / 2, grid_size, line_thickness, BLACK);
+    DrawRectangle(start_x, start_y + cell_size * 2 - line_thickness / 2, grid_size, line_thickness, BLACK);
 
     const int symbol_size = cell_size / 2;
     for (int i = 0; i < BOARD_SIZE; i++)
@@ -97,8 +88,9 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts)
             }
         }
     }
-    render_buttons(HOME ,1, 1, render_opts);
-    display_score();
+    
+    render_buttons(HOME, 1, 1, render_opts);
+    display_score(context); // Call display_score with context
 }
 
 
