@@ -8,11 +8,7 @@
 #include <game.h>
 #include <neural.h>
 
-// Declare Naive Bayes-related functions
-void init_naive_bayes();               // Function to initialize Naive Bayes probabilities
-EvalResult nb_move();                  // Function to make a move using Naive Bayes
 
-int predict(const char board[BOARD_SIZE]);
 EvalResult minimax(player_t current_player);
 
 void computer_move(const GameContext* context, const AiModels* models);

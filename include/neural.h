@@ -6,6 +6,20 @@
 #define NEURAL_H
 
 /***************************************************************/
+/*                    Naive Bayers                       */
+/***************************************************************/
+
+typedef struct {
+    double probX[3][3];
+    double probO[3][3];
+    double probBlank[3][3];
+    double probWin;
+    double probLose;
+} BayerProbabilities;
+
+
+
+/***************************************************************/
 /*                     NEURAL NETWORK                          */
 /***************************************************************/
 
@@ -36,6 +50,7 @@ typedef struct
 typedef struct
 {
     NeuralNetwork* neural_network;
+    BayerProbabilities* bayer_probabilities;
 } AiModels;
 
 typedef struct {
@@ -43,7 +58,10 @@ typedef struct {
     int move;
 } EvalResult;
 
+BayerProbabilities* init_naive_bayes();
+EvalResult nb_move(const BayerProbabilities* probs);
 
+int predict(const char board[3], const BayerProbabilities* probs);
 void forward_pass(NeuralNetwork *nn, const double input[]);
 EvalResult nn_move(NeuralNetwork* nn);
 NeuralNetwork* load_model();

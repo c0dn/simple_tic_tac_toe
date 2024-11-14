@@ -7,19 +7,26 @@ double probX[BOARD_SIZE][3], probO[BOARD_SIZE][3], probBlank[BOARD_SIZE][3];
 
 double probWin, probLose;
 
-int predict(const char board[BOARD_SIZE]) {
-    double winProb = probWin, loseProb = probLose;
+int predict(const char board[BOARD_SIZE], const BayerProbabilities* probs)
+{
+    double winProb = probs->probWin, loseProb = probs->probLose;
 
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        if (board[i] == 'x') {
-            winProb *= probX[i][1];
-            loseProb *= probX[i][0];
-        } else if (board[i] == 'o') {
-            winProb *= probO[i][1];
-            loseProb *= probO[i][0];
-        } else {
-            winProb *= probBlank[i][1];
-            loseProb *= probBlank[i][0];
+    for (int i = 0; i < BOARD_SIZE; i++)
+    {
+        if (board[i] == 'x')
+        {
+            winProb *= probs->probX[i][1];
+            loseProb *= probs->probX[i][0];
+        }
+        else if (board[i] == 'o')
+        {
+            winProb *= probs->probO[i][1];
+            loseProb *= probs->probO[i][0];
+        }
+        else
+        {
+            winProb *= probs->probBlank[i][1];
+            loseProb *= probs->probBlank[i][0];
         }
     }
 
@@ -49,6 +56,28 @@ NeuralNetwork* load_model()
     return nn;
 }
 
+BayerProbabilities* init_naive_bayes()
+{
+    BayerProbabilities* probs = malloc(sizeof(BayerProbabilities));
+
+    probs->probWin = 0.6;
+    probs->probLose = 0.4;
+
+    for (int i = 0; i < BOARD_SIZE; i++)
+    {
+        probs->probX[i][1] = 0.6;
+        probs->probO[i][1] = 0.5;
+        probs->probBlank[i][1] = 0.8;
+
+        probs->probX[i][0] = 0.4;
+        probs->probO[i][0] = 0.3;
+        probs->probBlank[i][0] = 0.2;
+    }
+
+    return probs;
+}
+
+
 
 void forward_pass(NeuralNetwork* nn, const double input[])
 {
@@ -75,21 +104,24 @@ void forward_pass(NeuralNetwork* nn, const double input[])
     }
 }
 
-EvalResult nn_move(NeuralNetwork* nn) {
+EvalResult nn_move(NeuralNetwork* nn)
+{
     int best_move = -1;
     double best_score = -1;
 
     const uint16_t occupied = x_board | o_board;
     uint16_t legal_moves = ~occupied & 0b111111111;
 
-    while(legal_moves) {
+    while (legal_moves)
+    {
         const int move = __builtin_ctz(legal_moves);
-        o_board |= (1 << move); // Try move
+        o_board |= 1 << move; // Try move
 
         double input[INPUT_NODES];
-        for(int i = 0; i < INPUT_NODES; i++) {
-            if(x_board & (1 << i)) input[i] = 1.0;
-            else if(o_board & (1 << i)) input[i] = -1.0;
+        for (int i = 0; i < INPUT_NODES; i++)
+        {
+            if (x_board & 1 << i) input[i] = 1.0;
+            else if (o_board & 1 << i) input[i] = -1.0;
             else input[i] = 0.0;
         }
 
@@ -98,7 +130,8 @@ EvalResult nn_move(NeuralNetwork* nn) {
 
         o_board &= ~(1 << move); // Undo move
 
-        if(score > best_score) {
+        if (score > best_score)
+        {
             best_score = score;
             best_move = move;
         }
@@ -109,8 +142,9 @@ EvalResult nn_move(NeuralNetwork* nn) {
     return (EvalResult){(int)best_score, best_move};
 }
 
-// Naive Bayes-based move selection
-EvalResult nb_move() {
+// naive bayers move
+EvalResult nb_move(const BayerProbabilities* probs)
+{
     int best_move = -1;
     double best_score = -1;
 
@@ -118,26 +152,29 @@ EvalResult nb_move() {
     const uint16_t occupied = x_board | o_board;
     uint16_t legal_moves = ~occupied & 0b111111111;
 
-    while (legal_moves) {
+    while (legal_moves)
+    {
         const int move = __builtin_ctz(legal_moves); // Get the least significant bit
 
         o_board |= (1 << move); // Try the move for 'o'
 
         // Create a board state to predict
         char board[BOARD_SIZE] = {0};
-        for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int i = 0; i < BOARD_SIZE; i++)
+        {
             if (x_board & (1 << i)) board[i] = 'x';
             else if (o_board & (1 << i)) board[i] = 'o';
             else board[i] = 'b';
         }
 
         // Use Naive Bayes to predict the outcome for this move
-        const int predicted_outcome = predict(board);
+        const int predicted_outcome = predict(board, probs);
 
         // We are aiming for a 'win' (1) for the computer, but minimizing the loss
         const double score = predicted_outcome == 1 ? 1.0 : 0.0;
 
-        if (score > best_score) {
+        if (score > best_score)
+        {
             best_score = score;
             best_move = move;
         }
@@ -201,17 +238,19 @@ EvalResult minimax(const player_t current_player)
 
 
 // Computer's move function (adjusted to include Naive Bayes)
-void computer_move(const GameContext* context, const AiModels* models) {
+void computer_move(const GameContext* context, const AiModels* models)
+{
     const player_t computer_player = get_computer_player(context);
     EvalResult result;
 
-    switch (context->selected_game_mode) {
+    switch (context->selected_game_mode)
+    {
     case ONE_PLAYER_EASY:
         result = nn_move(models->neural_network);
         break;
 
     case ONE_PLAYER_EASY_NAIVE:
-        result = nb_move();
+        result = nb_move(models->bayer_probabilities);
         break;
 
     case ONE_PLAYER_MEDIUM:
@@ -227,27 +266,10 @@ void computer_move(const GameContext* context, const AiModels* models) {
     }
 
     // Execute the best move if available
-    if (result.move != -1) {
+    if (result.move != -1)
+    {
         const int row = result.move / 3;
         const int col = result.move % 3;
         set_cell(row, col, computer_player);
     }
 }
-
-// Function to initialize Naive Bayes probabilities (this should be called during setup)
-void init_naive_bayes() {
-    // Example initialization of probabilities (you should adjust these based on your dataset)
-    probWin = 0.6;
-    probLose = 0.4;
-
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        probX[i][1] = 0.6; // Probability of 'x' in a winning state
-        probO[i][1] = 0.5; // Probability of 'o' in a winning state
-        probBlank[i][1] = 0.8; // Probability of a blank space in a winning state
-
-        probX[i][0] = 0.4; // Probability of 'x' in a losing state
-        probO[i][0] = 0.3; // Probability of 'o' in a losing state
-        probBlank[i][0] = 0.2; // Probability of a blank space in a losing state
-    }
-}
-
