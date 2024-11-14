@@ -3,10 +3,6 @@
 #include <stdlib.h>
 #include <tgmath.h>
 
-double probX[BOARD_SIZE][3], probO[BOARD_SIZE][3], probBlank[BOARD_SIZE][3];
-
-double probWin, probLose;
-
 int predict(const char board[BOARD_SIZE], const BayerProbabilities* probs)
 {
     double winProb = probs->probWin, loseProb = probs->probLose;
