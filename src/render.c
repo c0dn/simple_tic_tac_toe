@@ -283,6 +283,7 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
 {
     // Constants
     static const char PLAYER1_WIN_MSG[] = "Player 1 Wins!";
+    static const char HUMAN_WIN_MSG[] = "You Win!";
     static const char PLAYER2_WIN_MSG[] = "Player 2 Wins!";
     static const char DRAW_MSG[] = "It's a DRAW";
     static const char LOSE_MSG[] = "You lose!";
@@ -303,9 +304,15 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
     const char* message;
     switch (context->state)
     {
-    case GAME_STATE_P1_WIN: message = PLAYER1_WIN_MSG;
+    case GAME_STATE_P1_WIN:
+        message = context->computer_enabled
+            ? (context->player_1 == PLAYER_X ? HUMAN_WIN_MSG : PLAYER1_WIN_MSG)
+            : PLAYER1_WIN_MSG;
         break;
-    case GAME_STATE_P2_WIN: message = PLAYER2_WIN_MSG;
+    case GAME_STATE_P2_WIN:
+        message = context->computer_enabled
+            ? LOSE_MSG
+            : PLAYER2_WIN_MSG;
         break;
     case GAME_STATE_DRAW: message = DRAW_MSG;
         break;
@@ -422,7 +429,7 @@ void render_game_mode_choice(const UiOptions* render_opts)
 }
 
 void do_game_over_transition(const GameResources* resources, const UiOptions* render_opts,
-                                 GameContext* context, const Vector2 mouse_pos)
+                             GameContext* context)
 {
 
     if (!context->transition.active) {

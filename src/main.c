@@ -124,7 +124,7 @@ int main(void)
         case GAME_STATE_P1_WIN:
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
-            do_game_over_transition(&resources, &render_options, &context, mouse_pos);
+            do_game_over_transition(&resources, &render_options, &context);
             break;
 
         case MENU_INSTRUCTIONS:

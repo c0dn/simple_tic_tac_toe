@@ -126,10 +126,9 @@ Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* 
 void do_game_start_transition(const GameResources* resources, const UiOptions* render_opts,
                                   GameContext* context);
 void do_game_over_transition(
-    const GameResources* resources,
-    const UiOptions* render_opts,
-    GameContext* context,
-    Vector2 mouse_pos
+ const GameResources* resources,
+ const UiOptions* render_opts,
+ GameContext* context
 );
 
 #endif //RENDER_H
