@@ -13,12 +13,7 @@ void initialize_game(const GameResources* res, GameContext* context)
     o_board = 0;
     context->state = GAME_STATE_PLAYING;
     current_player = PLAYER_X;
-    if (current_player == get_computer_player(context))
-    {
-        computer_move(context, res->models);
-        PlaySound(res->fx_symbol);
-        current_player = get_computer_player(context) == PLAYER_X ? PLAYER_O : PLAYER_X;
-    }
+    context->start_screen_shown = false;
 }
 
 

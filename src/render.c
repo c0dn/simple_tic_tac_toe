@@ -1,6 +1,6 @@
 #include "render.h"
 #include <buttons.h>
-#include "handlers.h"
+#include <computer.h>
 #include <raylib.h>
 #include <stddef.h>
 #include <utils.h>
@@ -53,7 +53,52 @@ static void render_buttons(
     }
 }
 
-void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
+void do_game_start_transition(const GameResources* resources, const UiOptions* render_opts,
+                                  GameContext* context)
+{
+    if (!context->transition.active) {
+        context->transition.start_time = GetTime();
+        context->transition.active = true;
+    }
+
+    render_grid(resources, render_opts, context, false);
+
+    const float elapsed_time = GetTime() - context->transition.start_time;
+
+    // Semi-transparent background
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(),
+                  (Color){0, 0, 0, 100});
+
+    const char* start_msg = context->computer_enabled
+        ? (current_player == get_human_player(context) ? "Player starts first" : "Computer starts first")
+        : current_player == context->player_1 ? "Player 1 starts first" : "Player 2 starts first";
+
+    // Calculate centered text position
+    const Coords text_coords = calculate_centered_text_xy(
+        start_msg,
+        40,
+        0,
+        0,
+        (float)GetScreenWidth(),
+        (float)GetScreenHeight()
+    );
+
+    DrawText(start_msg, (int)text_coords.x, (int)text_coords.y, 40, RAYWHITE);
+
+    // Reset transition after 1 second
+    if (elapsed_time >= 1.0) {
+        context->transition.active = false;
+        context->start_screen_shown = true;
+        if (current_player == get_computer_player(context))
+        {
+            computer_move(context, resources->models);
+            PlaySound(resources->fx_symbol);
+            current_player = get_computer_player(context) == PLAYER_X ? PLAYER_O : PLAYER_X;
+        }
+    }
+}
+
+void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context, bool show_buttons)
 {
     ClearBackground(render_opts->background_color);
 
@@ -89,8 +134,11 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
             }
         }
     }
+    if (show_buttons)
+    {
+        render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts);
+    }
 
-    render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts);
     display_score(context);
     const int winning_pattern = check_win(current_player);
     if (winning_pattern != -1)
@@ -373,7 +421,7 @@ void render_game_mode_choice(const UiOptions* render_opts)
     render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts);
 }
 
-void handle_game_over_transition(const GameResources* resources, const UiOptions* render_opts,
+void do_game_over_transition(const GameResources* resources, const UiOptions* render_opts,
                                  GameContext* context, const Vector2 mouse_pos)
 {
 
@@ -382,7 +430,7 @@ void handle_game_over_transition(const GameResources* resources, const UiOptions
         context->transition.active = true;
     }
 
-    render_grid(resources, render_opts, context);
+    render_grid(resources, render_opts, context, false);
 
     const float elapsed_time = GetTime() - context->transition.start_time;
 

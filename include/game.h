@@ -57,6 +57,7 @@ typedef struct {
     bool computer_enabled;
     bool audio_disabled;
     ActiveTransition transition;
+    bool start_screen_shown;
     int p1_score;
     int p2_score;
 
