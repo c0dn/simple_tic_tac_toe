@@ -1,18 +1,13 @@
-//new code
 #include "computer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <tgmath.h>
 
-//#define BOARD_SIZE 9  // Tic-tac-toe board size (3x3 = 9 cells)
-
-// Probability matrices for each position in a winning or losing state
 double probX[BOARD_SIZE][3], probO[BOARD_SIZE][3], probBlank[BOARD_SIZE][3];
 
 double probWin, probLose;
 
-// Function to predict if a given board state is a win for X or O
-int predict(char board[BOARD_SIZE]) {
+int predict(const char board[BOARD_SIZE]) {
     double winProb = probWin, loseProb = probLose;
 
     for (int i = 0; i < BOARD_SIZE; i++) {
@@ -30,6 +25,88 @@ int predict(char board[BOARD_SIZE]) {
 
     // Return the prediction (1 for win, 0 for lose)
     return winProb * 0.9 > loseProb ? 1 : 0;
+}
+
+NeuralNetwork* load_model()
+{
+    const static char weights_path[] = "assets/nn_weights.dat";
+    NeuralNetwork* nn = malloc(sizeof(NeuralNetwork));
+    FILE* file = fopen(weights_path, "rb");
+    if (file == NULL)
+    {
+        printf("Failed to open file for loading model.\n");
+        return NULL;
+    }
+
+    // Read weights and biases from the file and load them into the network
+    fread(nn->weights, sizeof(double), HIDDEN_NODES * INPUT_NODES, file);
+    fread(nn->bias_hidden, sizeof(double), HIDDEN_NODES, file);
+    fread(nn->output_weights, sizeof(double), OUTPUT_NODES * HIDDEN_NODES, file);
+    fread(nn->bias_output, sizeof(double), OUTPUT_NODES, file);
+
+    fclose(file);
+    TraceLog(LOG_INFO, "Model loaded successfully from '%s'.\n", weights_path);
+    return nn;
+}
+
+
+void forward_pass(NeuralNetwork* nn, const double input[])
+{
+    for (int i = 0; i < HIDDEN_NODES; i++)
+    {
+        nn->hidden_layer[i] = nn->bias_hidden[i];
+        for (int j = 0; j < INPUT_NODES; j++)
+        {
+            nn->hidden_layer[i] += nn->weights[i][j] * input[j];
+        }
+        // ReLU activation function for the hidden layer
+        nn->hidden_layer[i] = nn->hidden_layer[i] > 0 ? nn->hidden_layer[i] : 0.0;
+    }
+
+    for (int i = 0; i < OUTPUT_NODES; i++)
+    {
+        nn->output_layer[i] = nn->bias_output[i];
+        for (int j = 0; j < HIDDEN_NODES; j++)
+        {
+            nn->output_layer[i] += nn->output_weights[i][j] * nn->hidden_layer[j];
+        }
+        // sigmoid activation for the output layer
+        nn->output_layer[i] = 1.0 / (1.0 + exp(-nn->output_layer[i])); // Sigmoid activation
+    }
+}
+
+EvalResult nn_move(NeuralNetwork* nn) {
+    int best_move = -1;
+    double best_score = -1;
+
+    const uint16_t occupied = x_board | o_board;
+    uint16_t legal_moves = ~occupied & 0b111111111;
+
+    while(legal_moves) {
+        const int move = __builtin_ctz(legal_moves);
+        o_board |= (1 << move); // Try move
+
+        double input[INPUT_NODES];
+        for(int i = 0; i < INPUT_NODES; i++) {
+            if(x_board & (1 << i)) input[i] = 1.0;
+            else if(o_board & (1 << i)) input[i] = -1.0;
+            else input[i] = 0.0;
+        }
+
+        forward_pass(nn, input);
+        const double score = nn->output_layer[0];
+
+        o_board &= ~(1 << move); // Undo move
+
+        if(score > best_score) {
+            best_score = score;
+            best_move = move;
+        }
+
+        legal_moves &= ~(1 << move);
+    }
+
+    return (EvalResult){(int)best_score, best_move};
 }
 
 // Naive Bayes-based move selection
@@ -55,10 +132,10 @@ EvalResult nb_move() {
         }
 
         // Use Naive Bayes to predict the outcome for this move
-        int predicted_outcome = predict(board);
+        const int predicted_outcome = predict(board);
 
         // We are aiming for a 'win' (1) for the computer, but minimizing the loss
-        double score = predicted_outcome == 1 ? 1.0 : 0.0;
+        const double score = predicted_outcome == 1 ? 1.0 : 0.0;
 
         if (score > best_score) {
             best_score = score;
@@ -130,7 +207,10 @@ void computer_move(const GameContext* context, const AiModels* models) {
 
     switch (context->selected_game_mode) {
     case ONE_PLAYER_EASY:
-        // Use Naive Bayes move for easy mode
+        result = nn_move(models->neural_network);
+        break;
+
+    case ONE_PLAYER_EASY_NAIVE:
         result = nb_move();
         break;
 
@@ -139,7 +219,6 @@ void computer_move(const GameContext* context, const AiModels* models) {
         break;
 
     case ONE_PLAYER_HARD:
-        // Use the Minimax algorithm for hard mode
         result = minimax(computer_player);
         break;
 

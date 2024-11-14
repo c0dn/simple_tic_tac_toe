@@ -39,6 +39,7 @@ typedef enum
 {
     TWO_PLAYER,
     ONE_PLAYER_EASY,
+    ONE_PLAYER_EASY_NAIVE,
     ONE_PLAYER_MEDIUM,
     ONE_PLAYER_HARD
 } GameMode;
@@ -49,7 +50,6 @@ typedef struct {
     GameState state;
     GameMode selected_game_mode;
     player_t player_1;
-    NeuralNetwork nn;
     bool computer_enabled;
     bool audio_disabled;
 } GameContext;

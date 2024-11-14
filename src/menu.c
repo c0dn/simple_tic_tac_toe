@@ -36,9 +36,9 @@ GameResources load_game_resources(int screen_width, int screen_height) {
     resources.music_off = LoadTextureFromImage(music_off);
     UnloadImage(music_off);
 
-    // No longer loading neural network model
-    resources.models = NULL;  // Just set the models to NULL if you don't want to use it anymore
-    
+    NeuralNetwork* neural_network = load_model();
+    resources.models = malloc(sizeof(AiModels));
+    resources.models->neural_network = neural_network;
     return resources;
 }
 
@@ -53,10 +53,7 @@ void unload_game_resources(GameResources* resources) {
     UnloadTexture(resources->instructions_2);
     UnloadTexture(resources->music_off);
     UnloadTexture(resources->music_on);
-
-    // No need to free neural network or models anymore
-    free(resources->models); // Free models if allocated
-    resources->models = NULL; // Set models to NULL after freeing
-
-    // No neural network model to free anymore
+    free(resources->models->neural_network);
+    free(resources->models);
+    resources->models = NULL;
 }
