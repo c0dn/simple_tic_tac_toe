@@ -118,20 +118,20 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
             line_end_x = start_x + grid_size;
             line_end_y = line_start_y;
             break;
-        case 3: // First column
-            line_start_x = start_x + cell_size / 2;
+        case 5: // First column
+            line_start_x = start_x + cell_size / 2.6;
             line_start_y = start_y;
             line_end_x = line_start_x;
             line_end_y = start_y + grid_size;
             break;
         case 4: // Middle column
-            line_start_x = start_x + cell_size + cell_size / 2;
+            line_start_x = start_x + cell_size + cell_size / 2.4;
             line_start_y = start_y;
             line_end_x = line_start_x;
             line_end_y = start_y + grid_size;
             break;
-        case 5: // Last column
-            line_start_x = start_x + grid_size - cell_size / 2;
+        case 3: // Last column
+            line_start_x = start_x + grid_size - cell_size / 1.6;
             line_start_y = start_y;
             line_end_x = line_start_x;
             line_end_y = start_y + grid_size;
