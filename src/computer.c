@@ -186,8 +186,8 @@ EvalResult nb_move(const BayerProbabilities* probs)
 EvalResult minimax(const player_t current_player)
 {
     // Check win conditions
-    if (check_win(PLAYER_X)) return (EvalResult){-1, -1};
-    if (check_win(PLAYER_O)) return (EvalResult){1, -1};
+    if (check_win(PLAYER_X) != -1) return (EvalResult){-1, -1};
+    if (check_win(PLAYER_O) != -1) return (EvalResult){1, -1};
     if (check_draw()) return (EvalResult){0, -1};
 
     int bestScore = (current_player == PLAYER_O) ? -2 : 2;

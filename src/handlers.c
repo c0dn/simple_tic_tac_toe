@@ -76,7 +76,7 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
             else
             {
                 // Toggle back to Player X if the game is still ongoing
-                current_player = PLAYER_X;
+                current_player = current_player == PLAYER_X ? PLAYER_O : PLAYER_X;
             }
         }
     } else
@@ -199,6 +199,8 @@ void handle_game_over_menu_click(const Vector2 mouse_pos, const GameResources* r
             IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
             btn.action)
         {
+            context->transition.start_time = 0;
+            context->transition.active = false;
             btn.action(resources, context);
         }
     }
