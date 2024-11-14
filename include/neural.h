@@ -10,7 +10,7 @@
 /***************************************************************/
 
 #define INPUT_NODES 9
-#define HIDDEN_NODES 10
+#define HIDDEN_NODES 8
 #define OUTPUT_NODES 1
 
 typedef struct
