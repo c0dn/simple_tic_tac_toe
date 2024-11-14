@@ -54,31 +54,43 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
             // Toggle to the next player if the game is still ongoing
             current_player = current_player == PLAYER_X ? PLAYER_O : PLAYER_X;
         }
-    }
+        // Handle computer move if enabled and it’s the computer’s turn
+        if (context->computer_enabled &&
+            current_player == get_computer_player(context))
+        {
+            computer_move(context, resources->models);
+            PlaySound(resources->fx_symbol);
 
-    // Handle computer move if enabled and it’s the computer’s turn
-    if (context->computer_enabled &&
-        current_player == get_computer_player(context))
+            // Update game state and score after computer's move
+            update_game_state_and_score(context);
+
+            // Play specific sounds based on game state
+            if (context->state == GAME_STATE_DRAW)
+            {
+                PlaySound(resources->fx_draw);
+            }
+            else if (context->state == GAME_STATE_P2_WIN)
+            {
+                PlaySound(resources->fx_win);
+            }
+            else
+            {
+                // Toggle back to Player X if the game is still ongoing
+                current_player = PLAYER_X;
+            }
+        }
+    } else
     {
-        computer_move(context, resources->models);
-        PlaySound(resources->fx_symbol);
+        const size_t button_count = sizeof(IN_GAME_BUTTONS) / sizeof(Button);
 
-        // Update game state and score after computer's move
-        update_game_state_and_score(context);
-
-        // Play specific sounds based on game state
-        if (context->state == GAME_STATE_DRAW)
+        for (int i = 0; i < button_count; i++)
         {
-            PlaySound(resources->fx_draw);
-        }
-        else if (context->state == GAME_STATE_P2_WIN)
-        {
-            PlaySound(resources->fx_win);
-        }
-        else
-        {
-            // Toggle back to Player X if the game is still ongoing
-            current_player = PLAYER_X;
+            const Button btn = IN_GAME_BUTTONS[i];
+            if (CheckCollisionPointRec(mouse_pos, btn.rect) &&
+                IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                btn.action(resources, context);
+            }
         }
     }
 }
