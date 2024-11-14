@@ -28,9 +28,18 @@ static void start_hard_mode(const GameResources* res, GameContext* context)
     context->state = GAME_STATE_PLAYING;
 }
 
+static void continue_playing(const GameResources* res, GameContext* context)
+{
+    context->player_1 = context->player_1 == PLAYER_X ? PLAYER_O : PLAYER_X;
+    initialize_game(res,  context);
+}
+
+
 static void return_to_menu(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
+    context->p2_score = 0;
+    context->p1_score = 0;
     context->state = GAME_STATE_MENU;
 }
 
@@ -137,7 +146,7 @@ Button GAME_OVER_BUTTONS[] = {
         .padding = PaddingY(15.0f),
         .rounded = true,
         .font_size = 20,
-        .action = initialize_game
+        .action = continue_playing
     },
     {
         .text = "End Game",

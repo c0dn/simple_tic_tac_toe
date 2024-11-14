@@ -30,7 +30,10 @@ int main(void)
         .transition = {
             .start_time = 0,
             .active = false
-        }
+        },
+        .start_screen_shown = false,
+        .p1_score = 0,
+        .p2_score = 0,
     };
 
     const UiOptions render_options = {
@@ -63,7 +66,7 @@ int main(void)
             }
             break;
         case GAME_STATE_PLAYING:
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || IsGestureDetected(GESTURE_TAP))
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && context.start_screen_shown)
             {
                 context.needs_redraw = true;
                 handle_game_click(mouse_pos, &resources, &context);
@@ -112,12 +115,16 @@ int main(void)
             render_menu(&resources, &render_options, &context);
             break;
         case GAME_STATE_PLAYING:
-            render_grid(&resources, &render_options, &context);
+            if (!context.start_screen_shown) {
+                do_game_start_transition(&resources, &render_options, &context);
+            } else {
+                render_grid(&resources, &render_options, &context, true);
+            }
             break;
         case GAME_STATE_P1_WIN:
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
-            handle_game_over_transition(&resources, &render_options, &context, mouse_pos);
+            do_game_over_transition(&resources, &render_options, &context);
             break;
 
         case MENU_INSTRUCTIONS:
