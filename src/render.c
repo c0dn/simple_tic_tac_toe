@@ -234,7 +234,6 @@ Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* 
 
 void render_game_over(const GameContext* context, const UiOptions* render_opts)
 {
-    ClearBackground(render_opts->background_color);
     // Constants
     static const char PLAYER1_WIN_MSG[] = "Player 1 Wins!";
     static const char PLAYER2_WIN_MSG[] = "Player 2 Wins!";
@@ -373,4 +372,29 @@ void render_game_mode_choice(const UiOptions* render_opts)
 
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
     render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts);
+}
+
+void handle_game_over_transition(const GameResources* resources, const UiOptions* render_opts,
+                                 GameContext* context, const Vector2 mouse_pos)
+{
+
+    if (!context->transition.active) {
+        context->transition.start_time = GetTime();
+        context->transition.active = true;
+    }
+
+    render_grid(resources, render_opts, context);
+
+    const float elapsed_time = GetTime() - context->transition.start_time;
+
+    if (elapsed_time >= 1.0) {
+        // Semi-transparent background
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(),
+                      (Color){0, 0, 0, 100});
+
+        render_game_over(context, render_opts);
+
+    }
+
+    display_score(context);
 }

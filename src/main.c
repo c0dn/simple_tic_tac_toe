@@ -27,6 +27,10 @@ int main(void)
         .player_1 = PLAYER_X,
         .computer_enabled = false,
         .audio_disabled = false,
+        .transition = {
+            .start_time = 0,
+            .active = false
+        }
     };
 
     const UiOptions render_options = {
@@ -113,9 +117,7 @@ int main(void)
         case GAME_STATE_P1_WIN:
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
-            render_grid(&resources, &render_options,&context);
-            render_game_over(&context, &render_options);
-            display_score(&context);
+            handle_game_over_transition(&resources, &render_options, &context, mouse_pos);
             break;
 
         case MENU_INSTRUCTIONS:
