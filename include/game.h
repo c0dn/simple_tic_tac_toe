@@ -52,6 +52,8 @@ typedef struct {
     player_t player_1;
     bool computer_enabled;
     bool audio_disabled;
+    int p1_score;
+    int p2_score;
 } GameContext;
 
 
@@ -65,6 +67,10 @@ void set_cell(int row, int col, player_t player);
 bool is_computer_win(const GameContext* context);
 player_t get_human_player(const GameContext* context);
 player_t get_computer_player(const GameContext* context);
+void display_score(const GameContext* context);
+void reset_score();
+void update_score(player_t winner, const GameContext* context);
+void update_game_state_and_score(GameContext* context);
 
 
 #endif // GAME_H

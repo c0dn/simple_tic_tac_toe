@@ -37,7 +37,7 @@ NeuralNetwork* load_model()
     FILE* file = fopen(weights_path, "rb");
     if (file == NULL)
     {
-        printf("Failed to open file for loading model.\n");
+        TraceLog(LOG_ERROR, "Failed to open file for loading model.\n");
         return NULL;
     }
 
@@ -202,8 +202,10 @@ EvalResult minimax(const player_t current_player)
         const int row = move / 3;
         const int col = move % 3;
 
+        // Make the move
         set_cell(row, col, current_player);
 
+        // Recursive call with the next player
         const EvalResult result = minimax(
             current_player == PLAYER_X ? PLAYER_O : PLAYER_X
         );
@@ -212,30 +214,33 @@ EvalResult minimax(const player_t current_player)
         if (current_player == PLAYER_X)
         {
             x_board &= ~BIT_POS(row, col);
-        }
-        else
-        {
+        } else {
             o_board &= ~BIT_POS(row, col);
         }
 
-        // Update best score and move
+        // Update best score and move based on the current player
         if ((current_player == PLAYER_O && result.score > bestScore) ||
-            (current_player == PLAYER_X && result.score < bestScore))
-        {
+            (current_player == PLAYER_X && result.score < bestScore)) {
             bestScore = result.score;
             bestMove = move;
-        }
+            }
 
+        // Remove the current move from legal_moves
         legal_moves &= ~(1 << move);
     }
 
     return (EvalResult){bestScore, bestMove};
 }
 
-
-// Computer's move function (adjusted to include Naive Bayes)
-void computer_move(const GameContext* context, const AiModels* models)
-{
+/**
+ * @brief Execute computer's move using minimax algorithm
+ *
+ * Selects and places optimal move on game board
+ *
+ * @param context Current game context
+ * @param models
+ */
+void computer_move(const GameContext* context, const AiModels* models) {
     const player_t computer_player = get_computer_player(context);
     EvalResult result;
 
@@ -269,3 +274,4 @@ void computer_move(const GameContext* context, const AiModels* models)
         set_cell(row, col, computer_player);
     }
 }
+
