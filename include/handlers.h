@@ -13,5 +13,4 @@ void handle_instructions_menu_click(Vector2 mouse_pos, const GameResources* reso
 void handle_game_over_menu_click(Vector2 mouse_pos, const GameResources* resources, GameContext* context);
 void handle_music_toggle(const GameResources* resources, GameContext* context);
 
-
 #endif //HANDLERS_H
