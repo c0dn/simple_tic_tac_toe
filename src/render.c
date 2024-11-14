@@ -19,7 +19,9 @@ static void render_buttons(
                                       ? (overwrite_default_colors
                                              ? buttons[i].clickColor
                                              : render_opts->btn_clicked_color)
-                                      : overwrite_default_colors ? buttons[i].color : render_opts->primary_btn_color;
+                                      : overwrite_default_colors
+                                      ? buttons[i].color
+                                      : render_opts->primary_btn_color;
 
         buttons[i].rect = calculate_button_rectangle(
             buttons[i].width, buttons[i].padding, buttons[i].height, buttons[i].first_render_offset, i, buttons_per_row
@@ -49,23 +51,22 @@ static void render_buttons(
 
         DrawText(buttons[i].text, (int)cords.x, (int)cords.y, buttons[i].font_size, BLACK);
     }
-
 }
 
 void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
 {
     ClearBackground(render_opts->background_color);
-    
+
     const int grid_size = GetScreenWidth() < GetScreenHeight()
                               ? (float)GetScreenWidth() * 0.6f
                               : (float)GetScreenHeight() * 0.6f;
     const int cell_size = grid_size / 3;
-    
+
     const int start_x = (GetScreenWidth() - grid_size) / 2;
     const int start_y = (GetScreenHeight() - grid_size) / 2;
-    
+
     const int line_thickness = 4;
-    
+
     DrawRectangle(start_x + cell_size - line_thickness / 2, start_y, line_thickness, grid_size, BLACK);
     DrawRectangle(start_x + cell_size * 2 - line_thickness / 2, start_y, line_thickness, grid_size, BLACK);
     DrawRectangle(start_x, start_y + cell_size - line_thickness / 2, grid_size, line_thickness, BLACK);
@@ -88,9 +89,74 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
             }
         }
     }
-    
+
     render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts);
-    display_score(context); 
+    display_score(context);
+    const int winning_pattern = check_win(context->state == GAME_STATE_P1_WIN ? PLAYER_X : PLAYER_O);
+    if (winning_pattern != -1)
+    {
+        int line_start_x = 0, line_start_y = 0, line_end_x = 0, line_end_y = 0;
+        const float line_width = 10;
+
+        switch (winning_pattern)
+        {
+        case 0: // Top row
+            line_start_x = start_x;
+            line_start_y = start_y + cell_size / 2;
+            line_end_x = start_x + grid_size;
+            line_end_y = line_start_y;
+            break;
+        case 1: // Middle row
+            line_start_x = start_x;
+            line_start_y = start_y + cell_size + cell_size / 2;
+            line_end_x = start_x + grid_size;
+            line_end_y = line_start_y;
+            break;
+        case 2: // Bottom row
+            line_start_x = start_x;
+            line_start_y = start_y + grid_size - cell_size / 2;
+            line_end_x = start_x + grid_size;
+            line_end_y = line_start_y;
+            break;
+        case 5: // First column
+            line_start_x = start_x + cell_size / 2.6;
+            line_start_y = start_y;
+            line_end_x = line_start_x;
+            line_end_y = start_y + grid_size;
+            break;
+        case 4: // Middle column
+            line_start_x = start_x + cell_size + cell_size / 2.4;
+            line_start_y = start_y;
+            line_end_x = line_start_x;
+            line_end_y = start_y + grid_size;
+            break;
+        case 3: // Last column
+            line_start_x = start_x + grid_size - cell_size / 1.6;
+            line_start_y = start_y;
+            line_end_x = line_start_x;
+            line_end_y = start_y + grid_size;
+            break;
+        case 6: // Diagonal top-left to bottom-right
+            line_start_x = start_x;
+            line_start_y = start_y;
+            line_end_x = start_x + grid_size;
+            line_end_y = start_y + grid_size;
+            break;
+        case 7: // Diagonal top-right to bottom-left
+            line_start_x = start_x + grid_size;
+            line_start_y = start_y;
+            line_end_x = start_x;
+            line_end_y = start_y + grid_size;
+            break;
+        default:
+            TraceLog(LOG_ERROR, "Unknown win pattern");
+            break;
+        }
+
+        DrawLineEx((Vector2){(float)line_start_x, (float)line_start_y},
+                   (Vector2){(float)line_end_x, (float)line_end_y},
+                   line_width, RED);
+    }
 }
 
 
@@ -131,8 +197,8 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
 
     // Music toggle icon
     const Texture2D music_icon = context->audio_disabled
-        ? resources->music_off
-        : resources->music_on;
+                                     ? resources->music_off
+                                     : resources->music_on;
 
     const float icon_scale = 0.08f;
     const Vector2 icon_pos = {
@@ -148,8 +214,8 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
 Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* resources)
 {
     const Texture2D music_icon = context->audio_disabled
-        ? resources->music_off
-        : resources->music_on;
+                                     ? resources->music_off
+                                     : resources->music_on;
 
     const float icon_scale = 0.08f;
     const Vector2 icon_pos = {
@@ -168,7 +234,6 @@ Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* 
 
 void render_game_over(const GameContext* context, const UiOptions* render_opts)
 {
-    ClearBackground(render_opts->background_color);
     // Constants
     static const char PLAYER1_WIN_MSG[] = "Player 1 Wins!";
     static const char PLAYER2_WIN_MSG[] = "Player 2 Wins!";
@@ -268,7 +333,6 @@ void render_instructions(const GameResources* resources, const UiOptions* render
 }
 
 
-
 void render_exit(const UiOptions* render_opts)
 {
     // Calculate message box dimensions
@@ -308,4 +372,29 @@ void render_game_mode_choice(const UiOptions* render_opts)
 
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
     render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts);
+}
+
+void handle_game_over_transition(const GameResources* resources, const UiOptions* render_opts,
+                                 GameContext* context, const Vector2 mouse_pos)
+{
+
+    if (!context->transition.active) {
+        context->transition.start_time = GetTime();
+        context->transition.active = true;
+    }
+
+    render_grid(resources, render_opts, context);
+
+    const float elapsed_time = GetTime() - context->transition.start_time;
+
+    if (elapsed_time >= 1.0) {
+        // Semi-transparent background
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(),
+                      (Color){0, 0, 0, 100});
+
+        render_game_over(context, render_opts);
+
+    }
+
+    display_score(context);
 }

@@ -40,7 +40,7 @@ bool is_cell_empty(const int row, const int col)
  * @brief Checks if the specified player has won using bitwise operations
  *
  * @param player Player to check for win (PLAYER_X or PLAYER_O)
- * @return true if a player has won, false otherwise
+ * @return the winning pattern otherwise returns -1, no winning patterns found
  *
  * @details
  * Uses predefined bit patterns representing winning combinations
@@ -48,7 +48,7 @@ bool is_cell_empty(const int row, const int col)
  * - Returns true if any winning pattern is fully matched
  * - Checks 8 possible win conditions
  */
-bool check_win(const player_t player)
+int check_win(const player_t player)
 {
     static const uint16_t WIN_PATTERNS[] = {
         0b000000111, // Row 1    (top row)
@@ -70,11 +70,11 @@ bool check_win(const player_t player)
     {
         if ((current & WIN_PATTERNS[i]) == WIN_PATTERNS[i])
         {
-            return true;
+            return i;
         }
     }
 
-    return false;
+    return -1;
 }
 
 
@@ -174,7 +174,7 @@ player_t get_computer_player(const GameContext* context) {
 
 // Scoring part
 
-void update_score(player_t winner, const GameContext* context) {
+void update_score(const player_t winner, const GameContext* context) {
     if (context->computer_enabled) {
         // One-player mode
         if (winner == context->player_1) {
@@ -195,10 +195,10 @@ void update_score(player_t winner, const GameContext* context) {
 
 void update_game_state_and_score(GameContext* context)
 {
-    if (check_win(PLAYER_X)) {
+    if (check_win(PLAYER_X) != -1) {
         context->state = GAME_STATE_P1_WIN;
         update_score(PLAYER_X, context);
-    } else if (check_win(PLAYER_O)) {
+    } else if (check_win(PLAYER_O) != -1) {
         context->state = GAME_STATE_P2_WIN;
         update_score(PLAYER_O, context);
     } else if (check_draw()) {

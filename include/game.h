@@ -43,24 +43,30 @@ typedef enum
     ONE_PLAYER_HARD
 } GameMode;
 
+typedef struct {
+    double start_time;
+    double active;
+} ActiveTransition;
+
 
 typedef struct {
     bool needs_redraw;
     GameState state;
     GameMode selected_game_mode;
     player_t player_1;
-    NeuralNetwork nn;
     bool computer_enabled;
     bool audio_disabled;
+    ActiveTransition transition;
     int p1_score;
     int p2_score;
+
 } GameContext;
 
 
 
 void initialize_game(const GameResources* res, GameContext* context);
 bool is_cell_empty(int row, int col);
-bool check_win(player_t player);
+int check_win(player_t player);
 bool check_draw(void);
 player_t get_cell(int row, int col);
 void set_cell(int row, int col, player_t player);
