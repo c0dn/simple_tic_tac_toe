@@ -60,7 +60,7 @@ typedef struct {
 
 void initialize_game(const GameResources* res, GameContext* context);
 bool is_cell_empty(int row, int col);
-bool check_win(player_t player);
+int check_win(player_t player);
 bool check_draw(void);
 player_t get_cell(int row, int col);
 void set_cell(int row, int col, player_t player);
