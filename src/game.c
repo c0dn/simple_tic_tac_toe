@@ -1,10 +1,9 @@
+#include <computer.h>
 #include <game.h>
 
 uint16_t x_board;
 uint16_t o_board;
 player_t current_player;
-int p1_score = 0;
-int p2_score = 0;
 
 
 
@@ -14,6 +13,12 @@ void initialize_game(const GameResources* res, GameContext* context)
     o_board = 0;
     context->state = GAME_STATE_PLAYING;
     current_player = PLAYER_X;
+    if (current_player == get_computer_player(context))
+    {
+        computer_move(context, res->models);
+        PlaySound(res->fx_symbol);
+        current_player = get_computer_player(context) == PLAYER_X ? PLAYER_O : PLAYER_X;
+    }
 }
 
 
@@ -174,20 +179,20 @@ player_t get_computer_player(const GameContext* context) {
 
 // Scoring part
 
-void update_score(const player_t winner, const GameContext* context) {
+void update_score(const player_t winner, GameContext* context) {
     if (context->computer_enabled) {
         // One-player mode
         if (winner == context->player_1) {
-            p1_score++; // Human score
+            context->p1_score++;
         } else if (winner == get_computer_player(context)) {
-            p2_score++; // Computer score
+            context->p2_score++;
         }
     } else {
         // Two-player mode
-        if (winner == PLAYER_X) {
-            p1_score++;
-        } else if (winner == PLAYER_O) {
-            p2_score++;
+        if (winner == context->player_1) {
+            context->p1_score++;
+        } else {
+            context->p2_score++;
         }
     }
 }
@@ -195,12 +200,16 @@ void update_score(const player_t winner, const GameContext* context) {
 
 void update_game_state_and_score(GameContext* context)
 {
-    if (check_win(PLAYER_X) != -1) {
-        context->state = GAME_STATE_P1_WIN;
-        update_score(PLAYER_X, context);
-    } else if (check_win(PLAYER_O) != -1) {
-        context->state = GAME_STATE_P2_WIN;
-        update_score(PLAYER_O, context);
+    const int result = check_win(current_player);
+
+    if (result != -1) {
+        if (current_player == context->player_1) {
+            context->state = GAME_STATE_P1_WIN;
+            update_score(current_player, context);
+        } else {
+            context->state = GAME_STATE_P2_WIN;
+            update_score(current_player, context);
+        }
     } else if (check_draw()) {
         context->state = GAME_STATE_DRAW;
     }
@@ -208,16 +217,11 @@ void update_game_state_and_score(GameContext* context)
 
 void display_score(const GameContext* context) {
     if (context->computer_enabled) {
-        DrawText(TextFormat("Human: %d", p1_score), 10, 0, 40, BLACK);
-        DrawText(TextFormat("Computer: %d", p2_score), 760, 0, 40, BLACK);
+        DrawText(TextFormat("Human: %d", context->p1_score), 10, 0, 40, BLACK);
+        DrawText(TextFormat("Computer: %d", context->p2_score), 760, 0, 40, BLACK);
     } else {
-        DrawText(TextFormat("Player 1: %d", p1_score), 10, 0, 40, BLACK);
-        DrawText(TextFormat("Player 2: %d", p2_score), 760, 0, 40, BLACK);
+        DrawText(TextFormat("Player 1: %d", context->p1_score), 10, 0, 40, BLACK);
+        DrawText(TextFormat("Player 2: %d", context->p2_score), 760, 0, 40, BLACK);
     }
-}
-
-void reset_score() {
-    p1_score = 0;
-    p2_score = 0;
 }
 

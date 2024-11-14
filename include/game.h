@@ -74,8 +74,7 @@ bool is_computer_win(const GameContext* context);
 player_t get_human_player(const GameContext* context);
 player_t get_computer_player(const GameContext* context);
 void display_score(const GameContext* context);
-void reset_score();
-void update_score(player_t winner, const GameContext* context);
+void update_score(player_t winner, GameContext* context);
 void update_game_state_and_score(GameContext* context);
 
 

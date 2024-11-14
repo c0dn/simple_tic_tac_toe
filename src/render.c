@@ -92,7 +92,7 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
 
     render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts);
     display_score(context);
-    const int winning_pattern = check_win(context->state == GAME_STATE_P1_WIN ? PLAYER_X : PLAYER_O);
+    const int winning_pattern = check_win(current_player);
     if (winning_pattern != -1)
     {
         int line_start_x = 0, line_start_y = 0, line_end_x = 0, line_end_y = 0;
@@ -207,7 +207,6 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
     };
 
     DrawTextureEx(music_icon, icon_pos, 0.0f, icon_scale, WHITE);
-    reset_score();
 }
 
 

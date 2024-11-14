@@ -30,7 +30,9 @@ int main(void)
         .transition = {
             .start_time = 0,
             .active = false
-        }
+        },
+        .p1_score = 0,
+        .p2_score = 0,
     };
 
     const UiOptions render_options = {
