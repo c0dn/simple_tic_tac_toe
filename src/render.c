@@ -49,36 +49,27 @@ static void render_buttons(
 
         DrawText(buttons[i].text, (int)cords.x, (int)cords.y, buttons[i].font_size, BLACK);
     }
+
 }
 
-
-void render_grid(const GameResources* resources, const UiOptions* render_opts)
+void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
 {
     ClearBackground(render_opts->background_color);
-    // Calculate grid size for a square centered grid
+    
     const int grid_size = GetScreenWidth() < GetScreenHeight()
                               ? (float)GetScreenWidth() * 0.6f
                               : (float)GetScreenHeight() * 0.6f;
     const int cell_size = grid_size / 3;
-
-    // Calculate starting position to center the grid
+    
     const int start_x = (GetScreenWidth() - grid_size) / 2;
     const int start_y = (GetScreenHeight() - grid_size) / 2;
-
-    // Draw thicker lines using rectangles
+    
     const int line_thickness = 4;
-
-    // Vertical lines
-    DrawRectangle(start_x + cell_size - line_thickness / 2, start_y,
-                  line_thickness, grid_size, BLACK);
-    DrawRectangle(start_x + cell_size * 2 - line_thickness / 2, start_y,
-                  line_thickness, grid_size, BLACK);
-
-    // Horizontal lines
-    DrawRectangle(start_x, start_y + cell_size - line_thickness / 2,
-                  grid_size, line_thickness, BLACK);
-    DrawRectangle(start_x, start_y + cell_size * 2 - line_thickness / 2,
-                  grid_size, line_thickness, BLACK);
+    
+    DrawRectangle(start_x + cell_size - line_thickness / 2, start_y, line_thickness, grid_size, BLACK);
+    DrawRectangle(start_x + cell_size * 2 - line_thickness / 2, start_y, line_thickness, grid_size, BLACK);
+    DrawRectangle(start_x, start_y + cell_size - line_thickness / 2, grid_size, line_thickness, BLACK);
+    DrawRectangle(start_x, start_y + cell_size * 2 - line_thickness / 2, grid_size, line_thickness, BLACK);
 
     const int symbol_size = cell_size / 2;
     for (int i = 0; i < BOARD_SIZE; i++)
@@ -91,12 +82,15 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts)
                 const char* symbol = cell == PLAYER_X ? "X" : "O";
                 const int draw_x = start_x + j * cell_size + (cell_size - symbol_size) / 2;
                 const int draw_y = start_y + i * cell_size + (cell_size - symbol_size) / 2;
-                const Color symbol_color = (cell == PLAYER_X) ? SKYBLUE : GOLD;
+                const Color symbol_color = cell == PLAYER_X ? SKYBLUE : GOLD;
 
                 DrawText(symbol, draw_x, draw_y, symbol_size, symbol_color);
             }
         }
     }
+    
+    render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts);
+    display_score(context); 
 }
 
 
@@ -147,6 +141,7 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
     };
 
     DrawTextureEx(music_icon, icon_pos, 0.0f, icon_scale, WHITE);
+    reset_score();
 }
 
 
@@ -177,7 +172,7 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
     // Constants
     static const char PLAYER1_WIN_MSG[] = "Player 1 Wins!";
     static const char PLAYER2_WIN_MSG[] = "Player 2 Wins!";
-    static const char DRAW_MSG[] = "A draw. How droll.";
+    static const char DRAW_MSG[] = "It's a DRAW";
     static const char LOSE_MSG[] = "You lose!";
 
     // Draw a semi-transparent background

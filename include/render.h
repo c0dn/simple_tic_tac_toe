@@ -9,7 +9,6 @@
 #define GRID_HEIGHT (CELL_HEIGHT * 3)
 #include <game.h>
 #include <menu.h>
-#include <raylib.h>
 
 
 typedef struct
@@ -114,7 +113,7 @@ typedef struct {
 
 
 
-void render_grid(const GameResources* resources, const UiOptions* render_opts);
+void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context);
 void render_menu(
     const GameResources* resources, const UiOptions* render_opts, const GameContext* context);
 void render_game_over(

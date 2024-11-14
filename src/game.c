@@ -3,6 +3,8 @@
 uint16_t x_board;
 uint16_t o_board;
 player_t current_player;
+int p1_score = 0;
+int p2_score = 0;
 
 
 
@@ -169,3 +171,53 @@ player_t get_human_player(const GameContext* context) {
 player_t get_computer_player(const GameContext* context) {
     return context->player_1 == PLAYER_X ? PLAYER_O : PLAYER_X;
 }
+
+// Scoring part
+
+void update_score(player_t winner, const GameContext* context) {
+    if (context->computer_enabled) {
+        // One-player mode
+        if (winner == context->player_1) {
+            p1_score++; // Human score
+        } else if (winner == get_computer_player(context)) {
+            p2_score++; // Computer score
+        }
+    } else {
+        // Two-player mode
+        if (winner == PLAYER_X) {
+            p1_score++;
+        } else if (winner == PLAYER_O) {
+            p2_score++;
+        }
+    }
+}
+
+
+void update_game_state_and_score(GameContext* context)
+{
+    if (check_win(PLAYER_X)) {
+        context->state = GAME_STATE_P1_WIN;
+        update_score(PLAYER_X, context);
+    } else if (check_win(PLAYER_O)) {
+        context->state = GAME_STATE_P2_WIN;
+        update_score(PLAYER_O, context);
+    } else if (check_draw()) {
+        context->state = GAME_STATE_DRAW;
+    }
+}
+
+void display_score(const GameContext* context) {
+    if (context->computer_enabled) {
+        DrawText(TextFormat("Human: %d", p1_score), 10, 0, 40, BLACK);
+        DrawText(TextFormat("Computer: %d", p2_score), 760, 0, 40, BLACK);
+    } else {
+        DrawText(TextFormat("Player 1: %d", p1_score), 10, 0, 40, BLACK);
+        DrawText(TextFormat("Player 2: %d", p2_score), 760, 0, 40, BLACK);
+    }
+}
+
+void reset_score() {
+    p1_score = 0;
+    p2_score = 0;
+}
+

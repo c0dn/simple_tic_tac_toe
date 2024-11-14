@@ -26,7 +26,6 @@ NeuralNetwork* load_model()
     return nn;
 }
 
-
 void forward_pass(NeuralNetwork* nn, const double input[])
 {
     for (int i = 0; i < HIDDEN_NODES; i++)
@@ -86,8 +85,6 @@ EvalResult nn_move(NeuralNetwork* nn) {
     return (EvalResult){(int)best_score, best_move};
 }
 
-
-
 EvalResult minimax(const player_t current_player)
 {
     // Check win conditions
@@ -107,8 +104,10 @@ EvalResult minimax(const player_t current_player)
         const int row = move / 3;
         const int col = move % 3;
 
+        // Make the move
         set_cell(row, col, current_player);
 
+        // Recursive call with the next player
         const EvalResult result = minimax(
             current_player == PLAYER_X ? PLAYER_O : PLAYER_X
         );
@@ -117,20 +116,18 @@ EvalResult minimax(const player_t current_player)
         if (current_player == PLAYER_X)
         {
             x_board &= ~BIT_POS(row, col);
-        }
-        else
-        {
+        } else {
             o_board &= ~BIT_POS(row, col);
         }
 
-        // Update best score and move
+        // Update best score and move based on the current player
         if ((current_player == PLAYER_O && result.score > bestScore) ||
-            (current_player == PLAYER_X && result.score < bestScore))
-        {
+            (current_player == PLAYER_X && result.score < bestScore)) {
             bestScore = result.score;
             bestMove = move;
-        }
+            }
 
+        // Remove the current move from legal_moves
         legal_moves &= ~(1 << move);
     }
 
@@ -143,7 +140,7 @@ EvalResult minimax(const player_t current_player)
  * Selects and places optimal move on game board
  *
  * @param context Current game context
- * @param models
+ * @param models 
  */
 void computer_move(const GameContext* context, const AiModels* models) {
     const player_t computer_player = get_computer_player(context);
@@ -171,3 +168,4 @@ void computer_move(const GameContext* context, const AiModels* models) {
         set_cell(row, col, computer_player);
     }
 }
+
