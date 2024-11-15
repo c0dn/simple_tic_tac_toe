@@ -28,9 +28,18 @@ static void start_hard_mode(const GameResources* res, GameContext* context)
     context->state = GAME_STATE_PLAYING;
 }
 
+static void continue_playing(const GameResources* res, GameContext* context)
+{
+    context->player_1 = context->player_1 == PLAYER_X ? PLAYER_O : PLAYER_X;
+    initialize_game(res,  context);
+}
+
+
 static void return_to_menu(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
+    context->p2_score = 0;
+    context->p1_score = 0;
     context->state = GAME_STATE_MENU;
 }
 
@@ -60,7 +69,6 @@ static void show_exit_confirmation(const GameResources* res, GameContext* contex
     PlaySound(res->fx_click);
     context->state = GAME_STATE_EXIT;
 }
-
 
 Button GAME_MODE_BUTTONS[] = {
     {
@@ -131,17 +139,17 @@ Button INSTRUCTIONS_BUTTONS[] = {
 
 Button GAME_OVER_BUTTONS[] = {
     {
-        .text = "Restart Game",
+        .text = "Continue Playing",
         .width = 200,
         .height = 60,
         .first_render_offset = 0,
         .padding = PaddingY(15.0f),
         .rounded = true,
         .font_size = 20,
-        .action = initialize_game
+        .action = continue_playing
     },
     {
-        .text = "Back to Menu",
+        .text = "End Game",
         .width = 200,
         .height = 60,
         .first_render_offset = 0,
@@ -193,5 +201,18 @@ Button MAIN_MENU_BUTTONS[] = {
         .rounded = true,
         .font_size = 30,
         .action = show_exit_confirmation
+    }
+};
+
+Button IN_GAME_BUTTONS[] = {
+    {
+        .text = "Return to menu",
+        .width = 330.0f,
+        .height = 100.0f,
+        .padding = PaddingY(10.0f),
+        .first_render_offset = 400.0f,
+        .rounded = true,
+        .font_size = 40,
+        .action = return_to_menu
     }
 };

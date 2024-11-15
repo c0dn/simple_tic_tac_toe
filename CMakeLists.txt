@@ -26,4 +26,5 @@ endif()
 add_executable(1103_tic_tac_toe ${SOURCES})
 
 target_link_libraries(1103_tic_tac_toe raylib)
+target_link_libraries(1103_tic_tac_toe m)
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
