@@ -40,8 +40,8 @@ GameResources load_game_resources(int screen_width, int screen_height) {
     resources.models = malloc(sizeof(AiModels));
     resources.models->neural_network = neural_network;
 
-    BayerProbabilities* bayer_probabilities = init_naive_bayes();
-    resources.models->bayer_probabilities = bayer_probabilities;
+    BayesModel* bayes_model = load_naive_bayes();
+    resources.models->bayes_model = bayes_model;
     return resources;
 }
 
@@ -57,7 +57,7 @@ void unload_game_resources(GameResources* resources) {
     UnloadTexture(resources->music_off);
     UnloadTexture(resources->music_on);
     free(resources->models->neural_network);
-    free(resources->models->bayer_probabilities);
+    free(resources->models->bayes_model);
     free(resources->models);
     resources->models = NULL;
 }

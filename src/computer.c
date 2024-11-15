@@ -3,32 +3,6 @@
 #include <stdlib.h>
 #include <tgmath.h>
 
-int predict(const char board[BOARD_SIZE], const BayerProbabilities* probs)
-{
-    double winProb = probs->probWin, loseProb = probs->probLose;
-
-    for (int i = 0; i < BOARD_SIZE; i++)
-    {
-        if (board[i] == 'x')
-        {
-            winProb *= probs->probX[i][1];
-            loseProb *= probs->probX[i][0];
-        }
-        else if (board[i] == 'o')
-        {
-            winProb *= probs->probO[i][1];
-            loseProb *= probs->probO[i][0];
-        }
-        else
-        {
-            winProb *= probs->probBlank[i][1];
-            loseProb *= probs->probBlank[i][0];
-        }
-    }
-
-    // Return the prediction (1 for win, 0 for lose)
-    return winProb * 0.9 > loseProb ? 1 : 0;
-}
 
 NeuralNetwork* load_model()
 {
@@ -37,7 +11,7 @@ NeuralNetwork* load_model()
     FILE* file = fopen(weights_path, "rb");
     if (file == NULL)
     {
-        TraceLog(LOG_ERROR, "Failed to open file for loading model.\n");
+        TraceLog(LOG_ERROR, "Failed to load Neural net\n");
         return NULL;
     }
 
@@ -52,28 +26,29 @@ NeuralNetwork* load_model()
     return nn;
 }
 
-BayerProbabilities* init_naive_bayes()
+BayesModel* load_naive_bayes()
 {
-    BayerProbabilities* probs = malloc(sizeof(BayerProbabilities));
+    BayesModel* model = malloc(sizeof(BayesModel));
+    FILE* file = fopen("assets/bayes_model.dat", "rb");
 
-    probs->probWin = 0.6;
-    probs->probLose = 0.4;
-
-    for (int i = 0; i < BOARD_SIZE; i++)
-    {
-        probs->probX[i][1] = 0.6;
-        probs->probO[i][1] = 0.5;
-        probs->probBlank[i][1] = 0.8;
-
-        probs->probX[i][0] = 0.4;
-        probs->probO[i][0] = 0.3;
-        probs->probBlank[i][0] = 0.2;
+    if (!file) {
+        TraceLog(LOG_ERROR, "Fail to load Bayes model");
+        return NULL;
     }
 
-    return probs;
+    fread(model->prob_x, sizeof(double), 9, file);
+    fread(model->prob_o, sizeof(double), 9, file);
+    fread(model->prob_b, sizeof(double), 9, file);
+    fread(&model->prob_win, sizeof(double), 1, file);
+    fread(&model->prob_lose, sizeof(double), 1, file);
+    fread(&model->total_win, sizeof(int), 1, file);
+    fread(&model->total_lose, sizeof(int), 1, file);
+
+    fclose(file);
+    TraceLog(LOG_INFO, "Model loaded from bayes_model.dat\n");
+
+    return model;
 }
-
-
 
 void forward_pass(NeuralNetwork* nn, const double input[])
 {
@@ -98,6 +73,41 @@ void forward_pass(NeuralNetwork* nn, const double input[])
         // sigmoid activation for the output layer
         nn->output_layer[i] = 1.0 / (1.0 + exp(-nn->output_layer[i])); // Sigmoid activation
     }
+}
+
+double predict_naive_bayes(const BayesModel* model, int const computer_player) {
+    double win_probability = model->prob_win;
+    double lose_probability = model->prob_lose;
+    uint16_t input_x_board = 0;
+    uint16_t input_o_board = 0;
+
+    if(computer_player == PLAYER_O) {
+        input_x_board = o_board;
+        input_o_board = x_board;
+    } else
+    {
+        input_x_board = x_board;
+        input_o_board = o_board;
+    }
+
+    for(int pos = 0; pos < 9; pos++) {
+        const uint16_t bit = 1 << pos;
+
+        if(x_board & bit) {
+            win_probability *= model->prob_x[pos];
+            lose_probability *= model->prob_x[pos];
+        }
+        else if(o_board & bit) {
+            win_probability *= model->prob_o[pos];
+            lose_probability *= model->prob_o[pos];
+        }
+        else {
+            win_probability *= model->prob_b[pos];
+            lose_probability *= model->prob_b[pos];
+        }
+    }
+
+    return win_probability / (win_probability + lose_probability);
 }
 
 EvalResult nn_move(NeuralNetwork* nn)
@@ -138,8 +148,8 @@ EvalResult nn_move(NeuralNetwork* nn)
     return (EvalResult){(int)best_score, best_move};
 }
 
-// naive bayers move
-EvalResult nb_move(const BayerProbabilities* probs)
+// naive bayes move
+EvalResult nb_move(const BayesModel* model, player_t computer_player)
 {
     int best_move = -1;
     double best_score = -1;
@@ -152,22 +162,17 @@ EvalResult nb_move(const BayerProbabilities* probs)
     {
         const int move = __builtin_ctz(legal_moves); // Get the least significant bit
 
-        o_board |= (1 << move); // Try the move for 'o'
-
-        // Create a board state to predict
-        char board[BOARD_SIZE] = {0};
-        for (int i = 0; i < BOARD_SIZE; i++)
+        if (computer_player == PLAYER_X)
         {
-            if (x_board & (1 << i)) board[i] = 'x';
-            else if (o_board & (1 << i)) board[i] = 'o';
-            else board[i] = 'b';
+            x_board |= 1 << move;
+        } else
+        {
+            o_board |= 1 << move;
         }
 
-        // Use Naive Bayes to predict the outcome for this move
-        const int predicted_outcome = predict(board, probs);
 
-        // We are aiming for a 'win' (1) for the computer, but minimizing the loss
-        const double score = predicted_outcome == 1 ? 1.0 : 0.0;
+
+        const double score = predict_naive_bayes(model, computer_player);
 
         if (score > best_score)
         {
@@ -175,9 +180,15 @@ EvalResult nb_move(const BayerProbabilities* probs)
             best_move = move;
         }
 
-        o_board &= ~(1 << move); // Undo the move
+        if (computer_player == PLAYER_X)
+        {
+            x_board &= ~(1 << move);
+        } else
+        {
+            o_board &= ~(1 << move);
+        }
 
-        legal_moves &= ~(1 << move); // Remove the move from legal moves
+        legal_moves &= ~(1 << move);
     }
 
     return (EvalResult){best_score, best_move};
@@ -190,7 +201,7 @@ EvalResult minimax(const player_t current_player)
     if (check_win(PLAYER_O) != -1) return (EvalResult){1, -1};
     if (check_draw()) return (EvalResult){0, -1};
 
-    int bestScore = (current_player == PLAYER_O) ? -2 : 2;
+    int bestScore = current_player == PLAYER_O ? -2 : 2;
     int bestMove = -1;
 
     const uint16_t occupied_board = x_board | o_board;
@@ -251,7 +262,7 @@ void computer_move(const GameContext* context, const AiModels* models) {
         break;
 
     case ONE_PLAYER_EASY_NAIVE:
-        result = nb_move(models->bayer_probabilities);
+        result = nb_move(models->bayes_model, computer_player);
         break;
 
     case ONE_PLAYER_MEDIUM:
