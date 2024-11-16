@@ -1,5 +1,4 @@
 #include "computer.h"
-#include "game.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <tgmath.h>
@@ -85,6 +84,18 @@ EvalResult nn_move(NeuralNetwork* nn) {
     return (EvalResult){(int)best_score, best_move};
 }
 
+/**
+ * @brief Execute minimax algorithm for optimal Tic-Tac-Toe move
+ *
+ * Recursively evaluates board positions using minimax with alpha-beta pruning
+ * to determine the best move for the current player
+ *
+ * @param current_player Current player (X or O)
+ * @param alpha Alpha value for pruning
+ * @param beta Beta value for pruning
+ * @param depth Remaining search depth
+ * @return EvalResult containing best score and move
+ */
 EvalResult minimax(const player_t current_player, int alpha, int beta, int depth, const GameContext* context)
 {  
     const player_t human = get_human_player(context);
@@ -152,17 +163,14 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, int depth
 
 
 /**
- * @brief Execute computer's move using minimax algorithm
- *
- * Selects and places optimal move on game board
+ * @brief Execute computer's move using various algorithms selected by current game difficulty
  *
  * @param context Current game context
- * @param models 
+ * @param models struct containing ML model parameters
  */
 void computer_move(const GameContext* context, const AiModels* models) {
     const player_t computer_player = get_computer_player(context);
     EvalResult result;
-    int depth;
 
     switch(context->selected_game_mode) {
     case ONE_PLAYER_EASY:
@@ -170,15 +178,11 @@ void computer_move(const GameContext* context, const AiModels* models) {
         break;
 
     case ONE_PLAYER_MEDIUM:
-
-        depth = 3;
-        result = minimax(computer_player, -2, 2, depth, context);
+        result = minimax(computer_player, -2, 2, 3, context);
         break;
 
     case ONE_PLAYER_HARD:
-
-        depth = 9;
-        result = minimax(computer_player, -2, 2, depth, context);
+        result = minimax(computer_player, -2, 2, 9, context);
         break;
 
     default:
