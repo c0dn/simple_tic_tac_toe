@@ -1,6 +1,7 @@
 #include "render.h"
 #include <buttons.h>
-#include "handlers.h"
+#include <computer.h>
+
 #include <raylib.h>
 #include <stddef.h>
 #include <utils.h>
@@ -98,7 +99,7 @@ void do_game_start_transition(const GameResources* resources, const UiOptions* r
     }
 }
 
-void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context, bool show_buttons)
+void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context, const bool show_buttons)
 {
     ClearBackground(render_opts->background_color);
     const int grid_size = GetScreenWidth() < GetScreenHeight()
@@ -124,17 +125,7 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
                   grid_size, line_thickness, BLACK);
 
     const int symbol_size = cell_size / 2;
-    for (int i = 0; i < BOARD_SIZE; i++)
-    {
-        for (int j = 0; j < BOARD_SIZE; j++)
-        {
-            const player_t cell = get_cell(i, j);
-            if (cell != PLAYER_NONE)
-            {
-                const char* symbol = cell == PLAYER_X ? "X" : "O";
-                const int draw_x = start_x + j * cell_size + (cell_size - symbol_size) / 2;
-                const int draw_y = start_y + i * cell_size + (cell_size - symbol_size) / 2;
-                const Color symbol_color = cell == PLAYER_X ? SKYBLUE : GOLD;
+
     uint16_t mask = 1;
     for(int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
         const int row = i / BOARD_SIZE;
@@ -455,7 +446,7 @@ void do_game_over_transition(const GameResources* resources, const UiOptions* re
 
     render_grid(resources, render_opts, context, false);
 
-    const float elapsed_time = GetTime() - context->transition.start_time;
+    const double elapsed_time = GetTime() - context->transition.start_time;
 
     if (elapsed_time >= 1.0) {
         // Semi-transparent background
