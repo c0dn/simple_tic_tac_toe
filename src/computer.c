@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <tgmath.h>
 
-
 NeuralNetwork* load_model()
 {
     const static char weights_path[] = "assets/nn_weights.dat";
@@ -85,14 +84,30 @@ EvalResult nn_move(NeuralNetwork* nn) {
     return (EvalResult){(int)best_score, best_move};
 }
 
-EvalResult minimax(const player_t current_player)
-{
-    // Check win conditions
-    if (check_win(PLAYER_X) != -1) return (EvalResult){-1, -1};
-    if (check_win(PLAYER_O) != -1) return (EvalResult){1, -1};
-    if (check_draw()) return (EvalResult){0, -1};
+/**
+ * @brief Execute minimax algorithm for optimal Tic-Tac-Toe move
+ *
+ * Recursively evaluates board positions using minimax with alpha-beta pruning
+ * to determine the best move for the current player
+ *
+ * @param current_player Current player (X or O)
+ * @param alpha Alpha value for pruning
+ * @param beta Beta value for pruning
+ * @param depth Remaining search depth
+ * @param context Pointer to game context
+ * @return EvalResult containing best score and move
+ */
+EvalResult minimax(const player_t current_player, int alpha, int beta, const int depth, const GameContext* context)
+{  
+    const player_t human = get_human_player(context);
+    const player_t computer = get_computer_player(context);
 
-    int bestScore = (current_player == PLAYER_O) ? -2 : 2;
+    // Check win conditions
+    if (check_win(human) != -1) return (EvalResult){-1, -1};
+    if (check_win(computer) != -1) return (EvalResult){1, -1};
+    if (check_draw() || depth == 0) return (EvalResult){0, -1};
+
+    int bestScore = (current_player == computer) ? -2 : 2;
     int bestMove = -1;
 
     const uint16_t occupied_board = x_board | o_board;
@@ -104,43 +119,55 @@ EvalResult minimax(const player_t current_player)
         const int row = move / 3;
         const int col = move % 3;
 
-        // Make the move
+        // try the move
         set_cell(row, col, current_player);
 
-        // Recursive call with the next player
         const EvalResult result = minimax(
-            current_player == PLAYER_X ? PLAYER_O : PLAYER_X
+            current_player == human ? computer : human, alpha, beta, depth -1, context
         );
 
         // Undo move
         if (current_player == PLAYER_X)
         {
             x_board &= ~BIT_POS(row, col);
-        } else {
+        }
+        else
+        {
             o_board &= ~BIT_POS(row, col);
         }
 
-        // Update best score and move based on the current player
-        if ((current_player == PLAYER_O && result.score > bestScore) ||
-            (current_player == PLAYER_X && result.score < bestScore)) {
-            bestScore = result.score;
-            bestMove = move;
+        // Update best score and move
+        // maximizing for computer
+        if (current_player == computer) {
+            if (result.score > bestScore) {
+                bestScore = result.score;
+                bestMove = move;
             }
+            alpha = (alpha > bestScore) ? alpha : bestScore;
+        } else {
+            if (result.score < bestScore) {
+                bestScore = result.score;
+                bestMove = move;
+            }
+            beta = (beta < bestScore) ? beta : bestScore;
+        }
 
-        // Remove the current move from legal_moves
+        if (alpha >= beta) {
+            break;
+        }
+
         legal_moves &= ~(1 << move);
     }
 
     return (EvalResult){bestScore, bestMove};
 }
 
+
 /**
- * @brief Execute computer's move using minimax algorithm
- *
- * Selects and places optimal move on game board
+ * @brief Execute computer's move using various algorithms selected by current game difficulty
  *
  * @param context Current game context
- * @param models 
+ * @param models struct containing ML model parameters
  */
 void computer_move(const GameContext* context, const AiModels* models) {
     const player_t computer_player = get_computer_player(context);
@@ -152,10 +179,11 @@ void computer_move(const GameContext* context, const AiModels* models) {
         break;
 
     case ONE_PLAYER_MEDIUM:
+        result = minimax(computer_player, -2, 2, 3, context);
         break;
 
     case ONE_PLAYER_HARD:
-        result = minimax(computer_player);
+        result = minimax(computer_player, -2, 2, 9, context);
         break;
 
     default:
