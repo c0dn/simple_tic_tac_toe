@@ -85,12 +85,12 @@ EvalResult nn_move(NeuralNetwork* nn) {
     return (EvalResult){(int)best_score, best_move};
 }
 
-EvalResult minimax(const player_t current_player)
-{
+EvalResult minimax(const player_t current_player, int alpha, int beta, int depth)
+{  
     // Check win conditions
-    if (check_win(PLAYER_X) != -1) return (EvalResult){-1, -1};
-    if (check_win(PLAYER_O) != -1) return (EvalResult){1, -1};
-    if (check_draw()) return (EvalResult){0, -1};
+    if (check_win(PLAYER_X) != 1) return (EvalResult){-1, -1};
+    if (check_win(PLAYER_O) != 1) return (EvalResult){1, -1};
+    if (check_draw() || depth == 0) return (EvalResult){0, -1};
 
     int bestScore = (current_player == PLAYER_O) ? -2 : 2;
     int bestMove = -1;
@@ -104,35 +104,49 @@ EvalResult minimax(const player_t current_player)
         const int row = move / 3;
         const int col = move % 3;
 
-        // Make the move
+        // try the move
         set_cell(row, col, current_player);
 
-        // Recursive call with the next player
         const EvalResult result = minimax(
-            current_player == PLAYER_X ? PLAYER_O : PLAYER_X
+            current_player == PLAYER_X ? PLAYER_O : PLAYER_X, alpha, beta, depth -1
         );
 
         // Undo move
         if (current_player == PLAYER_X)
         {
             x_board &= ~BIT_POS(row, col);
-        } else {
+        }
+        else
+        {
             o_board &= ~BIT_POS(row, col);
         }
 
-        // Update best score and move based on the current player
-        if ((current_player == PLAYER_O && result.score > bestScore) ||
-            (current_player == PLAYER_X && result.score < bestScore)) {
-            bestScore = result.score;
-            bestMove = move;
+        // Update best score and move
+        // maximizing for player O
+        if (current_player == PLAYER_O) {
+            if (result.score > bestScore) {
+                bestScore = result.score;
+                bestMove = move;
             }
+            alpha = (alpha > bestScore) ? alpha : bestScore;
+        } else {
+            if (result.score < bestScore) {
+                bestScore = result.score;
+                bestMove = move;
+            }
+            beta = (beta < bestScore) ? beta : bestScore;
+        }
 
-        // Remove the current move from legal_moves
+        if (alpha >= beta) {
+            break;
+        }
+
         legal_moves &= ~(1 << move);
     }
 
     return (EvalResult){bestScore, bestMove};
 }
+
 
 /**
  * @brief Execute computer's move using minimax algorithm
@@ -145,6 +159,7 @@ EvalResult minimax(const player_t current_player)
 void computer_move(const GameContext* context, const AiModels* models) {
     const player_t computer_player = get_computer_player(context);
     EvalResult result;
+    int depth;
 
     switch(context->selected_game_mode) {
     case ONE_PLAYER_EASY:
@@ -152,10 +167,15 @@ void computer_move(const GameContext* context, const AiModels* models) {
         break;
 
     case ONE_PLAYER_MEDIUM:
+
+        depth = 3;
+        result = minimax(computer_player, -2, 2, depth);
         break;
 
     case ONE_PLAYER_HARD:
-        result = minimax(computer_player);
+
+        depth = 9;
+        result = minimax(computer_player, -2, 2, depth);
         break;
 
     default:
