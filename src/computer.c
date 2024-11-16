@@ -15,7 +15,7 @@ NeuralNetwork* load_model()
     }
 
     // Read weights and biases from the file and load them into the network
-    fread(nn->weights, sizeof(double), HIDDEN_NODES * INPUT_NODES, file);
+    fread(nn->hidden_weights, sizeof(double), HIDDEN_NODES * INPUT_NODES, file);
     fread(nn->bias_hidden, sizeof(double), HIDDEN_NODES, file);
     fread(nn->output_weights, sizeof(double), OUTPUT_NODES * HIDDEN_NODES, file);
     fread(nn->bias_output, sizeof(double), OUTPUT_NODES, file);
@@ -32,7 +32,7 @@ void forward_pass(NeuralNetwork* nn, const double input[])
         nn->hidden_layer[i] = nn->bias_hidden[i];
         for (int j = 0; j < INPUT_NODES; j++)
         {
-            nn->hidden_layer[i] += nn->weights[i][j] * input[j];
+            nn->hidden_layer[i] += nn->hidden_weights[i][j] * input[j];
         }
         // ReLU activation function for the hidden layer
         nn->hidden_layer[i] = nn->hidden_layer[i] > 0 ? nn->hidden_layer[i] : 0.0;
