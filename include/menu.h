@@ -2,6 +2,7 @@
 #define MENU_H
 
 #include <raylib.h>
+#include "neural.h"
 
 
 typedef struct {
@@ -15,6 +16,7 @@ typedef struct {
     Texture2D music_on;
     Texture2D music_off;
     Texture2D instructions_2;
+    AiModels *models;
 } GameResources;
 
 typedef struct {
@@ -24,7 +26,7 @@ typedef struct {
 } UiOptions;
 
 GameResources load_game_resources(int screen_width, int screen_height);
-void unload_game_resources(const GameResources* resources);
+void unload_game_resources(GameResources* resources);
 
 
 #endif //MENU_H

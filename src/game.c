@@ -1,3 +1,4 @@
+#include <computer.h>
 #include <game.h>
 
 uint16_t x_board;
@@ -12,6 +13,7 @@ void initialize_game(const GameResources* res, GameContext* context)
     o_board = 0;
     context->state = GAME_STATE_PLAYING;
     current_player = PLAYER_X;
+    context->start_screen_shown = false;
 }
 
 
@@ -38,7 +40,7 @@ bool is_cell_empty(const int row, const int col)
  * @brief Checks if the specified player has won using bitwise operations
  *
  * @param player Player to check for win (PLAYER_X or PLAYER_O)
- * @return true if a player has won, false otherwise
+ * @return the winning pattern otherwise returns -1, no winning patterns found
  *
  * @details
  * Uses predefined bit patterns representing winning combinations
@@ -46,7 +48,7 @@ bool is_cell_empty(const int row, const int col)
  * - Returns true if any winning pattern is fully matched
  * - Checks 8 possible win conditions
  */
-bool check_win(const player_t player)
+int check_win(const player_t player)
 {
     static const uint16_t WIN_PATTERNS[] = {
         0b000000111, // Row 1    (top row)
@@ -68,11 +70,11 @@ bool check_win(const player_t player)
     {
         if ((current & WIN_PATTERNS[i]) == WIN_PATTERNS[i])
         {
-            return true;
+            return i;
         }
     }
 
-    return false;
+    return -1;
 }
 
 
@@ -86,10 +88,12 @@ bool check_win(const player_t player)
  * - Compares result with full board pattern (0b111111111)
  * - Draw occurs when all nine spots are occupied (all bits set)
  */
+#ifndef USE_ASM_CHECK_DRAW
 bool check_draw(void)
 {
     return (x_board | o_board) == 0b111111111;
 }
+#endif
 
 
 /**
@@ -169,3 +173,52 @@ player_t get_human_player(const GameContext* context) {
 player_t get_computer_player(const GameContext* context) {
     return context->player_1 == PLAYER_X ? PLAYER_O : PLAYER_X;
 }
+
+// Scoring part
+
+void update_score(const player_t winner, GameContext* context) {
+    if (context->computer_enabled) {
+        // One-player mode
+        if (winner == context->player_1) {
+            context->p1_score++;
+        } else if (winner == get_computer_player(context)) {
+            context->p2_score++;
+        }
+    } else {
+        // Two-player mode
+        if (winner == context->player_1) {
+            context->p1_score++;
+        } else {
+            context->p2_score++;
+        }
+    }
+}
+
+
+void update_game_state_and_score(GameContext* context)
+{
+    const int result = check_win(current_player);
+
+    if (result != -1) {
+        if (current_player == context->player_1) {
+            context->state = GAME_STATE_P1_WIN;
+            update_score(current_player, context);
+        } else {
+            context->state = GAME_STATE_P2_WIN;
+            update_score(current_player, context);
+        }
+    } else if (check_draw()) {
+        context->state = GAME_STATE_DRAW;
+    }
+}
+
+void display_score(const GameContext* context) {
+    if (context->computer_enabled) {
+        DrawText(TextFormat("Human: %d", context->p1_score), 10, 0, 40, BLACK);
+        DrawText(TextFormat("Computer: %d", context->p2_score), 760, 0, 40, BLACK);
+    } else {
+        DrawText(TextFormat("Player 1: %d", context->p1_score), 10, 0, 40, BLACK);
+        DrawText(TextFormat("Player 2: %d", context->p2_score), 760, 0, 40, BLACK);
+    }
+}
+

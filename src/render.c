@@ -19,7 +19,9 @@ static void render_buttons(
                                       ? (overwrite_default_colors
                                              ? buttons[i].clickColor
                                              : render_opts->btn_clicked_color)
-                                      : overwrite_default_colors ? buttons[i].color : render_opts->primary_btn_color;
+                                      : overwrite_default_colors
+                                      ? buttons[i].color
+                                      : render_opts->primary_btn_color;
 
         buttons[i].rect = calculate_button_rectangle(
             buttons[i].width, buttons[i].padding, buttons[i].height, buttons[i].first_render_offset, i, buttons_per_row
@@ -51,21 +53,62 @@ static void render_buttons(
     }
 }
 
+void do_game_start_transition(const GameResources* resources, const UiOptions* render_opts,
+                                  GameContext* context)
+{
+    if (!context->transition.active) {
+        context->transition.start_time = GetTime();
+        context->transition.active = true;
+    }
 
-void render_grid(const GameResources* resources, const UiOptions* render_opts)
+    render_grid(resources, render_opts, context, false);
+
+    const float elapsed_time = GetTime() - context->transition.start_time;
+
+    // Semi-transparent background
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(),
+                  (Color){0, 0, 0, 100});
+
+    const char* start_msg = context->computer_enabled
+        ? (current_player == get_human_player(context) ? "Player starts first" : "Computer starts first")
+        : current_player == context->player_1 ? "Player 1 starts first" : "Player 2 starts first";
+
+    // Calculate centered text position
+    const Coords text_coords = calculate_centered_text_xy(
+        start_msg,
+        40,
+        0,
+        0,
+        (float)GetScreenWidth(),
+        (float)GetScreenHeight()
+    );
+
+    DrawText(start_msg, (int)text_coords.x, (int)text_coords.y, 40, RAYWHITE);
+
+    // Reset transition after 1 second
+    if (elapsed_time >= 1.0) {
+        context->transition.active = false;
+        context->start_screen_shown = true;
+        if (current_player == get_computer_player(context))
+        {
+            computer_move(context, resources->models);
+            PlaySound(resources->fx_symbol);
+            current_player = get_computer_player(context) == PLAYER_X ? PLAYER_O : PLAYER_X;
+        }
+    }
+}
+
+void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context, bool show_buttons)
 {
     ClearBackground(render_opts->background_color);
-    // Calculate grid size for a square centered grid
     const int grid_size = GetScreenWidth() < GetScreenHeight()
                               ? (float)GetScreenWidth() * 0.6f
                               : (float)GetScreenHeight() * 0.6f;
     const int cell_size = grid_size / 3;
 
-    // Calculate starting position to center the grid
     const int start_x = (GetScreenWidth() - grid_size) / 2;
     const int start_y = (GetScreenHeight() - grid_size) / 2;
 
-    // Draw thicker lines using rectangles
     const int line_thickness = 4;
 
     // Vertical lines
@@ -81,6 +124,17 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts)
                   grid_size, line_thickness, BLACK);
 
     const int symbol_size = cell_size / 2;
+    for (int i = 0; i < BOARD_SIZE; i++)
+    {
+        for (int j = 0; j < BOARD_SIZE; j++)
+        {
+            const player_t cell = get_cell(i, j);
+            if (cell != PLAYER_NONE)
+            {
+                const char* symbol = cell == PLAYER_X ? "X" : "O";
+                const int draw_x = start_x + j * cell_size + (cell_size - symbol_size) / 2;
+                const int draw_y = start_y + i * cell_size + (cell_size - symbol_size) / 2;
+                const Color symbol_color = cell == PLAYER_X ? SKYBLUE : GOLD;
     uint16_t mask = 1;
     for(int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
         const int row = i / BOARD_SIZE;
@@ -95,6 +149,77 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts)
             DrawText("O", draw_x, draw_y, symbol_size, GOLD);
         }
         mask <<= 1;
+    }
+    if (show_buttons)
+    {
+        render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts);
+    }
+
+    display_score(context);
+    const int winning_pattern = check_win(current_player);
+    if (winning_pattern != -1)
+    {
+        int line_start_x = 0, line_start_y = 0, line_end_x = 0, line_end_y = 0;
+        const float line_width = 10;
+
+        switch (winning_pattern)
+        {
+        case 0: // Top row
+            line_start_x = start_x;
+            line_start_y = start_y + cell_size / 2;
+            line_end_x = start_x + grid_size;
+            line_end_y = line_start_y;
+            break;
+        case 1: // Middle row
+            line_start_x = start_x;
+            line_start_y = start_y + cell_size + cell_size / 2;
+            line_end_x = start_x + grid_size;
+            line_end_y = line_start_y;
+            break;
+        case 2: // Bottom row
+            line_start_x = start_x;
+            line_start_y = start_y + grid_size - cell_size / 2;
+            line_end_x = start_x + grid_size;
+            line_end_y = line_start_y;
+            break;
+        case 5: // First column
+            line_start_x = start_x + cell_size / 2.6;
+            line_start_y = start_y;
+            line_end_x = line_start_x;
+            line_end_y = start_y + grid_size;
+            break;
+        case 4: // Middle column
+            line_start_x = start_x + cell_size + cell_size / 2.4;
+            line_start_y = start_y;
+            line_end_x = line_start_x;
+            line_end_y = start_y + grid_size;
+            break;
+        case 3: // Last column
+            line_start_x = start_x + grid_size - cell_size / 1.6;
+            line_start_y = start_y;
+            line_end_x = line_start_x;
+            line_end_y = start_y + grid_size;
+            break;
+        case 6: // Diagonal top-left to bottom-right
+            line_start_x = start_x;
+            line_start_y = start_y;
+            line_end_x = start_x + grid_size;
+            line_end_y = start_y + grid_size;
+            break;
+        case 7: // Diagonal top-right to bottom-left
+            line_start_x = start_x + grid_size;
+            line_start_y = start_y;
+            line_end_x = start_x;
+            line_end_y = start_y + grid_size;
+            break;
+        default:
+            TraceLog(LOG_ERROR, "Unknown win pattern");
+            break;
+        }
+
+        DrawLineEx((Vector2){(float)line_start_x, (float)line_start_y},
+                   (Vector2){(float)line_end_x, (float)line_end_y},
+                   line_width, RED);
     }
 }
 
@@ -136,8 +261,8 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
 
     // Music toggle icon
     const Texture2D music_icon = context->audio_disabled
-        ? resources->music_off
-        : resources->music_on;
+                                     ? resources->music_off
+                                     : resources->music_on;
 
     const float icon_scale = 0.08f;
     const Vector2 icon_pos = {
@@ -152,8 +277,8 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
 Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* resources)
 {
     const Texture2D music_icon = context->audio_disabled
-        ? resources->music_off
-        : resources->music_on;
+                                     ? resources->music_off
+                                     : resources->music_on;
 
     const float icon_scale = 0.08f;
     const Vector2 icon_pos = {
@@ -172,11 +297,11 @@ Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* 
 
 void render_game_over(const GameContext* context, const UiOptions* render_opts)
 {
-    ClearBackground(render_opts->background_color);
     // Constants
     static const char PLAYER1_WIN_MSG[] = "Player 1 Wins!";
+    static const char HUMAN_WIN_MSG[] = "You Win!";
     static const char PLAYER2_WIN_MSG[] = "Player 2 Wins!";
-    static const char DRAW_MSG[] = "A draw. How droll.";
+    static const char DRAW_MSG[] = "It's a DRAW";
     static const char LOSE_MSG[] = "You lose!";
 
     // Draw a semi-transparent background
@@ -195,9 +320,15 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
     const char* message;
     switch (context->state)
     {
-    case GAME_STATE_P1_WIN: message = PLAYER1_WIN_MSG;
+    case GAME_STATE_P1_WIN:
+        message = context->computer_enabled
+            ? (context->player_1 == PLAYER_X ? HUMAN_WIN_MSG : PLAYER1_WIN_MSG)
+            : PLAYER1_WIN_MSG;
         break;
-    case GAME_STATE_P2_WIN: message = PLAYER2_WIN_MSG;
+    case GAME_STATE_P2_WIN:
+        message = context->computer_enabled
+            ? LOSE_MSG
+            : PLAYER2_WIN_MSG;
         break;
     case GAME_STATE_DRAW: message = DRAW_MSG;
         break;
@@ -272,7 +403,6 @@ void render_instructions(const GameResources* resources, const UiOptions* render
 }
 
 
-
 void render_exit(const UiOptions* render_opts)
 {
     // Calculate message box dimensions
@@ -312,4 +442,29 @@ void render_game_mode_choice(const UiOptions* render_opts)
 
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
     render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts);
+}
+
+void do_game_over_transition(const GameResources* resources, const UiOptions* render_opts,
+                             GameContext* context)
+{
+
+    if (!context->transition.active) {
+        context->transition.start_time = GetTime();
+        context->transition.active = true;
+    }
+
+    render_grid(resources, render_opts, context, false);
+
+    const float elapsed_time = GetTime() - context->transition.start_time;
+
+    if (elapsed_time >= 1.0) {
+        // Semi-transparent background
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(),
+                      (Color){0, 0, 0, 100});
+
+        render_game_over(context, render_opts);
+
+    }
+
+    display_score(context);
 }
