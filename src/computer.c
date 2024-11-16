@@ -88,8 +88,8 @@ EvalResult nn_move(NeuralNetwork* nn) {
 EvalResult minimax(const player_t current_player, int alpha, int beta, int depth)
 {  
     // Check win conditions
-    if (check_win(PLAYER_X) != 1) return (EvalResult){-1, -1};
-    if (check_win(PLAYER_O) != 1) return (EvalResult){1, -1};
+    if (check_win(PLAYER_X) != -1) return (EvalResult){-1, -1};
+    if (check_win(PLAYER_O) != -1) return (EvalResult){1, -1};
     if (check_draw() || depth == 0) return (EvalResult){0, -1};
 
     int bestScore = (current_player == PLAYER_O) ? -2 : 2;
