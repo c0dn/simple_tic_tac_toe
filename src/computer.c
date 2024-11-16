@@ -1,8 +1,8 @@
 #include "computer.h"
+#include "game.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <tgmath.h>
-
 
 NeuralNetwork* load_model()
 {
@@ -85,14 +85,17 @@ EvalResult nn_move(NeuralNetwork* nn) {
     return (EvalResult){(int)best_score, best_move};
 }
 
-EvalResult minimax(const player_t current_player, int alpha, int beta, int depth)
+EvalResult minimax(const player_t current_player, int alpha, int beta, int depth, const GameContext* context)
 {  
+    const player_t human = get_human_player(context);
+    const player_t computer = get_computer_player(context);
+
     // Check win conditions
-    if (check_win(PLAYER_X) != -1) return (EvalResult){-1, -1};
-    if (check_win(PLAYER_O) != -1) return (EvalResult){1, -1};
+    if (check_win(human) != -1) return (EvalResult){-1, -1};
+    if (check_win(computer) != -1) return (EvalResult){1, -1};
     if (check_draw() || depth == 0) return (EvalResult){0, -1};
 
-    int bestScore = (current_player == PLAYER_O) ? -2 : 2;
+    int bestScore = (current_player == computer) ? -2 : 2;
     int bestMove = -1;
 
     const uint16_t occupied_board = x_board | o_board;
@@ -108,7 +111,7 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, int depth
         set_cell(row, col, current_player);
 
         const EvalResult result = minimax(
-            current_player == PLAYER_X ? PLAYER_O : PLAYER_X, alpha, beta, depth -1
+            current_player == human ? computer : human, alpha, beta, depth -1, context
         );
 
         // Undo move
@@ -122,8 +125,8 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, int depth
         }
 
         // Update best score and move
-        // maximizing for player O
-        if (current_player == PLAYER_O) {
+        // maximizing for computer
+        if (current_player == computer) {
             if (result.score > bestScore) {
                 bestScore = result.score;
                 bestMove = move;
@@ -169,13 +172,13 @@ void computer_move(const GameContext* context, const AiModels* models) {
     case ONE_PLAYER_MEDIUM:
 
         depth = 3;
-        result = minimax(computer_player, -2, 2, depth);
+        result = minimax(computer_player, -2, 2, depth, context);
         break;
 
     case ONE_PLAYER_HARD:
 
         depth = 9;
-        result = minimax(computer_player, -2, 2, depth);
+        result = minimax(computer_player, -2, 2, depth, context);
         break;
 
     default:
