@@ -94,9 +94,10 @@ EvalResult nn_move(NeuralNetwork* nn) {
  * @param alpha Alpha value for pruning
  * @param beta Beta value for pruning
  * @param depth Remaining search depth
+ * @param context Pointer to game context
  * @return EvalResult containing best score and move
  */
-EvalResult minimax(const player_t current_player, int alpha, int beta, int depth, const GameContext* context)
+EvalResult minimax(const player_t current_player, int alpha, int beta, const int depth, const GameContext* context)
 {  
     const player_t human = get_human_player(context);
     const player_t computer = get_computer_player(context);
