@@ -72,3 +72,15 @@ Coords calculate_text_xy_offset(
     cord.y = ref_y + ref_height * vertical_offset_percent - (float)font_size / 2;
     return cord;
 }
+
+
+int count_trailing_zeros(uint16_t x) {
+    if (x == 0) return 32;
+
+    int count = 0;
+    while (!(x & 1)) {
+        x >>= 1;
+        count++;
+    }
+    return count;
+}

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <tgmath.h>
+#include <utils.h>
 
 NeuralNetwork* load_model()
 {
@@ -58,7 +59,7 @@ EvalResult nn_move(NeuralNetwork* nn) {
     uint16_t legal_moves = ~occupied & 0b111111111;
 
     while(legal_moves) {
-        const int move = __builtin_ctz(legal_moves);
+        const int move = count_trailing_zeros(legal_moves);
         o_board |= (1 << move); // Try move
 
         double input[INPUT_NODES];
@@ -115,7 +116,7 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, const int
 
     while (legal_moves)
     {
-        const int move = __builtin_ctz(legal_moves);
+        const int move = count_trailing_zeros(legal_moves);
         const int row = move / 3;
         const int col = move % 3;
 

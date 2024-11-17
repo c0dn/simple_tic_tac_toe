@@ -1,7 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
+#include <buttons.h>
 #include <raylib.h>
-#include <render.h>
 
 typedef struct
 {
@@ -47,5 +47,7 @@ Coords calculate_text_xy_offset(
     float vertical_offset_percent,
     float horizontal_offset_percent
 );
+
+int count_trailing_zeros(uint16_t x);
 
 #endif //UTILS_H
