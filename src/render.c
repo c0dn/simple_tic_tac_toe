@@ -6,17 +6,20 @@
 #include <stddef.h>
 #include <utils.h>
 
-static void render_buttons(Button *buttons, const size_t button_count, const int buttons_per_row,
-                           const UiOptions *render_opts)
+static void render_buttons(Button* buttons, const size_t button_count, const int buttons_per_row,
+                           const UiOptions* render_opts)
 {
     for (int i = 0; i < button_count; i++)
     {
         const bool overwrite_default_colors = buttons[i].override_default_colors;
         const bool is_hovering = CheckCollisionPointRec(GetMousePosition(), buttons[i].rect);
         const Color buttonColor = is_hovering
-            ? (overwrite_default_colors ? buttons[i].clickColor : render_opts->btn_clicked_color)
-            : overwrite_default_colors ? buttons[i].color
-                                       : render_opts->primary_btn_color;
+                                      ? (overwrite_default_colors
+                                             ? buttons[i].clickColor
+                                             : render_opts->btn_clicked_color)
+                                      : overwrite_default_colors
+                                      ? buttons[i].color
+                                      : render_opts->primary_btn_color;
 
         buttons[i].rect = calculate_button_rectangle(buttons[i].width, buttons[i].padding, buttons[i].height,
                                                      buttons[i].first_render_offset, i, buttons_per_row,
@@ -43,7 +46,7 @@ static void render_buttons(Button *buttons, const size_t button_count, const int
     }
 }
 
-void do_game_start_transition(const GameResources *resources, const UiOptions *render_opts, GameContext *context)
+void do_game_start_transition(const GameResources* resources, const UiOptions* render_opts, GameContext* context)
 {
     if (!context->transition.active)
     {
@@ -58,10 +61,13 @@ void do_game_start_transition(const GameResources *resources, const UiOptions *r
     // Semi-transparent background
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, 100});
 
-    const char *start_msg = context->computer_enabled
-        ? (current_player == get_human_player(context) ? "Player starts first" : "Computer starts first")
-        : current_player == context->player_1 ? "Player 1 starts first"
-                                              : "Player 2 starts first";
+    const char* start_msg = context->computer_enabled
+                                ? (current_player == get_human_player(context)
+                                       ? "Player starts first"
+                                       : "Computer starts first")
+                                : current_player == context->player_1
+                                ? "Player 1 starts first"
+                                : "Player 2 starts first";
 
     // Calculate centered text position
     const Coords text_coords =
@@ -83,7 +89,7 @@ void do_game_start_transition(const GameResources *resources, const UiOptions *r
     }
 }
 
-void render_grid(const GameResources *resources, const UiOptions *render_opts, const GameContext *context,
+void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context,
                  const bool show_buttons)
 {
     ClearBackground(render_opts->background_color);
@@ -130,9 +136,9 @@ void render_grid(const GameResources *resources, const UiOptions *render_opts, c
     }
 
     display_score(context);
-    const int winning_pattern = check_win(current_player);
-    if (winning_pattern != -1)
+    if (context->state == GAME_STATE_P1_WIN || context->state == GAME_STATE_P2_WIN)
     {
+        const int winning_pattern = check_win(current_player);
         int line_start_x = 0, line_start_y = 0, line_end_x = 0, line_end_y = 0;
         const float line_width = 10;
 
@@ -197,7 +203,7 @@ void render_grid(const GameResources *resources, const UiOptions *render_opts, c
 }
 
 
-void render_menu(const GameResources *resources, const UiOptions *render_opts, const GameContext *context)
+void render_menu(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
 {
     // Constants
     static const char TITLE[] = "TIC-TAC-TOE";
@@ -213,8 +219,10 @@ void render_menu(const GameResources *resources, const UiOptions *render_opts, c
     const float image_scale = 0.3f;
     const float scaled_width = (float)resources->main_menu_img.width * image_scale;
     const float scaled_height = (float)resources->main_menu_img.height * image_scale;
-    const Vector2 image_pos = {((float)GetScreenWidth() - scaled_width) / 2,
-                               ((float)GetScreenHeight() - scaled_height) / 4};
+    const Vector2 image_pos = {
+        ((float)GetScreenWidth() - scaled_width) / 2,
+        ((float)GetScreenHeight() - scaled_height) / 4
+    };
 
     DrawTextureEx(resources->main_menu_img, image_pos, 0.0f, image_scale, WHITE);
 
@@ -234,7 +242,7 @@ void render_menu(const GameResources *resources, const UiOptions *render_opts, c
 }
 
 
-Rectangle calc_music_icon_rect(const GameContext *context, const GameResources *resources)
+Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* resources)
 {
     const Texture2D music_icon = context->audio_disabled ? resources->music_off : resources->music_on;
 
@@ -245,7 +253,7 @@ Rectangle calc_music_icon_rect(const GameContext *context, const GameResources *
 }
 
 
-void render_game_over(const GameContext *context, const UiOptions *render_opts)
+void render_game_over(const GameContext* context, const UiOptions* render_opts)
 {
     // Constants
     static const char PLAYER1_WIN_MSG[] = "Player 1 Wins!";
@@ -254,12 +262,16 @@ void render_game_over(const GameContext *context, const UiOptions *render_opts)
     static const char DRAW_MSG[] = "It's a DRAW";
     static const char LOSE_MSG[] = "You lose!";
 
+    const int screen_width = GetScreenWidth();
+
+    const int screen_height = GetScreenHeight();
+
     // Draw a semi-transparent background
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, 200});
+    DrawRectangle(0, 0, screen_width, screen_height, (Color){0, 0, 0, 200});
 
 
     // Calculate message box dimensions
-    const BoxDimensions box = calculate_centered_box_dimensions(0.5f, 0.4f);
+    const BoxDimensions box = calculate_centered_box_dimensions(0.5f, 0.4f, screen_height, screen_width);
 
     // Draw message box
     DrawRectangle((int)box.x, (int)box.y, (int)box.width, (int)box.height, DARKGRAY);
@@ -267,12 +279,13 @@ void render_game_over(const GameContext *context, const UiOptions *render_opts)
 
 
     // Determine the message based on game state
-    const char *message;
+    const char* message;
     switch (context->state)
     {
     case GAME_STATE_P1_WIN:
-        message = context->computer_enabled ? (context->player_1 == PLAYER_X ? HUMAN_WIN_MSG : PLAYER1_WIN_MSG)
-                                            : PLAYER1_WIN_MSG;
+        message = context->computer_enabled
+                      ? (context->player_1 == PLAYER_X ? HUMAN_WIN_MSG : PLAYER1_WIN_MSG)
+                      : PLAYER1_WIN_MSG;
         break;
     case GAME_STATE_P2_WIN:
         message = context->computer_enabled ? LOSE_MSG : PLAYER2_WIN_MSG;
@@ -299,15 +312,16 @@ void render_game_over(const GameContext *context, const UiOptions *render_opts)
 }
 
 
-void render_instructions(const GameResources *resources, const UiOptions *render_opts)
+void render_instructions(const GameResources* resources, const UiOptions* render_opts)
 {
     ClearBackground(render_opts->background_color);
     // Constants
     static const char TITLE[] = "INSTRUCTIONS";
     static const int FONT_SIZE = 70;
-    static const char *INSTRUCTION_TEXTS[] = {
+    static const char* INSTRUCTION_TEXTS[] = {
         "1. Player 1 is X and Player 2 is O.", "2. Click any grid to make your move.",
-        "3. First to line three 'X's or 'O's wins the game.", "4. Click BACK to return to the main menu."};
+        "3. First to line three 'X's or 'O's wins the game.", "4. Click BACK to return to the main menu."
+    };
 
     // Title rendering
     const Coords title_c =
@@ -331,10 +345,10 @@ void render_instructions(const GameResources *resources, const UiOptions *render
 }
 
 
-void render_exit(const UiOptions *render_opts)
+void render_exit(const UiOptions* render_opts)
 {
     // Calculate message box dimensions
-    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.3f);
+    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.3f, GetScreenHeight(), GetScreenWidth());
     // Draw message box
     DrawRectangle((int)box_dim.x, (int)box_dim.y, (int)box_dim.width, (int)box_dim.height, DARKGRAY);
     DrawRectangleLinesEx((Rectangle){box_dim.x, box_dim.y, box_dim.width, box_dim.height}, 4, RAYWHITE);
@@ -351,10 +365,10 @@ void render_exit(const UiOptions *render_opts)
 }
 
 
-void render_game_mode_choice(const UiOptions *render_opts)
+void render_game_mode_choice(const UiOptions* render_opts)
 {
     // Calculate message box dimensions
-    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f);
+    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f, GetScreenHeight(), GetScreenWidth());
 
     // Draw message box
     DrawRectangle((int)box_dim.x, (int)box_dim.y, (int)box_dim.width, (int)box_dim.height, DARKGRAY);
@@ -372,9 +386,8 @@ void render_game_mode_choice(const UiOptions *render_opts)
     render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts);
 }
 
-void do_game_over_transition(const GameResources *resources, const UiOptions *render_opts, GameContext *context)
+void do_game_over_transition(const GameResources* resources, const UiOptions* render_opts, GameContext* context)
 {
-
     if (!context->transition.active)
     {
         context->transition.start_time = GetTime();
