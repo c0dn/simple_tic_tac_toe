@@ -4,6 +4,8 @@
 
 ButtonCache* BUTTON_CACHE = NULL;
 BoxCache* BOX_CACHE = NULL;
+TextCache* TEXT_CACHE = NULL;
+OffsetTextCache* OFFSET_TEXT_CACHE = NULL;
 
 BoxDimensions calculate_centered_box_dimensions(const float width_percentage, const float height_percentage, const int screen_height, const int screen_width)
 {
@@ -90,11 +92,35 @@ Rectangle calculate_button_rectangle(const float btn_width, const ComponentPaddi
 Coords calculate_centered_text_xy(const char* message, const int font_size, const float ref_x, const float ref_y,
                                   const float ref_width, const float ref_height)
 {
+    TextKey key = {
+        .font_size = font_size,
+        .ref_x = ref_x,
+        .ref_y = ref_y,
+        .ref_width = ref_width,
+        .ref_height = ref_height
+    };
+    strncpy(key.message, message, sizeof(key.message) - 1);
+    key.message[sizeof(key.message) - 1] = '\0';
+
+    TextCache* entry;
+    HASH_FIND(hh, TEXT_CACHE, &key, sizeof(TextKey), entry);
+
+    if (entry) {
+        return entry->result;
+    }
+
     const int text_width = MeasureText(message, font_size);
-    Coords cord;
-    cord.x = ref_x + (ref_width - (float)text_width) / 2;
-    cord.y = ref_y + (ref_height - (float)font_size) / 2;
-    return cord;
+    Coords coords = {
+        .x = ref_x + (ref_width - (float)text_width) / 2,
+        .y = ref_y + (ref_height - (float)font_size) / 2
+    };
+
+    entry = malloc(sizeof(TextCache));
+    entry->key = key;
+    entry->result = coords;
+    HASH_ADD(hh, TEXT_CACHE, key, sizeof(TextKey), entry);
+
+    return coords;
 }
 
 
@@ -102,11 +128,35 @@ Coords calculate_text_xy_offset(const char* message, const int font_size, const 
                                 const float ref_width, const float ref_height, const float vertical_offset_percent,
                                 const float horizontal_offset_percent)
 {
+        OffsetTextKey key = {
+        .font_size = font_size,
+        .ref_x = ref_x,
+        .ref_y = ref_y,
+        .ref_width = ref_width,
+        .ref_height = ref_height,
+        .vertical_offset_percent = vertical_offset_percent,
+        .horizontal_offset_percent = horizontal_offset_percent
+    };
+    strncpy(key.message, message, sizeof(key.message) - 1);
+    key.message[sizeof(key.message) - 1] = '\0';
+    OffsetTextCache* entry;
+    HASH_FIND(hh, OFFSET_TEXT_CACHE, &key, sizeof(OffsetTextKey), entry);
+
+    if (entry) {
+        return entry->result;
+    }
+
     const int text_width = MeasureText(message, font_size);
-    Coords cord;
-    cord.x = ref_x + ref_width * horizontal_offset_percent - (float)text_width / 2;
-    cord.y = ref_y + ref_height * vertical_offset_percent - (float)font_size / 2;
-    return cord;
+    Coords coords = {
+        .x = ref_x + ref_width * horizontal_offset_percent - (float)text_width / 2,
+        .y = ref_y + ref_height * vertical_offset_percent - (float)font_size / 2
+    };
+
+    entry = malloc(sizeof(OffsetTextCache));
+    entry->key = key;
+    entry->result = coords;
+    HASH_ADD(hh, OFFSET_TEXT_CACHE, key, sizeof(OffsetTextKey), entry);
+    return coords;
 }
 
 
@@ -135,6 +185,19 @@ void cleanup_cache(void) {
     HASH_ITER(hh, BOX_CACHE, current2, tmp2) {
         HASH_DEL(BOX_CACHE, current2);
         free(current2);
+    }
+
+
+    TextCache *current3, *tmp3;
+    HASH_ITER(hh, TEXT_CACHE, current3, tmp3) {
+        HASH_DEL(TEXT_CACHE, current3);
+        free(current3);
+    }
+
+    OffsetTextCache *current4, *tmp4;
+    HASH_ITER(hh, OFFSET_TEXT_CACHE, current4, tmp4) {
+        HASH_DEL(OFFSET_TEXT_CACHE, current4);
+        free(current4);
     }
 
 }
