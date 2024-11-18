@@ -3,14 +3,36 @@
 #include "memo.h"
 
 ButtonCache* BUTTON_CACHE = NULL;
+BoxCache* BOX_CACHE = NULL;
 
-BoxDimensions calculate_centered_box_dimensions(const float width_percentage, const float height_percentage)
+BoxDimensions calculate_centered_box_dimensions(const float width_percentage, const float height_percentage, const int screen_height, const int screen_width)
 {
-    BoxDimensions box;
-    box.width = (float)GetScreenWidth() * width_percentage;
-    box.height = (float)GetScreenHeight() * height_percentage;
-    box.x = ((float)GetScreenWidth() - box.width) / 2;
-    box.y = ((float)GetScreenHeight() - box.height) / 2;
+    BoxKey key = {
+        .width_percentage = width_percentage,
+        .height_percentage = height_percentage,
+        .screen_height = screen_height,
+        .screen_width = screen_width
+    };
+
+    BoxCache* entry;
+    HASH_FIND(hh, BOX_CACHE, &key, sizeof(BoxKey), entry);
+
+    if (entry) {
+        return entry->result;
+    }
+
+    BoxDimensions box = {
+        .width = (float)screen_width * width_percentage,
+        .height = (float)screen_height * height_percentage,
+        .x = ((float)screen_width - ((float)screen_width * width_percentage)) / 2,
+        .y = ((float)screen_height - ((float)screen_height * height_percentage)) / 2
+    };
+
+    entry = malloc(sizeof(BoxCache));
+    entry->key = key;
+    entry->result = box;
+    HASH_ADD(hh, BOX_CACHE, key, sizeof(BoxKey), entry);
+
     return box;
 }
 
@@ -108,4 +130,11 @@ void cleanup_cache(void) {
         HASH_DEL(BUTTON_CACHE, current);
         free(current);
     }
+
+    BoxCache *current2, *tmp2;
+    HASH_ITER(hh, BOX_CACHE, current2, tmp2) {
+        HASH_DEL(BOX_CACHE, current2);
+        free(current2);
+    }
+
 }
