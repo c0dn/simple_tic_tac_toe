@@ -10,6 +10,7 @@ find_package(raylib CONFIG REQUIRED)
 
 # Add MSVC-specific compiler flags to suppress specific warnings
 if(MSVC)
+    find_package(PThreads4W REQUIRED)
     add_compile_options(/wd4013)
 
     # Additional flags for more lenient compilation
@@ -19,6 +20,8 @@ if(MSVC)
          DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
     file(COPY ${CMAKE_SOURCE_DIR}/assets
          DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release)
+    # Pthreads for windows
+    list(APPEND EXTRA_LIBS PThreads4W::PThreads4W)
 else()
     file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
 endif()
@@ -28,7 +31,7 @@ endif()
 if(UNIX AND NOT APPLE)
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|x86_64")
         message(STATUS "Linking math library for Linux ${CMAKE_SYSTEM_PROCESSOR}")
-        set(EXTRA_LIBS ${EXTRA_LIBS} m)
+        list(APPEND EXTRA_LIBS m)
     endif()
 endif()
 
