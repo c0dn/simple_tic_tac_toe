@@ -6,11 +6,11 @@ set(CMAKE_C_STANDARD 11)
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 file(GLOB SOURCES "${SRC_DIR}/*.c")
 include_directories("${CMAKE_SOURCE_DIR}/include")
-find_package(raylib CONFIG REQUIRED)
 
 # Add MSVC-specific compiler flags to suppress specific warnings
 if(MSVC)
     find_package(PThreads4W REQUIRED)
+    find_package(raylib CONFIG REQUIRED)
     add_compile_options(/wd4013)
 
     # Additional flags for more lenient compilation
