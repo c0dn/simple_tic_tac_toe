@@ -25,7 +25,7 @@ typedef struct {
     Color btn_clicked_color;
 } UiOptions;
 
-GameResources load_game_resources(int screen_width, int screen_height);
+GameResources load_game_resources();
 void unload_game_resources(GameResources* resources);
 
 

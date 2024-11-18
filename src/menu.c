@@ -1,7 +1,7 @@
 #include <menu.h>
 #include <stdlib.h>
 
-GameResources load_game_resources(int screen_width, int screen_height) {
+GameResources load_game_resources() {
     GameResources resources = { 0 };
 
     // Load audio resources
@@ -13,7 +13,7 @@ GameResources load_game_resources(int screen_width, int screen_height) {
 
     // Load and resize background
     Image background = LoadImage("assets/main1.png");
-    ImageResize(&background, screen_width, screen_height);
+    ImageResize(&background, GetScreenWidth(), GetScreenHeight());
     resources.main_menu_img = LoadTextureFromImage(background);
     UnloadImage(background);
 

@@ -19,7 +19,8 @@ typedef struct
  * This structure defines a flexible button component with multiple rendering and interaction options.
  * It can be used across different menu screens and game states.
  */
-typedef struct {
+typedef struct
+{
     /**
      * @brief Rectangle defining the button's position and size
      *
@@ -28,10 +29,11 @@ typedef struct {
      */
     Rectangle rect;
 
+
     /**
      * @brief Text displayed on the button
      */
-    const char* text;
+    const char *text;
 
     /**
      * @brief Button color
@@ -91,7 +93,7 @@ typedef struct {
      * @param resources Pointer to game resources
      * @param context Pointer to current game context
      */
-    void (*action)(const GameResources*, GameContext*);
+    void (*action)(const GameResources *, GameContext *);
 } Button;
 
 
@@ -102,4 +104,4 @@ extern Button MAIN_MENU_BUTTONS[4];
 extern Button GAME_OVER_BUTTONS[2];
 extern Button IN_GAME_BUTTONS[1];
 
-#endif //BUTTONS_H
+#endif // BUTTONS_H

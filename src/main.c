@@ -12,6 +12,8 @@
 #include <menu.h>
 #include <raylib.h>
 #include <stdlib.h>
+#include <uthash.h>
+#include <utils.h>
 
 int main(void)
 {
@@ -45,7 +47,7 @@ int main(void)
     InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
     InitAudioDevice();
 
-    GameResources resources = load_game_resources((int)screen_width, (int)screen_height);
+    GameResources resources = load_game_resources();
 
     SetTargetFPS(60);
     PlayMusicStream(resources.background_music);
@@ -145,6 +147,7 @@ int main(void)
         EndDrawing();
     }
     unload_game_resources(&resources);
+    cleanup_cache();
     CloseAudioDevice();
     CloseWindow();
     return EXIT_SUCCESS;
