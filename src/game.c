@@ -1,4 +1,3 @@
-#include <computer.h>
 #include <game.h>
 
 uint16_t x_board;

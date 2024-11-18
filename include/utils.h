@@ -3,26 +3,11 @@
 #include <buttons.h>
 #include <raylib.h>
 
-typedef struct
-{
-    float width;
-    float height;
-    float x;
-    float y;
-} BoxDimensions;
-
-typedef struct
-{
-    float x;
-    float y;
-} Coords;
-
-
 Rectangle calculate_button_rectangle(float btn_width, ComponentPadding btn_padding, float btn_height,
                                      float first_button_offset, int index, int buttons_per_row, int screen_height,
-                                     int screen_width);
+                                     int screen_width, MemoCache* cache);
 
-BoxDimensions calculate_centered_box_dimensions(float width_percentage, float height_percentage, int screen_height, int screen_width);
+BoxDimensions calculate_centered_box_dimensions(float width_percentage, float height_percentage, int screen_height, int screen_width, MemoCache* cache);
 
 Coords calculate_centered_text_xy(
     const char* message,
@@ -30,7 +15,7 @@ Coords calculate_centered_text_xy(
     float ref_x,
     float ref_y,
     float ref_width,
-    float ref_height
+    float ref_height, MemoCache* cache
 );
 
 Coords calculate_text_xy_offset(
@@ -41,11 +26,9 @@ Coords calculate_text_xy_offset(
     float ref_width,
     float ref_height,
     float vertical_offset_percent,
-    float horizontal_offset_percent
+    float horizontal_offset_percent, MemoCache* cache
 );
 
 int count_trailing_zeros(uint16_t x);
-
-void cleanup_cache(void);
 
 #endif //UTILS_H

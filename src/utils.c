@@ -1,13 +1,11 @@
 #include "utils.h"
+
+#include <common.h>
 #include <raylib.h>
-#include "memo.h"
 
-ButtonCache* BUTTON_CACHE = NULL;
-BoxCache* BOX_CACHE = NULL;
-TextCache* TEXT_CACHE = NULL;
-OffsetTextCache* OFFSET_TEXT_CACHE = NULL;
-
-BoxDimensions calculate_centered_box_dimensions(const float width_percentage, const float height_percentage, const int screen_height, const int screen_width)
+BoxDimensions calculate_centered_box_dimensions(const float width_percentage, const float height_percentage,
+                                                const int screen_height, const int screen_width, MemoCache
+                                                * cache)
 {
     BoxKey key = {
         .width_percentage = width_percentage,
@@ -16,10 +14,11 @@ BoxDimensions calculate_centered_box_dimensions(const float width_percentage, co
         .screen_width = screen_width
     };
 
-    BoxCache* entry;
-    HASH_FIND(hh, BOX_CACHE, &key, sizeof(BoxKey), entry);
+    BoxCache* entry = NULL;
+    HASH_FIND(hh, cache->box_cache, &key, sizeof(BoxKey), entry);
 
-    if (entry) {
+    if (entry)
+    {
         return entry->result;
     }
 
@@ -30,17 +29,20 @@ BoxDimensions calculate_centered_box_dimensions(const float width_percentage, co
         .y = ((float)screen_height - ((float)screen_height * height_percentage)) / 2
     };
 
-    entry = malloc(sizeof(BoxCache));
-    entry->key = key;
-    entry->result = box;
-    HASH_ADD(hh, BOX_CACHE, key, sizeof(BoxKey), entry);
+    BoxCache* new_entry = malloc(sizeof(BoxCache));
+    if (new_entry) {
+        new_entry->key = key;
+        new_entry->result = box;
+        HASH_ADD(hh, cache->box_cache, key, sizeof(BoxKey), new_entry);
+    }
+
 
     return box;
 }
 
 Rectangle calculate_button_rectangle(const float btn_width, const ComponentPadding btn_padding, const float btn_height,
                                      const float first_button_offset, const int index, const int buttons_per_row,
-                                     const int screen_height, const int screen_width
+                                     const int screen_height, const int screen_width, MemoCache* cache
 
 )
 {
@@ -55,13 +57,13 @@ Rectangle calculate_button_rectangle(const float btn_width, const ComponentPaddi
         .screen_width = screen_width
     };
 
-    ButtonCache* entry;
-    HASH_FIND(hh, BUTTON_CACHE, &key, sizeof(ButtonKey), entry);
+    ButtonCache* entry = NULL;
+    HASH_FIND(hh, cache->button_cache, &key, sizeof(ButtonKey), entry);
 
-    if (entry)
-    {
+    if (entry != NULL) {
         return entry->result;
     }
+
     const float btn_spacing = btn_padding.up + btn_padding.down;
     const float horizontal_spacing = btn_padding.left + btn_padding.right;
     const float start_y = (float)screen_height / 2 - btn_height / 2 + first_button_offset;
@@ -80,17 +82,19 @@ Rectangle calculate_button_rectangle(const float btn_width, const ComponentPaddi
         btn_width, btn_height
     };
 
-    entry = malloc(sizeof(ButtonCache));
-    entry->key = key;
-    entry->result = result;
-    HASH_ADD(hh, BUTTON_CACHE, key, sizeof(ButtonKey), entry);
+    ButtonCache* new_entry = malloc(sizeof(ButtonCache));
+    if (new_entry) {
+        memcpy(&new_entry->key, &key, sizeof(ButtonKey));
+        memcpy(&new_entry->result, &result, sizeof(Rectangle));
+        HASH_ADD(hh, cache->button_cache, key, sizeof(ButtonKey), new_entry);
+    }
 
     return result;
 }
 
 
 Coords calculate_centered_text_xy(const char* message, const int font_size, const float ref_x, const float ref_y,
-                                  const float ref_width, const float ref_height)
+                                  const float ref_width, const float ref_height, MemoCache* cache)
 {
     TextKey key = {
         .font_size = font_size,
@@ -102,10 +106,10 @@ Coords calculate_centered_text_xy(const char* message, const int font_size, cons
     strncpy(key.message, message, sizeof(key.message) - 1);
     key.message[sizeof(key.message) - 1] = '\0';
 
-    TextCache* entry;
-    HASH_FIND(hh, TEXT_CACHE, &key, sizeof(TextKey), entry);
+    TextCache* entry = NULL;
+    HASH_FIND(hh, cache->text_cache, &key, sizeof(TextKey), entry);
 
-    if (entry) {
+    if (entry != NULL) {
         return entry->result;
     }
 
@@ -115,20 +119,21 @@ Coords calculate_centered_text_xy(const char* message, const int font_size, cons
         .y = ref_y + (ref_height - (float)font_size) / 2
     };
 
-    entry = malloc(sizeof(TextCache));
-    entry->key = key;
-    entry->result = coords;
-    HASH_ADD(hh, TEXT_CACHE, key, sizeof(TextKey), entry);
-
+    TextCache* new_entry = malloc(sizeof(TextCache));
+    if (new_entry) {
+        new_entry->key = key;
+        new_entry->result = coords;
+        HASH_ADD(hh, cache->text_cache, key, sizeof(TextKey), new_entry);
+    }
     return coords;
 }
 
 
 Coords calculate_text_xy_offset(const char* message, const int font_size, const float ref_x, const float ref_y,
                                 const float ref_width, const float ref_height, const float vertical_offset_percent,
-                                const float horizontal_offset_percent)
+                                const float horizontal_offset_percent, MemoCache* cache)
 {
-        OffsetTextKey key = {
+    OffsetTextKey key = {
         .font_size = font_size,
         .ref_x = ref_x,
         .ref_y = ref_y,
@@ -139,10 +144,10 @@ Coords calculate_text_xy_offset(const char* message, const int font_size, const 
     };
     strncpy(key.message, message, sizeof(key.message) - 1);
     key.message[sizeof(key.message) - 1] = '\0';
-    OffsetTextCache* entry;
-    HASH_FIND(hh, OFFSET_TEXT_CACHE, &key, sizeof(OffsetTextKey), entry);
+    OffsetTextCache* entry = NULL;
+    HASH_FIND(hh, cache->offset_text_cache, &key, sizeof(OffsetTextKey), entry);
 
-    if (entry) {
+    if (entry != NULL) {
         return entry->result;
     }
 
@@ -152,10 +157,13 @@ Coords calculate_text_xy_offset(const char* message, const int font_size, const 
         .y = ref_y + ref_height * vertical_offset_percent - (float)font_size / 2
     };
 
-    entry = malloc(sizeof(OffsetTextCache));
-    entry->key = key;
-    entry->result = coords;
-    HASH_ADD(hh, OFFSET_TEXT_CACHE, key, sizeof(OffsetTextKey), entry);
+    OffsetTextCache* new_entry = malloc(sizeof(OffsetTextCache));
+    if (new_entry) {
+        new_entry->key = key;
+        new_entry->result = coords;
+        HASH_ADD(hh, cache->offset_text_cache, key, sizeof(OffsetTextKey), new_entry);
+    }
+
     return coords;
 }
 
@@ -172,32 +180,4 @@ int count_trailing_zeros(uint16_t x)
         count++;
     }
     return count;
-}
-
-void cleanup_cache(void) {
-    ButtonCache *current, *tmp;
-    HASH_ITER(hh, BUTTON_CACHE, current, tmp) {
-        HASH_DEL(BUTTON_CACHE, current);
-        free(current);
-    }
-
-    BoxCache *current2, *tmp2;
-    HASH_ITER(hh, BOX_CACHE, current2, tmp2) {
-        HASH_DEL(BOX_CACHE, current2);
-        free(current2);
-    }
-
-
-    TextCache *current3, *tmp3;
-    HASH_ITER(hh, TEXT_CACHE, current3, tmp3) {
-        HASH_DEL(TEXT_CACHE, current3);
-        free(current3);
-    }
-
-    OffsetTextCache *current4, *tmp4;
-    HASH_ITER(hh, OFFSET_TEXT_CACHE, current4, tmp4) {
-        HASH_DEL(OFFSET_TEXT_CACHE, current4);
-        free(current4);
-    }
-
 }

@@ -7,7 +7,7 @@
 #include <utils.h>
 
 static void render_buttons(Button* buttons, const size_t button_count, const int buttons_per_row,
-                           const UiOptions* render_opts)
+                           const UiOptions* render_opts, MemoCache* cache)
 {
     for (int i = 0; i < button_count; i++)
     {
@@ -23,7 +23,7 @@ static void render_buttons(Button* buttons, const size_t button_count, const int
 
         buttons[i].rect = calculate_button_rectangle(buttons[i].width, buttons[i].padding, buttons[i].height,
                                                      buttons[i].first_render_offset, i, buttons_per_row,
-                                                     GetScreenHeight(), GetScreenWidth());
+                                                     GetScreenHeight(), GetScreenWidth(), cache);
 
         // Draw button
         if (buttons[i].rounded)
@@ -40,7 +40,7 @@ static void render_buttons(Button* buttons, const size_t button_count, const int
         // Center text
         const Coords cords =
             calculate_centered_text_xy(buttons[i].text, buttons[i].font_size, buttons[i].rect.x, buttons[i].rect.y,
-                                       buttons[i].rect.width, buttons[i].rect.height);
+                                       buttons[i].rect.width, buttons[i].rect.height, cache);
 
         DrawText(buttons[i].text, (int)cords.x, (int)cords.y, buttons[i].font_size, BLACK);
     }
@@ -71,7 +71,8 @@ void do_game_start_transition(const GameResources* resources, const UiOptions* r
 
     // Calculate centered text position
     const Coords text_coords =
-        calculate_centered_text_xy(start_msg, 40, 0, 0, (float)GetScreenWidth(), (float)GetScreenHeight());
+        calculate_centered_text_xy(start_msg, 40, 0, 0, (float)GetScreenWidth(), (float)GetScreenHeight(),
+                                   context->memo_cache);
 
     DrawText(start_msg, (int)text_coords.x, (int)text_coords.y, 40, RAYWHITE);
 
@@ -132,7 +133,7 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
     }
     if (show_buttons)
     {
-        render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts);
+        render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts, context->memo_cache);
     }
 
     display_score(context);
@@ -213,7 +214,8 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
 
     // Title rendering
     const Coords title_c =
-        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)GetScreenWidth(), (float)FONT_SIZE);
+        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)GetScreenWidth(), (float)FONT_SIZE,
+                                   context->memo_cache);
     DrawText(TITLE, (int)title_c.x, (int)title_c.y, FONT_SIZE, DARKPURPLE);
 
     const float image_scale = 0.3f;
@@ -228,7 +230,7 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
 
     const size_t button_count = sizeof(MAIN_MENU_BUTTONS) / sizeof(Button);
 
-    render_buttons(MAIN_MENU_BUTTONS, button_count, 2, render_opts);
+    render_buttons(MAIN_MENU_BUTTONS, button_count, 2, render_opts, context->memo_cache);
 
     const Rectangle audio_ico_rect = calc_music_icon_rect(context, resources);
 
@@ -271,7 +273,8 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
 
 
     // Calculate message box dimensions
-    const BoxDimensions box = calculate_centered_box_dimensions(0.5f, 0.4f, screen_height, screen_width);
+    const BoxDimensions box = calculate_centered_box_dimensions(0.5f, 0.4f, screen_height, screen_width,
+                                                                context->memo_cache);
 
     // Draw message box
     DrawRectangle((int)box.x, (int)box.y, (int)box.width, (int)box.height, DARKGRAY);
@@ -303,16 +306,17 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
         message = LOSE_MSG;
     }
 
-    const Coords text_c = calculate_text_xy_offset(message, 40, box.x, box.y, box.width, box.height, 0.1f, 0.5f);
+    const Coords text_c = calculate_text_xy_offset(message, 40, box.x, box.y, box.width, box.height, 0.1f, 0.5f,
+                                                   context->memo_cache);
 
 
     DrawText(message, (int)text_c.x, (int)text_c.y, 40, RAYWHITE);
     const size_t button_count = sizeof(GAME_OVER_BUTTONS) / sizeof(Button);
-    render_buttons(GAME_OVER_BUTTONS, button_count, 1, render_opts);
+    render_buttons(GAME_OVER_BUTTONS, button_count, 1, render_opts, context->memo_cache);
 }
 
 
-void render_instructions(const GameResources* resources, const UiOptions* render_opts)
+void render_instructions(const GameResources* resources, const UiOptions* render_opts, MemoCache* cache)
 {
     ClearBackground(render_opts->background_color);
     // Constants
@@ -325,7 +329,7 @@ void render_instructions(const GameResources* resources, const UiOptions* render
 
     // Title rendering
     const Coords title_c =
-        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)GetScreenWidth(), (float)FONT_SIZE);
+        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)GetScreenWidth(), (float)FONT_SIZE, cache);
     DrawText(TITLE, (int)title_c.x, (int)title_c.y, FONT_SIZE, DARKPURPLE);
 
 
@@ -341,14 +345,15 @@ void render_instructions(const GameResources* resources, const UiOptions* render
     DrawTexture(resources->instructions_1, instructions_x, (int)((float)GetScreenHeight() / 2 * 0.7f), WHITE);
     DrawTexture(resources->instructions_2, instructions_x, (int)((float)GetScreenHeight() / 2 * 1.08f), WHITE);
 
-    render_buttons(INSTRUCTIONS_BUTTONS, 1, 1, render_opts);
+    render_buttons(INSTRUCTIONS_BUTTONS, 1, 1, render_opts, cache);
 }
 
 
-void render_exit(const UiOptions* render_opts)
+void render_exit(const UiOptions* render_opts, MemoCache* cache)
 {
     // Calculate message box dimensions
-    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.3f, GetScreenHeight(), GetScreenWidth());
+    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.3f, GetScreenHeight(), GetScreenWidth(),
+                                                                    cache);
     // Draw message box
     DrawRectangle((int)box_dim.x, (int)box_dim.y, (int)box_dim.width, (int)box_dim.height, DARKGRAY);
     DrawRectangleLinesEx((Rectangle){box_dim.x, box_dim.y, box_dim.width, box_dim.height}, 4, RAYWHITE);
@@ -356,19 +361,20 @@ void render_exit(const UiOptions* render_opts)
     // Draw message
     const char message[] = "Do you want to exit?";
     const Coords text_cords =
-        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height);
+        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height, cache);
 
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
 
     const size_t button_count = sizeof(EXIT_CONFIRMATION_BUTTONS) / sizeof(Button);
-    render_buttons(EXIT_CONFIRMATION_BUTTONS, button_count, 1, render_opts);
+    render_buttons(EXIT_CONFIRMATION_BUTTONS, button_count, 1, render_opts, cache);
 }
 
 
-void render_game_mode_choice(const UiOptions* render_opts)
+void render_game_mode_choice(const UiOptions* render_opts, MemoCache* cache)
 {
     // Calculate message box dimensions
-    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f, GetScreenHeight(), GetScreenWidth());
+    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f, GetScreenHeight(), GetScreenWidth(),
+                                                                    cache);
 
     // Draw message box
     DrawRectangle((int)box_dim.x, (int)box_dim.y, (int)box_dim.width, (int)box_dim.height, DARKGRAY);
@@ -377,13 +383,13 @@ void render_game_mode_choice(const UiOptions* render_opts)
     // Draw message
     const char message[] = "Choose game mode!";
     const Coords text_cords =
-        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height);
+        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height, cache);
 
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
 
 
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
-    render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts);
+    render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts, cache);
 }
 
 void do_game_over_transition(const GameResources* resources, const UiOptions* render_opts, GameContext* context)
