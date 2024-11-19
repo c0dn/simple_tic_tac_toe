@@ -8,8 +8,6 @@
 #define GRID_WIDTH (CELL_WIDTH * 3)
 #define GRID_HEIGHT (CELL_HEIGHT * 3)
 #include <game.h>
-#include <menu.h>
-
 
 
 void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context, bool show_buttons);

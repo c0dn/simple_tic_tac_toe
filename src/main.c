@@ -13,7 +13,6 @@
 #include <raylib.h>
 #include <stdlib.h>
 #include <uthash.h>
-#include <utils.h>
 
 int main(void)
 {

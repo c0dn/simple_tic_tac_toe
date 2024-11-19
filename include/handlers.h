@@ -1,7 +1,6 @@
 #ifndef HANDLERS_H
 #define HANDLERS_H
 #include <game.h>
-#include <menu.h>
 #include <raylib.h>
 
 void handle_game_click(Vector2 mouse_pos, const GameResources* resources, GameContext* context);

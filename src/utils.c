@@ -96,35 +96,11 @@ Rectangle calculate_button_rectangle(const float btn_width, const ComponentPaddi
 Coords calculate_centered_text_xy(const char* message, const int font_size, const float ref_x, const float ref_y,
                                   const float ref_width, const float ref_height, MemoCache* cache)
 {
-    TextKey key = {
-        .font_size = font_size,
-        .ref_x = ref_x,
-        .ref_y = ref_y,
-        .ref_width = ref_width,
-        .ref_height = ref_height
-    };
-    strncpy(key.message, message, sizeof(key.message) - 1);
-    key.message[sizeof(key.message) - 1] = '\0';
-
-    TextCache* entry = NULL;
-    HASH_FIND(hh, cache->text_cache, &key, sizeof(TextKey), entry);
-
-    if (entry != NULL) {
-        return entry->result;
-    }
-
     const int text_width = MeasureText(message, font_size);
-    Coords coords = {
+    const Coords coords = {
         .x = ref_x + (ref_width - (float)text_width) / 2,
         .y = ref_y + (ref_height - (float)font_size) / 2
     };
-
-    TextCache* new_entry = malloc(sizeof(TextCache));
-    if (new_entry) {
-        new_entry->key = key;
-        new_entry->result = coords;
-        HASH_ADD(hh, cache->text_cache, key, sizeof(TextKey), new_entry);
-    }
     return coords;
 }
 
@@ -133,37 +109,11 @@ Coords calculate_text_xy_offset(const char* message, const int font_size, const 
                                 const float ref_width, const float ref_height, const float vertical_offset_percent,
                                 const float horizontal_offset_percent, MemoCache* cache)
 {
-    OffsetTextKey key = {
-        .font_size = font_size,
-        .ref_x = ref_x,
-        .ref_y = ref_y,
-        .ref_width = ref_width,
-        .ref_height = ref_height,
-        .vertical_offset_percent = vertical_offset_percent,
-        .horizontal_offset_percent = horizontal_offset_percent
-    };
-    strncpy(key.message, message, sizeof(key.message) - 1);
-    key.message[sizeof(key.message) - 1] = '\0';
-    OffsetTextCache* entry = NULL;
-    HASH_FIND(hh, cache->offset_text_cache, &key, sizeof(OffsetTextKey), entry);
-
-    if (entry != NULL) {
-        return entry->result;
-    }
-
     const int text_width = MeasureText(message, font_size);
-    Coords coords = {
+    const Coords coords = {
         .x = ref_x + ref_width * horizontal_offset_percent - (float)text_width / 2,
         .y = ref_y + ref_height * vertical_offset_percent - (float)font_size / 2
     };
-
-    OffsetTextCache* new_entry = malloc(sizeof(OffsetTextCache));
-    if (new_entry) {
-        new_entry->key = key;
-        new_entry->result = coords;
-        HASH_ADD(hh, cache->offset_text_cache, key, sizeof(OffsetTextKey), new_entry);
-    }
-
     return coords;
 }
 

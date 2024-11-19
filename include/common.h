@@ -138,8 +138,6 @@ typedef struct
 {
     ButtonCache* button_cache;
     BoxCache* box_cache;
-    TextCache* text_cache;
-    OffsetTextCache* offset_text_cache;
 } MemoCache;
 
 typedef struct {
