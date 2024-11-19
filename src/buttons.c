@@ -72,6 +72,7 @@ static void show_exit_confirmation(const GameResources* res, GameContext* contex
 
 Button GAME_MODE_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "Easy",
         .width = 300.0f,
         .height = 50.0f,
@@ -82,6 +83,7 @@ Button GAME_MODE_BUTTONS[] = {
         .action = start_easy_mode
     },
     {
+        .rect = NULL,
         .text = "Medium",
         .width = 300.0f,
         .height = 50.0f,
@@ -92,6 +94,7 @@ Button GAME_MODE_BUTTONS[] = {
         .action = start_medium_mode
     },
     {
+        .rect = NULL,
         .text = "Hard",
         .width = 300.0f,
         .height = 50.0f,
@@ -105,6 +108,7 @@ Button GAME_MODE_BUTTONS[] = {
 
 Button EXIT_CONFIRMATION_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "Yes",
         .width = 330.0f,
         .height = 100.0f,
@@ -114,6 +118,7 @@ Button EXIT_CONFIRMATION_BUTTONS[] = {
         .font_size = 30
     },
     {
+        .rect = NULL,
         .text = "No",
         .width = 330.0f,
         .height = 100.0f,
@@ -126,6 +131,7 @@ Button EXIT_CONFIRMATION_BUTTONS[] = {
 
 Button INSTRUCTIONS_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "Back",
         .width = 330.0f,
         .height = 100.0f,
@@ -139,6 +145,7 @@ Button INSTRUCTIONS_BUTTONS[] = {
 
 Button GAME_OVER_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "Continue Playing",
         .width = 200,
         .height = 60,
@@ -149,6 +156,7 @@ Button GAME_OVER_BUTTONS[] = {
         .action = continue_playing
     },
     {
+        .rect = NULL,
         .text = "End Game",
         .width = 200,
         .height = 60,
@@ -163,6 +171,7 @@ Button GAME_OVER_BUTTONS[] = {
 
 Button MAIN_MENU_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "1 Player",
         .width = 200.0f,
         .height = 60.0f,
@@ -173,6 +182,7 @@ Button MAIN_MENU_BUTTONS[] = {
         .action = start_1player
     },
     {
+        .rect = NULL,
         .text = "2 Player",
         .width = 200.0f,
         .height = 60.0f,
@@ -183,6 +193,7 @@ Button MAIN_MENU_BUTTONS[] = {
         .action = start_2player
     },
     {
+        .rect = NULL,
         .text = "How To Play",
         .width = 200.0f,
         .height = 60.0f,
@@ -193,6 +204,7 @@ Button MAIN_MENU_BUTTONS[] = {
         .action = show_instructions
     },
     {
+        .rect = NULL,
         .text = "Exit",
         .width = 200.0f,
         .height = 60.0f,
@@ -206,6 +218,7 @@ Button MAIN_MENU_BUTTONS[] = {
 
 Button IN_GAME_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "Return to menu",
         .width = 330.0f,
         .height = 100.0f,

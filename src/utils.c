@@ -46,23 +46,6 @@ Rectangle calculate_button_rectangle(const float btn_width, const ComponentPaddi
 
 )
 {
-    ButtonKey key = {
-        .btn_width = btn_width,
-        .btn_padding = btn_padding,
-        .btn_height = btn_height,
-        .first_button_offset = first_button_offset,
-        .index = index,
-        .buttons_per_row = buttons_per_row,
-        .screen_height = screen_height,
-        .screen_width = screen_width
-    };
-
-    ButtonCache* entry = NULL;
-    HASH_FIND(hh, cache->button_cache, &key, sizeof(ButtonKey), entry);
-
-    if (entry != NULL) {
-        return entry->result;
-    }
 
     const float btn_spacing = btn_padding.up + btn_padding.down;
     const float horizontal_spacing = btn_padding.left + btn_padding.right;
@@ -77,18 +60,10 @@ Rectangle calculate_button_rectangle(const float btn_width, const ComponentPaddi
     const int row = index / buttons_per_row;
     const int col = index % buttons_per_row;
 
-    Rectangle result = {
+    const Rectangle result = {
         base_x + col * (btn_width + horizontal_spacing), start_y + row * (btn_height + btn_spacing),
         btn_width, btn_height
     };
-
-    ButtonCache* new_entry = malloc(sizeof(ButtonCache));
-    if (new_entry) {
-        memcpy(&new_entry->key, &key, sizeof(ButtonKey));
-        memcpy(&new_entry->result, &result, sizeof(Rectangle));
-        HASH_ADD(hh, cache->button_cache, key, sizeof(ButtonKey), new_entry);
-    }
-
     return result;
 }
 

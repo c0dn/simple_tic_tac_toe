@@ -6,15 +6,22 @@
 #include <utils.h>
 
 static void render_buttons(Button* buttons, const size_t button_count, const int buttons_per_row,
-                           const UiOptions* render_opts, MemoCache* cache)
+                           const UiOptions* render_opts, MemoCache* cache, const bool need_recalc)
 {
     const int screen_width = GetScreenWidth();
     const int screen_height = GetScreenHeight();
 
     for (int i = 0; i < button_count; i++)
     {
+        if (buttons[i].rect == NULL || need_recalc)
+        {
+            buttons[i].rect = (Rectangle*)malloc(sizeof(Rectangle));
+            *buttons[i].rect = calculate_button_rectangle(buttons[i].width, buttons[i].padding, buttons[i].height,
+                                                         buttons[i].first_render_offset, i, buttons_per_row,
+                                                         screen_height, screen_width, cache);
+        }
         const bool overwrite_default_colors = buttons[i].override_default_colors;
-        const bool is_hovering = CheckCollisionPointRec(GetMousePosition(), buttons[i].rect);
+        const bool is_hovering = CheckCollisionPointRec(GetMousePosition(), *buttons[i].rect);
         const Color buttonColor = is_hovering
                                       ? (overwrite_default_colors
                                              ? buttons[i].clickColor
@@ -23,26 +30,23 @@ static void render_buttons(Button* buttons, const size_t button_count, const int
                                       ? buttons[i].color
                                       : render_opts->primary_btn_color;
 
-        buttons[i].rect = calculate_button_rectangle(buttons[i].width, buttons[i].padding, buttons[i].height,
-                                                     buttons[i].first_render_offset, i, buttons_per_row,
-                                                     screen_height, screen_width, cache);
 
         // Draw button
         if (buttons[i].rounded)
         {
-            DrawRectangleRounded(buttons[i].rect, 0.3f, 20, buttonColor);
-            DrawRectangleRoundedLines(buttons[i].rect, 0.3f, 20, 2.0f, GRAY);
+            DrawRectangleRounded(*buttons[i].rect, 0.3f, 20, buttonColor);
+            DrawRectangleRoundedLines(*buttons[i].rect, 0.3f, 20, 2.0f, GRAY);
         }
         else
         {
-            DrawRectangleRounded(buttons[i].rect, 0, 20, buttonColor);
-            DrawRectangleRoundedLines(buttons[i].rect, 0, 20, 2.0f, GRAY);
+            DrawRectangleRounded(*buttons[i].rect, 0, 20, buttonColor);
+            DrawRectangleRoundedLines(*buttons[i].rect, 0, 20, 2.0f, GRAY);
         }
 
         // Center text
         const Coords cords =
-            calculate_centered_text_xy(buttons[i].text, buttons[i].font_size, buttons[i].rect.x, buttons[i].rect.y,
-                                       buttons[i].rect.width, buttons[i].rect.height, cache);
+            calculate_centered_text_xy(buttons[i].text, buttons[i].font_size, buttons[i].rect->x, buttons[i].rect->y,
+                                       buttons[i].rect->width, buttons[i].rect->height, cache);
 
         DrawText(buttons[i].text, (int)cords.x, (int)cords.y, buttons[i].font_size, BLACK);
     }
@@ -105,19 +109,19 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
 
     // Vertical lines
     DrawRectangle(grid->start_x + grid->cell_size - line_thickness / 2,
-                 grid->start_y, line_thickness,
-                 (int)grid->grid_size, BLACK);
+                  grid->start_y, line_thickness,
+                  (int)grid->grid_size, BLACK);
     DrawRectangle(grid->start_x + grid->cell_size * 2 - line_thickness / 2,
-                 grid->start_y, line_thickness,
-                 (int)grid->grid_size, BLACK);
+                  grid->start_y, line_thickness,
+                  (int)grid->grid_size, BLACK);
 
     // Horizontal lines
     DrawRectangle(grid->start_x,
-                 grid->start_y + grid->cell_size - line_thickness / 2,
-                 (int)grid->grid_size, line_thickness, BLACK);
+                  grid->start_y + grid->cell_size - line_thickness / 2,
+                  (int)grid->grid_size, line_thickness, BLACK);
     DrawRectangle(grid->start_x,
-                 grid->start_y + grid->cell_size * 2 - line_thickness / 2,
-                 (int)grid->grid_size, line_thickness, BLACK);
+                  grid->start_y + grid->cell_size * 2 - line_thickness / 2,
+                  (int)grid->grid_size, line_thickness, BLACK);
 
     const int symbol_size = grid->cell_size / 2;
 
@@ -142,7 +146,7 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
 
     if (show_buttons)
     {
-        render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts, context->memo_cache);
+        render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts, context->memo_cache, context->needs_recalculation);
     }
 
     display_score(context);
@@ -208,8 +212,8 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
         }
 
         DrawLineEx((Vector2){(float)line_start_x, (float)line_start_y},
-                  (Vector2){(float)line_end_x, (float)line_end_y},
-                  line_width, RED);
+                   (Vector2){(float)line_end_x, (float)line_end_y},
+                   line_width, RED);
     }
 }
 
@@ -243,7 +247,7 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
 
     const size_t button_count = sizeof(MAIN_MENU_BUTTONS) / sizeof(Button);
 
-    render_buttons(MAIN_MENU_BUTTONS, button_count, 2, render_opts, context->memo_cache);
+    render_buttons(MAIN_MENU_BUTTONS, button_count, 2, render_opts, context->memo_cache, context->needs_recalculation);
 
     const Rectangle audio_ico_rect = calc_music_icon_rect(context, resources);
 
@@ -264,7 +268,9 @@ Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* 
     const float icon_scale = 0.08f;
     const Vector2 icon_pos = {(float)GetScreenWidth() - (float)music_icon.width * icon_scale - 20, 20};
 
-    return (Rectangle){icon_pos.x, icon_pos.y, (float)music_icon.width * icon_scale, (float)music_icon.height * icon_scale};
+    return (Rectangle){
+        icon_pos.x, icon_pos.y, (float)music_icon.width * icon_scale, (float)music_icon.height * icon_scale
+    };
 }
 
 
@@ -325,11 +331,11 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
 
     DrawText(message, (int)text_c.x, (int)text_c.y, 40, RAYWHITE);
     const size_t button_count = sizeof(GAME_OVER_BUTTONS) / sizeof(Button);
-    render_buttons(GAME_OVER_BUTTONS, button_count, 1, render_opts, context->memo_cache);
+    render_buttons(GAME_OVER_BUTTONS, button_count, 1, render_opts, context->memo_cache, context->needs_recalculation);
 }
 
 
-void render_instructions(const GameResources* resources, const UiOptions* render_opts, MemoCache* cache)
+void render_instructions(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
 {
     const int screen_width = GetScreenWidth();
     const int screen_height = GetScreenHeight();
@@ -345,7 +351,7 @@ void render_instructions(const GameResources* resources, const UiOptions* render
 
     // Title rendering
     const Coords title_c =
-        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)screen_width, (float)FONT_SIZE, cache);
+        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)screen_width, (float)FONT_SIZE, context->memo_cache);
     DrawText(TITLE, (int)title_c.x, (int)title_c.y, FONT_SIZE, DARKPURPLE);
 
     // Instructions render
@@ -360,17 +366,17 @@ void render_instructions(const GameResources* resources, const UiOptions* render
     DrawTexture(resources->instructions_1, instructions_x, (int)((float)screen_height / 2 * 0.7f), WHITE);
     DrawTexture(resources->instructions_2, instructions_x, (int)((float)screen_height / 2 * 1.08f), WHITE);
 
-    render_buttons(INSTRUCTIONS_BUTTONS, 1, 1, render_opts, cache);
+    render_buttons(INSTRUCTIONS_BUTTONS, 1, 1, render_opts, context->memo_cache, context->needs_recalculation);
 }
 
 
-void render_exit(const UiOptions* render_opts, MemoCache* cache)
+void render_exit(const UiOptions* render_opts, const GameContext* context)
 {
     const int screen_width = GetScreenWidth();
     const int screen_height = GetScreenHeight();
     // Calculate message box dimensions
     const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.3f, screen_height, screen_width,
-                                                                    cache);
+                                                                    context->memo_cache);
     // Draw message box
     DrawRectangle((int)box_dim.x, (int)box_dim.y, (int)box_dim.width, (int)box_dim.height, DARKGRAY);
     DrawRectangleLinesEx((Rectangle){box_dim.x, box_dim.y, box_dim.width, box_dim.height}, 4, RAYWHITE);
@@ -378,23 +384,23 @@ void render_exit(const UiOptions* render_opts, MemoCache* cache)
     // Draw message
     const char message[] = "Do you want to exit?";
     const Coords text_cords =
-        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height, cache);
+        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height, context->memo_cache);
 
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
 
     const size_t button_count = sizeof(EXIT_CONFIRMATION_BUTTONS) / sizeof(Button);
-    render_buttons(EXIT_CONFIRMATION_BUTTONS, button_count, 1, render_opts, cache);
+    render_buttons(EXIT_CONFIRMATION_BUTTONS, button_count, 1, render_opts, context->memo_cache, context->needs_recalculation);
 }
 
 
-void render_game_mode_choice(const UiOptions* render_opts, MemoCache* cache)
+void render_game_mode_choice(const UiOptions* render_opts, const GameContext* context)
 {
     const int screen_width = GetScreenWidth();
     const int screen_height = GetScreenHeight();
 
     // Calculate message box dimensions
     const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f, screen_height, screen_width,
-                                                                    cache);
+                                                                    context->memo_cache);
 
     // Draw message box
     DrawRectangle((int)box_dim.x, (int)box_dim.y, (int)box_dim.width, (int)box_dim.height, DARKGRAY);
@@ -403,12 +409,12 @@ void render_game_mode_choice(const UiOptions* render_opts, MemoCache* cache)
     // Draw message
     const char message[] = "Choose game mode!";
     const Coords text_cords =
-        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height, cache);
+        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height, context->memo_cache);
 
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
 
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
-    render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts, cache);
+    render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts, context->memo_cache, context->needs_recalculation);
 }
 
 void do_game_over_transition(const GameResources* resources, const UiOptions* render_opts, GameContext* context)

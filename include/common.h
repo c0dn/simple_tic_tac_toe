@@ -51,24 +51,6 @@ typedef struct {
     float y;
 } Coords;
 
-// Button-related structures
-typedef struct {
-    float btn_width;
-    ComponentPadding btn_padding;
-    float btn_height;
-    float first_button_offset;
-    int index;
-    int buttons_per_row;
-    int screen_height;
-    int screen_width;
-} ButtonKey;
-
-typedef struct {
-    ButtonKey key;
-    Rectangle result;
-    UT_hash_handle hh;
-} ButtonCache;
-
 // Game-related structures
 typedef struct {
     double start_time;
@@ -115,7 +97,6 @@ typedef struct {
 } BoxCache;
 
 typedef struct {
-    ButtonCache* button_cache;
     BoxCache* box_cache;
 } MemoCache;
 

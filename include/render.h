@@ -9,9 +9,9 @@ void render_menu(
 void render_game_over(
     const GameContext* context, const UiOptions* render_opts);
 void render_instructions(
-    const GameResources* resources, const UiOptions* render_opts, MemoCache* cache);
-void render_exit(const UiOptions* render_opts, MemoCache* cache);
-void render_game_mode_choice(const UiOptions* render_opts, MemoCache* cache);
+    const GameResources* resources, const UiOptions* render_opts, const GameContext* context);
+void render_exit(const UiOptions* render_opts, const GameContext* context);
+void render_game_mode_choice(const UiOptions* render_opts, const GameContext* context);
 Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* resources);
 void do_game_start_transition(const GameResources* resources, const UiOptions* render_opts,
                                   GameContext* context);

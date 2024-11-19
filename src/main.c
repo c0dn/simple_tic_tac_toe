@@ -66,6 +66,10 @@ int main(void)
     bool exit_flag = false;
     while (!exit_flag) // Detect window close button
     {
+        if (IsWindowResized()) {
+            context.needs_recalculation = true;
+            update_grid_dimensions(&context);
+        }
         UpdateMusicStream(resources.background_music);
         // Updates
         const Vector2 mouse_pos = GetMousePosition();
@@ -136,15 +140,15 @@ int main(void)
             break;
 
         case MENU_INSTRUCTIONS:
-            render_instructions(&resources, &render_options, context.memo_cache);
+            render_instructions(&resources, &render_options, &context);
             break;
 
         case GAME_STATE_EXIT:
-            render_exit(&render_options, context.memo_cache);
+            render_exit(&render_options, &context);
             break;
 
         case MENU_DIFF_CHOICE:
-            render_game_mode_choice(&render_options, context.memo_cache);
+            render_game_mode_choice(&render_options, &context);
             break;
 
         default:

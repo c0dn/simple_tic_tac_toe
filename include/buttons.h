@@ -4,7 +4,7 @@
 
 typedef struct
 {
-    Rectangle rect;
+    Rectangle* rect;
     const char* text;
     Color color;
     const float width;
