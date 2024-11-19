@@ -12,6 +12,7 @@ if(MSVC)
     find_package(PThreads4W REQUIRED)
     find_package(raylib CONFIG REQUIRED)
     add_compile_options(/wd4013)
+    add_compile_options(/wd4244)
 
     # Additional flags for more lenient compilation
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W3")  # Set warning level

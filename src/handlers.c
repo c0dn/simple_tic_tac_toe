@@ -16,12 +16,15 @@
  */
 void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
-    const float grid_size = (float)GetScreenWidth() < (float)GetScreenHeight()
-                                ? (float)GetScreenWidth() * 0.6f
-                                : (float)GetScreenHeight() * 0.6f;
+    const int screen_width = GetScreenWidth();
+    const int screen_height = GetScreenHeight();
+
+    const float grid_size = (float)screen_width < (float)screen_height
+                                ? (float)screen_width * 0.6f
+                                : (float)screen_height * 0.6f;
     const int cell_size = (int)grid_size / 3;
-    const int start_x = (int)((float)GetScreenWidth() - grid_size) / 2;
-    const int start_y = (int)((float)GetScreenHeight() - grid_size) / 2;
+    const int start_x = (int)((float)screen_width - grid_size) / 2;
+    const int start_y = (int)((float)screen_height - grid_size) / 2;
 
     // Convert mouse position to board coordinates
     const int row = ((int)mouse_pos.y - start_y) / cell_size;
@@ -53,7 +56,7 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
             // Toggle to the next player if the game is still ongoing
             current_player = current_player == PLAYER_X ? PLAYER_O : PLAYER_X;
         }
-        // Handle computer move if enabled and it’s the computer’s turn
+        // Handle computer move if enabled and it's the computer's turn
         if (context->computer_enabled &&
             current_player == get_computer_player(context))
         {
@@ -159,22 +162,17 @@ void handle_game_mode_menu_click(const Vector2 mouse_pos, const GameResources* r
  */
 void handle_instructions_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
-    static const float btn_width = 330.0f;
-    static const float btn_height = 100.0f;
-    static const float FIRST_BUTTON_OFFSET = 300.0f;
-
-    const Rectangle btnRect = {
-        (float)GetScreenWidth() / 2.0f - btn_width / 2.0f,
-        (float)GetScreenHeight() / 2 - btn_height / 2 + FIRST_BUTTON_OFFSET,
-        btn_width,
-        btn_height
-    };
-
-    if (CheckCollisionPointRec(mouse_pos, btnRect) &&
-        IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    const size_t button_count = sizeof(INSTRUCTIONS_BUTTONS) / sizeof(Button);
+    for (int i = 0; i < button_count; i++)
     {
-        PlaySound(resources->fx_click);
-        context->state = GAME_STATE_MENU;
+        const Button btn = INSTRUCTIONS_BUTTONS[i];
+        if (CheckCollisionPointRec(mouse_pos, btn.rect) &&
+            IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+            btn.action)
+        {
+            PlaySound(resources->fx_click);
+            btn.action(resources, context);
+        }
     }
 }
 
