@@ -3,7 +3,6 @@
 #include <computer.h>
 
 #include <raylib.h>
-#include <stddef.h>
 #include <utils.h>
 
 static void render_buttons(Button* buttons, const size_t button_count, const int buttons_per_row,
