@@ -1,5 +1,4 @@
-
-
+#include <buttons.h>
 #include <game.h>
 // Button click handlers
 static void start_easy_mode(const GameResources* res, GameContext* context)

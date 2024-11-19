@@ -8,6 +8,9 @@
 static void render_buttons(Button* buttons, const size_t button_count, const int buttons_per_row,
                            const UiOptions* render_opts, MemoCache* cache)
 {
+    const int screen_width = GetScreenWidth();
+    const int screen_height = GetScreenHeight();
+
     for (int i = 0; i < button_count; i++)
     {
         const bool overwrite_default_colors = buttons[i].override_default_colors;
@@ -22,7 +25,7 @@ static void render_buttons(Button* buttons, const size_t button_count, const int
 
         buttons[i].rect = calculate_button_rectangle(buttons[i].width, buttons[i].padding, buttons[i].height,
                                                      buttons[i].first_render_offset, i, buttons_per_row,
-                                                     GetScreenHeight(), GetScreenWidth(), cache);
+                                                     screen_height, screen_width, cache);
 
         // Draw button
         if (buttons[i].rounded)
@@ -47,6 +50,9 @@ static void render_buttons(Button* buttons, const size_t button_count, const int
 
 void do_game_start_transition(const GameResources* resources, const UiOptions* render_opts, GameContext* context)
 {
+    const int screen_width = GetScreenWidth();
+    const int screen_height = GetScreenHeight();
+
     if (!context->transition.active)
     {
         context->transition.start_time = GetTime();
@@ -55,10 +61,10 @@ void do_game_start_transition(const GameResources* resources, const UiOptions* r
 
     render_grid(resources, render_opts, context, false);
 
-    const float elapsed_time = GetTime() - context->transition.start_time;
+    const double elapsed_time = GetTime() - context->transition.start_time;
 
     // Semi-transparent background
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, 100});
+    DrawRectangle(0, 0, screen_width, screen_height, (Color){0, 0, 0, 100});
 
     const char* start_msg = context->computer_enabled
                                 ? (current_player == get_human_player(context)
@@ -70,7 +76,7 @@ void do_game_start_transition(const GameResources* resources, const UiOptions* r
 
     // Calculate centered text position
     const Coords text_coords =
-        calculate_centered_text_xy(start_msg, 40, 0, 0, (float)GetScreenWidth(), (float)GetScreenHeight(),
+        calculate_centered_text_xy(start_msg, 40, 0, 0, (float)screen_width, (float)screen_height,
                                    context->memo_cache);
 
     DrawText(start_msg, (int)text_coords.x, (int)text_coords.y, 40, RAYWHITE);
@@ -93,32 +99,35 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
                  const bool show_buttons)
 {
     ClearBackground(render_opts->background_color);
-    const int grid_size =
-        GetScreenWidth() < GetScreenHeight() ? (float)GetScreenWidth() * 0.6f : (float)GetScreenHeight() * 0.6f;
-    const int cell_size = grid_size / 3;
 
-    const int start_x = (GetScreenWidth() - grid_size) / 2;
-    const int start_y = (GetScreenHeight() - grid_size) / 2;
-
+    const GridDimensions* grid = &context->grid;
     const int line_thickness = 4;
 
     // Vertical lines
-    DrawRectangle(start_x + cell_size - line_thickness / 2, start_y, line_thickness, grid_size, BLACK);
-    DrawRectangle(start_x + cell_size * 2 - line_thickness / 2, start_y, line_thickness, grid_size, BLACK);
+    DrawRectangle(grid->start_x + grid->cell_size - line_thickness / 2,
+                 grid->start_y, line_thickness,
+                 (int)grid->grid_size, BLACK);
+    DrawRectangle(grid->start_x + grid->cell_size * 2 - line_thickness / 2,
+                 grid->start_y, line_thickness,
+                 (int)grid->grid_size, BLACK);
 
     // Horizontal lines
-    DrawRectangle(start_x, start_y + cell_size - line_thickness / 2, grid_size, line_thickness, BLACK);
-    DrawRectangle(start_x, start_y + cell_size * 2 - line_thickness / 2, grid_size, line_thickness, BLACK);
+    DrawRectangle(grid->start_x,
+                 grid->start_y + grid->cell_size - line_thickness / 2,
+                 (int)grid->grid_size, line_thickness, BLACK);
+    DrawRectangle(grid->start_x,
+                 grid->start_y + grid->cell_size * 2 - line_thickness / 2,
+                 (int)grid->grid_size, line_thickness, BLACK);
 
-    const int symbol_size = cell_size / 2;
+    const int symbol_size = grid->cell_size / 2;
 
     uint16_t mask = 1;
     for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
     {
         const int row = i / BOARD_SIZE;
         const int col = i % BOARD_SIZE;
-        const int draw_x = start_x + col * cell_size + (cell_size - symbol_size) / 2;
-        const int draw_y = start_y + row * cell_size + (cell_size - symbol_size) / 2;
+        const int draw_x = grid->start_x + col * grid->cell_size + (grid->cell_size - symbol_size) / 2;
+        const int draw_y = grid->start_y + row * grid->cell_size + (grid->cell_size - symbol_size) / 2;
 
         if (x_board & mask)
         {
@@ -130,6 +139,7 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
         }
         mask <<= 1;
     }
+
     if (show_buttons)
     {
         render_buttons(IN_GAME_BUTTONS, 1, 1, render_opts, context->memo_cache);
@@ -145,66 +155,70 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
         switch (winning_pattern)
         {
         case 0: // Top row
-            line_start_x = start_x;
-            line_start_y = start_y + cell_size / 2;
-            line_end_x = start_x + grid_size;
+            line_start_x = grid->start_x;
+            line_start_y = grid->start_y + grid->cell_size / 2;
+            line_end_x = grid->start_x + (int)grid->grid_size;
             line_end_y = line_start_y;
             break;
         case 1: // Middle row
-            line_start_x = start_x;
-            line_start_y = start_y + cell_size + cell_size / 2;
-            line_end_x = start_x + grid_size;
+            line_start_x = grid->start_x;
+            line_start_y = grid->start_y + grid->cell_size + grid->cell_size / 2;
+            line_end_x = grid->start_x + (int)grid->grid_size;
             line_end_y = line_start_y;
             break;
         case 2: // Bottom row
-            line_start_x = start_x;
-            line_start_y = start_y + grid_size - cell_size / 2;
-            line_end_x = start_x + grid_size;
+            line_start_x = grid->start_x;
+            line_start_y = grid->start_y + (int)grid->grid_size - grid->cell_size / 2;
+            line_end_x = grid->start_x + (int)grid->grid_size;
             line_end_y = line_start_y;
             break;
         case 5: // First column
-            line_start_x = start_x + cell_size / 2.6;
-            line_start_y = start_y;
+            line_start_x = grid->start_x + (int)((float)grid->cell_size / 2.6f);
+            line_start_y = grid->start_y;
             line_end_x = line_start_x;
-            line_end_y = start_y + grid_size;
+            line_end_y = grid->start_y + (int)grid->grid_size;
             break;
         case 4: // Middle column
-            line_start_x = start_x + cell_size + cell_size / 2.4;
-            line_start_y = start_y;
+            line_start_x = grid->start_x + grid->cell_size + (int)((float)grid->cell_size / 2.4f);
+            line_start_y = grid->start_y;
             line_end_x = line_start_x;
-            line_end_y = start_y + grid_size;
+            line_end_y = grid->start_y + (int)grid->grid_size;
             break;
         case 3: // Last column
-            line_start_x = start_x + grid_size - cell_size / 1.6;
-            line_start_y = start_y;
+            line_start_x = grid->start_x + (int)grid->grid_size - (int)((float)grid->cell_size / 1.6f);
+            line_start_y = grid->start_y;
             line_end_x = line_start_x;
-            line_end_y = start_y + grid_size;
+            line_end_y = grid->start_y + (int)grid->grid_size;
             break;
         case 6: // Diagonal top-left to bottom-right
-            line_start_x = start_x;
-            line_start_y = start_y;
-            line_end_x = start_x + grid_size;
-            line_end_y = start_y + grid_size;
+            line_start_x = grid->start_x;
+            line_start_y = grid->start_y;
+            line_end_x = grid->start_x + (int)grid->grid_size;
+            line_end_y = grid->start_y + (int)grid->grid_size;
             break;
-        case 7: // Diagonal top-right to bottom-left
-            line_start_x = start_x + grid_size;
-            line_start_y = start_y;
-            line_end_x = start_x;
-            line_end_y = start_y + grid_size;
+        case 7: // Diagonal top-right to bottom left
+            line_start_x = grid->start_x + (int)grid->grid_size;
+            line_start_y = grid->start_y;
+            line_end_x = grid->start_x;
+            line_end_y = grid->start_y + (int)grid->grid_size;
             break;
         default:
             TraceLog(LOG_ERROR, "Unknown win pattern");
             break;
         }
 
-        DrawLineEx((Vector2){(float)line_start_x, (float)line_start_y}, (Vector2){(float)line_end_x, (float)line_end_y},
-                   line_width, RED);
+        DrawLineEx((Vector2){(float)line_start_x, (float)line_start_y},
+                  (Vector2){(float)line_end_x, (float)line_end_y},
+                  line_width, RED);
     }
 }
 
 
 void render_menu(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
 {
+    const int screen_width = GetScreenWidth();
+    const int screen_height = GetScreenHeight();
+
     // Constants
     static const char TITLE[] = "TIC-TAC-TOE";
     static const int FONT_SIZE = 70;
@@ -213,7 +227,7 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
 
     // Title rendering
     const Coords title_c =
-        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)GetScreenWidth(), (float)FONT_SIZE,
+        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)screen_width, (float)FONT_SIZE,
                                    context->memo_cache);
     DrawText(TITLE, (int)title_c.x, (int)title_c.y, FONT_SIZE, DARKPURPLE);
 
@@ -221,8 +235,8 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
     const float scaled_width = (float)resources->main_menu_img.width * image_scale;
     const float scaled_height = (float)resources->main_menu_img.height * image_scale;
     const Vector2 image_pos = {
-        ((float)GetScreenWidth() - scaled_width) / 2,
-        ((float)GetScreenHeight() - scaled_height) / 4
+        ((float)screen_width - scaled_width) / 2,
+        ((float)screen_height - scaled_height) / 4
     };
 
     DrawTextureEx(resources->main_menu_img, image_pos, 0.0f, image_scale, WHITE);
@@ -250,7 +264,7 @@ Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* 
     const float icon_scale = 0.08f;
     const Vector2 icon_pos = {(float)GetScreenWidth() - (float)music_icon.width * icon_scale - 20, 20};
 
-    return (Rectangle){icon_pos.x, icon_pos.y, music_icon.width * icon_scale, music_icon.height * icon_scale};
+    return (Rectangle){icon_pos.x, icon_pos.y, (float)music_icon.width * icon_scale, (float)music_icon.height * icon_scale};
 }
 
 
@@ -317,6 +331,9 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
 
 void render_instructions(const GameResources* resources, const UiOptions* render_opts, MemoCache* cache)
 {
+    const int screen_width = GetScreenWidth();
+    const int screen_height = GetScreenHeight();
+
     ClearBackground(render_opts->background_color);
     // Constants
     static const char TITLE[] = "INSTRUCTIONS";
@@ -328,9 +345,8 @@ void render_instructions(const GameResources* resources, const UiOptions* render
 
     // Title rendering
     const Coords title_c =
-        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)GetScreenWidth(), (float)FONT_SIZE, cache);
+        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)screen_width, (float)FONT_SIZE, cache);
     DrawText(TITLE, (int)title_c.x, (int)title_c.y, FONT_SIZE, DARKPURPLE);
-
 
     // Instructions render
     for (int i = 0; i < 4; i++)
@@ -338,11 +354,11 @@ void render_instructions(const GameResources* resources, const UiOptions* render
         DrawText(INSTRUCTION_TEXTS[i], 30, 120 + i * 60, 39, BLACK);
     }
 
-    const int instructions_x = (int)((float)GetScreenWidth() / 2 * 0.3f);
+    const int instructions_x = (int)((float)screen_width / 2 * 0.3f);
 
     // Render instruction image
-    DrawTexture(resources->instructions_1, instructions_x, (int)((float)GetScreenHeight() / 2 * 0.7f), WHITE);
-    DrawTexture(resources->instructions_2, instructions_x, (int)((float)GetScreenHeight() / 2 * 1.08f), WHITE);
+    DrawTexture(resources->instructions_1, instructions_x, (int)((float)screen_height / 2 * 0.7f), WHITE);
+    DrawTexture(resources->instructions_2, instructions_x, (int)((float)screen_height / 2 * 1.08f), WHITE);
 
     render_buttons(INSTRUCTIONS_BUTTONS, 1, 1, render_opts, cache);
 }
@@ -350,8 +366,10 @@ void render_instructions(const GameResources* resources, const UiOptions* render
 
 void render_exit(const UiOptions* render_opts, MemoCache* cache)
 {
+    const int screen_width = GetScreenWidth();
+    const int screen_height = GetScreenHeight();
     // Calculate message box dimensions
-    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.3f, GetScreenHeight(), GetScreenWidth(),
+    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.3f, screen_height, screen_width,
                                                                     cache);
     // Draw message box
     DrawRectangle((int)box_dim.x, (int)box_dim.y, (int)box_dim.width, (int)box_dim.height, DARKGRAY);
@@ -371,8 +389,11 @@ void render_exit(const UiOptions* render_opts, MemoCache* cache)
 
 void render_game_mode_choice(const UiOptions* render_opts, MemoCache* cache)
 {
+    const int screen_width = GetScreenWidth();
+    const int screen_height = GetScreenHeight();
+
     // Calculate message box dimensions
-    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f, GetScreenHeight(), GetScreenWidth(),
+    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f, screen_height, screen_width,
                                                                     cache);
 
     // Draw message box
@@ -385,7 +406,6 @@ void render_game_mode_choice(const UiOptions* render_opts, MemoCache* cache)
         calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height, cache);
 
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
-
 
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
     render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts, cache);

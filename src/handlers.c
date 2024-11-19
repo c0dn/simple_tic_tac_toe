@@ -16,19 +16,8 @@
  */
 void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
-    const int screen_width = GetScreenWidth();
-    const int screen_height = GetScreenHeight();
-
-    const float grid_size = (float)screen_width < (float)screen_height
-                                ? (float)screen_width * 0.6f
-                                : (float)screen_height * 0.6f;
-    const int cell_size = (int)grid_size / 3;
-    const int start_x = (int)((float)screen_width - grid_size) / 2;
-    const int start_y = (int)((float)screen_height - grid_size) / 2;
-
-    // Convert mouse position to board coordinates
-    const int row = ((int)mouse_pos.y - start_y) / cell_size;
-    const int col = ((int)mouse_pos.x - start_x) / cell_size;
+    const int row = ((int)mouse_pos.y - context->grid.start_y) / context->grid.cell_size;
+    const int col = ((int)mouse_pos.x - context->grid.start_x) / context->grid.cell_size;
 
     // Check if click is within board and cell is empty
     if (row >= 0 && row < 3 && col >= 0 && col < 3 && is_cell_empty(row, col))
