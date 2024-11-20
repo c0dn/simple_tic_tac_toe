@@ -160,7 +160,7 @@ EvalResult nb_move(const BayesModel* model, const player_t computer_player)
 
     while (legal_moves)
     {
-        const int move = __builtin_ctz(legal_moves); // Get the least significant bit
+        const int move = count_trailing_zeros(legal_moves); // Get the least significant bit
 
         if (computer_player == PLAYER_X)
         {
@@ -216,7 +216,7 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, const int
     if (check_win(computer) != -1) return (EvalResult){1, -1};
     if (check_draw() || depth == 0) return (EvalResult){0, -1};
 
-    int bestScore = (current_player == computer) ? -2 : 2;
+    double bestScore = current_player == computer ? -2 : 2;
     int bestMove = -1;
 
     const uint16_t occupied_board = x_board | o_board;

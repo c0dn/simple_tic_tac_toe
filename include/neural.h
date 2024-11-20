@@ -56,7 +56,7 @@ typedef struct
 } NeuralNetwork;
 
 typedef struct {
-    int score;
+    double score;
     int move;
 } EvalResult;
 
