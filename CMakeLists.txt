@@ -9,7 +9,6 @@ include_directories("${CMAKE_SOURCE_DIR}/include")
 
 # Add MSVC-specific compiler flags to suppress specific warnings
 if(MSVC)
-    find_package(PThreads4W REQUIRED)
     find_package(raylib CONFIG REQUIRED)
     add_compile_options(/wd4013)
     add_compile_options(/wd4244)
@@ -21,8 +20,6 @@ if(MSVC)
          DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
     file(COPY ${CMAKE_SOURCE_DIR}/assets
          DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release)
-    # Pthreads for windows
-    list(APPEND EXTRA_LIBS PThreads4W::PThreads4W)
 else()
     file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
 endif()
