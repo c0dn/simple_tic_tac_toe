@@ -6,6 +6,26 @@
 #define NEURAL_H
 
 /***************************************************************/
+/*                    Naive Bayes                       */
+/***************************************************************/
+
+typedef struct {
+    double prob_x[9];
+    double prob_o[9];
+    double prob_b[9];
+
+    // Prior probabilities
+    double prob_win;
+    double prob_lose;
+
+    // Count totals for calculating probabilities
+    int total_win;
+    int total_lose;
+} BayesModel;
+
+
+
+/***************************************************************/
 /*                     NEURAL NETWORK                          */
 /***************************************************************/
 
@@ -38,6 +58,7 @@ typedef struct
 typedef struct
 {
     NeuralNetwork* neural_network;
+    BayesModel* bayes_model;
 } AiModels;
 
 typedef struct {
@@ -45,9 +66,9 @@ typedef struct {
     int move;
 } EvalResult;
 
-
+BayesModel* load_naive_bayes();
 void forward_pass(NeuralNetwork *nn, const double input[]);
-EvalResult nn_move(NeuralNetwork* nn);
+double predict_naive_bayes(const BayesModel* model, int computer_player);
 NeuralNetwork* load_model();
 
 #endif //NEURAL_H

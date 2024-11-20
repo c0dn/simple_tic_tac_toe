@@ -39,6 +39,7 @@ typedef enum
 {
     TWO_PLAYER,
     ONE_PLAYER_EASY,
+    ONE_PLAYER_EASY_NAIVE,
     ONE_PLAYER_MEDIUM,
     ONE_PLAYER_HARD
 } GameMode;

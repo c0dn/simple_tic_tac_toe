@@ -410,7 +410,7 @@ void render_exit(const UiOptions* render_opts)
 void render_game_mode_choice(const UiOptions* render_opts)
 {
     // Calculate message box dimensions
-    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f);
+    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.4f);
 
     // Draw message box
     DrawRectangle((int)box_dim.x, (int)box_dim.y, (int)box_dim.width, (int)box_dim.height, DARKGRAY);
@@ -421,7 +421,7 @@ void render_game_mode_choice(const UiOptions* render_opts)
     const Coords text_cords = calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width,
                                                          box_dim.height);
 
-    DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
+    DrawText(message, (int)text_cords.x, (int)text_cords.y - 140, 30, RAYWHITE);
 
 
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
