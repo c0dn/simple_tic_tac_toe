@@ -21,14 +21,15 @@ NeuralNetwork* load_model()
     fread(nn->bias_output, sizeof(double), OUTPUT_NODES, file);
 
     fclose(file);
-    TraceLog(LOG_INFO, "Model loaded successfully from '%s'.\n", weights_path);
+    TraceLog(LOG_INFO, "Model loaded successfully from %s", weights_path);
     return nn;
 }
 
 BayesModel* load_naive_bayes()
 {
+    const static char model_path[] = "assets/bayes_model.dat";
     BayesModel* model = malloc(sizeof(BayesModel));
-    FILE* file = fopen("assets/bayes_model.dat", "rb");
+    FILE* file = fopen(model_path, "rb");
 
     if (!file) {
         TraceLog(LOG_ERROR, "Fail to load Bayes model");
@@ -44,7 +45,7 @@ BayesModel* load_naive_bayes()
     fread(&model->total_lose, sizeof(int), 1, file);
 
     fclose(file);
-    TraceLog(LOG_INFO, "Model loaded from bayes_model.dat\n");
+    TraceLog(LOG_INFO, "Model loaded from %s", model_path);
 
     return model;
 }
