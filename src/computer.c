@@ -93,11 +93,11 @@ double predict_naive_bayes(const BayesModel* model, int const computer_player) {
     for(int pos = 0; pos < 9; pos++) {
         const uint16_t bit = 1 << pos;
 
-        if(x_board & bit) {
+        if(input_x_board & bit) {
             win_probability *= model->prob_x[pos];
             lose_probability *= model->prob_x[pos];
         }
-        else if(o_board & bit) {
+        else if(input_o_board & bit) {
             win_probability *= model->prob_o[pos];
             lose_probability *= model->prob_o[pos];
         }
