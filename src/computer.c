@@ -11,7 +11,7 @@ NeuralNetwork* load_model()
     FILE* file = fopen(weights_path, "rb");
     if (file == NULL)
     {
-        TraceLog(LOG_ERROR, "Failed to open file for loading model.\n");
+        TraceLog(LOG_ERROR, "Failed to load Neural net\n");
         return NULL;
     }
 
@@ -22,8 +22,33 @@ NeuralNetwork* load_model()
     fread(nn->bias_output, sizeof(double), OUTPUT_NODES, file);
 
     fclose(file);
-    TraceLog(LOG_INFO, "Model loaded successfully from '%s'.\n", weights_path);
+    TraceLog(LOG_INFO, "Model loaded successfully from %s", weights_path);
     return nn;
+}
+
+BayesModel* load_naive_bayes()
+{
+    const static char model_path[] = "assets/bayes_model.dat";
+    BayesModel* model = malloc(sizeof(BayesModel));
+    FILE* file = fopen(model_path, "rb");
+
+    if (!file) {
+        TraceLog(LOG_ERROR, "Fail to load Bayes model");
+        return NULL;
+    }
+
+    fread(model->prob_x, sizeof(double), 9, file);
+    fread(model->prob_o, sizeof(double), 9, file);
+    fread(model->prob_b, sizeof(double), 9, file);
+    fread(&model->prob_win, sizeof(double), 1, file);
+    fread(&model->prob_lose, sizeof(double), 1, file);
+    fread(&model->total_win, sizeof(int), 1, file);
+    fread(&model->total_lose, sizeof(int), 1, file);
+
+    fclose(file);
+    TraceLog(LOG_INFO, "Model loaded from %s", model_path);
+
+    return model;
 }
 
 void forward_pass(NeuralNetwork* nn, const double input[])
@@ -51,21 +76,59 @@ void forward_pass(NeuralNetwork* nn, const double input[])
     }
 }
 
-EvalResult nn_move(NeuralNetwork* nn) {
+double predict_naive_bayes(const BayesModel* model, int const computer_player) {
+    double win_probability = model->prob_win;
+    double lose_probability = model->prob_lose;
+    uint16_t input_x_board = 0;
+    uint16_t input_o_board = 0;
+
+    if(computer_player == PLAYER_O) {
+        input_x_board = o_board;
+        input_o_board = x_board;
+    } else
+    {
+        input_x_board = x_board;
+        input_o_board = o_board;
+    }
+
+    for(int pos = 0; pos < 9; pos++) {
+        const uint16_t bit = 1 << pos;
+
+        if(input_x_board & bit) {
+            win_probability *= model->prob_x[pos];
+            lose_probability *= model->prob_x[pos];
+        }
+        else if(input_o_board & bit) {
+            win_probability *= model->prob_o[pos];
+            lose_probability *= model->prob_o[pos];
+        }
+        else {
+            win_probability *= model->prob_b[pos];
+            lose_probability *= model->prob_b[pos];
+        }
+    }
+
+    return win_probability / (win_probability + lose_probability);
+}
+
+EvalResult nn_move(NeuralNetwork* nn)
+{
     int best_move = -1;
     double best_score = -1;
 
     const uint16_t occupied = x_board | o_board;
     uint16_t legal_moves = ~occupied & 0b111111111;
 
-    while(legal_moves) {
+    while (legal_moves)
+    {
         const int move = count_trailing_zeros(legal_moves);
-        o_board |= (1 << move); // Try move
+        o_board |= 1 << move; // Try move
 
         double input[INPUT_NODES];
-        for(int i = 0; i < INPUT_NODES; i++) {
-            if(x_board & (1 << i)) input[i] = 1.0;
-            else if(o_board & (1 << i)) input[i] = -1.0;
+        for (int i = 0; i < INPUT_NODES; i++)
+        {
+            if (x_board & 1 << i) input[i] = 1.0;
+            else if (o_board & 1 << i) input[i] = -1.0;
             else input[i] = 0.0;
         }
 
@@ -74,7 +137,8 @@ EvalResult nn_move(NeuralNetwork* nn) {
 
         o_board &= ~(1 << move); // Undo move
 
-        if(score > best_score) {
+        if (score > best_score)
+        {
             best_score = score;
             best_move = move;
         }
@@ -83,6 +147,51 @@ EvalResult nn_move(NeuralNetwork* nn) {
     }
 
     return (EvalResult){(int)best_score, best_move};
+}
+
+EvalResult nb_move(const BayesModel* model, const player_t computer_player)
+{
+    int best_move = -1;
+    double best_score = -1;
+
+    // Loop through all possible moves and evaluate using Naive Bayes
+    const uint16_t occupied = x_board | o_board;
+    uint16_t legal_moves = ~occupied & 0b111111111;
+
+    while (legal_moves)
+    {
+        const int move = __builtin_ctz(legal_moves); // Get the least significant bit
+
+        if (computer_player == PLAYER_X)
+        {
+            x_board |= 1 << move;
+        } else
+        {
+            o_board |= 1 << move;
+        }
+
+
+
+        const double score = predict_naive_bayes(model, computer_player);
+
+        if (score > best_score)
+        {
+            best_score = score;
+            best_move = move;
+        }
+
+        if (computer_player == PLAYER_X)
+        {
+            x_board &= ~(1 << move);
+        } else
+        {
+            o_board &= ~(1 << move);
+        }
+
+        legal_moves &= ~(1 << move);
+    }
+
+    return (EvalResult){best_score, best_move};
 }
 
 /**
@@ -99,10 +208,9 @@ EvalResult nn_move(NeuralNetwork* nn) {
  * @return EvalResult containing best score and move
  */
 EvalResult minimax(const player_t current_player, int alpha, int beta, const int depth, const GameContext* context)
-{  
+{
     const player_t human = get_human_player(context);
     const player_t computer = get_computer_player(context);
-
     // Check win conditions
     if (check_win(human) != -1) return (EvalResult){-1, -1};
     if (check_win(computer) != -1) return (EvalResult){1, -1};
@@ -174,9 +282,14 @@ void computer_move(const GameContext* context, const AiModels* models) {
     const player_t computer_player = get_computer_player(context);
     EvalResult result;
 
-    switch(context->selected_game_mode) {
+    switch (context->selected_game_mode)
+    {
     case ONE_PLAYER_EASY:
         result = nn_move(models->neural_network);
+        break;
+
+    case ONE_PLAYER_EASY_NAIVE:
+        result = nb_move(models->bayes_model, computer_player);
         break;
 
     case ONE_PLAYER_MEDIUM:
@@ -191,7 +304,8 @@ void computer_move(const GameContext* context, const AiModels* models) {
         return;
     }
 
-    if(result.move != -1) {
+    if (result.move != -1)
+    {
         const int row = result.move / 3;
         const int col = result.move % 3;
         set_cell(row, col, computer_player);

@@ -29,7 +29,6 @@ GameResources load_game_resources() {
     resources.instructions_2 = LoadTextureFromImage(instructions2);
     UnloadImage(instructions2);
 
-
     Image music_on = LoadImage("assets/music_on.png");
     resources.music_on = LoadTextureFromImage(music_on);
     UnloadImage(music_on);
@@ -41,6 +40,9 @@ GameResources load_game_resources() {
     NeuralNetwork* neural_network = load_model();
     resources.models = malloc(sizeof(AiModels));
     resources.models->neural_network = neural_network;
+
+    BayesModel* bayes_model = load_naive_bayes();
+    resources.models->bayes_model = bayes_model;
     return resources;
 }
 
@@ -69,6 +71,7 @@ void unload_game_resources(GameResources* resources) {
     UnloadTexture(resources->music_off);
     UnloadTexture(resources->music_on);
     free(resources->models->neural_network);
+    free(resources->models->bayes_model);
     free(resources->models);
     resources->models = NULL;
 }

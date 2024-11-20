@@ -10,6 +10,16 @@ static void start_easy_mode(const GameResources* res, GameContext* context)
     context->state = GAME_STATE_PLAYING;
 }
 
+
+static void start_easy_mode_naive(const GameResources* res, GameContext* context)
+{
+    PlaySound(res->fx_click);
+    context->selected_game_mode = ONE_PLAYER_EASY_NAIVE;
+    context->computer_enabled = true;
+    initialize_game(res, context);
+    context->state = GAME_STATE_PLAYING;
+}
+
 static void start_medium_mode(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
@@ -73,10 +83,10 @@ static void show_exit_confirmation(const GameResources* res, GameContext* contex
 Button GAME_MODE_BUTTONS[] = {
     {
         .rect = NULL,
-        .text = "Easy",
+        .text = "Easiest",
         .width = 300.0f,
         .height = 50.0f,
-        .first_render_offset = -50.0f,
+        .first_render_offset = -75.0f,
         .padding = {0, 0, 10.0f, 10.0f},
         .rounded = true,
         .font_size = 30,
@@ -84,10 +94,21 @@ Button GAME_MODE_BUTTONS[] = {
     },
     {
         .rect = NULL,
+        .text = "Easy",
+        .width = 300.0f,
+        .height = 50.0f,
+        .padding = {0, 0, 10.0f, 10.0f},
+        .first_render_offset = -75.0f,
+        .rounded = true,
+        .font_size = 30,
+        .action = start_easy_mode_naive
+    },
+    {
+        .rect = NULL,
         .text = "Medium",
         .width = 300.0f,
         .height = 50.0f,
-        .first_render_offset = -50.0f,
+        .first_render_offset = -75.0f,
         .padding = {0, 0, 10.0f, 10.0f},
         .rounded = true,
         .font_size = 30,
@@ -98,7 +119,7 @@ Button GAME_MODE_BUTTONS[] = {
         .text = "Hard",
         .width = 300.0f,
         .height = 50.0f,
-        .first_render_offset = -50.0f,
+        .first_render_offset = -75.0f,
         .padding = {0, 0, 10.0f, 10.0f},
         .rounded = true,
         .font_size = 30,
@@ -215,6 +236,7 @@ Button MAIN_MENU_BUTTONS[] = {
         .action = show_exit_confirmation
     }
 };
+
 
 Button IN_GAME_BUTTONS[] = {
     {

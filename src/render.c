@@ -399,7 +399,7 @@ void render_game_mode_choice(const UiOptions* render_opts, const GameContext* co
     const int screen_height = GetScreenHeight();
 
     // Calculate message box dimensions
-    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.35f, screen_height, screen_width,
+    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.4f, screen_height, screen_width,
                                                                     context->memo_cache);
 
     // Draw message box
@@ -411,7 +411,7 @@ void render_game_mode_choice(const UiOptions* render_opts, const GameContext* co
     const Coords text_cords =
         calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height, context->memo_cache);
 
-    DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
+    DrawText(message, (int)text_cords.x, (int)text_cords.y - 140, 30, RAYWHITE);
 
     const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
     render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts, context->memo_cache, context->needs_recalculation);
