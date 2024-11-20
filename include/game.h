@@ -1,9 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "menu.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include "common.h"
 
 // Use 16-bit string to represent a player's board
 extern uint16_t x_board;
@@ -14,56 +14,8 @@ extern uint16_t o_board;
 // macro for bit positions
 #define BIT_POS(row, col) (1 << ((row) * 3 + (col)))
 
-typedef uint8_t player_t;
-#define PLAYER_NONE 0
-#define PLAYER_X 1
-#define PLAYER_O 2
-
 
 extern player_t current_player;
-
-typedef enum {
-    GAME_STATE_MENU,
-    MENU_DIFF_CHOICE,
-    GAME_STATE_PLAYING,
-    GAME_STATE_P1_WIN,
-    GAME_STATE_P2_WIN,
-    GAME_STATE_DRAW,
-    MENU_INSTRUCTIONS,
-    MENU_SETTINGS,
-    GAME_STATE_EXIT
-} GameState;
-
-
-typedef enum
-{
-    TWO_PLAYER,
-    ONE_PLAYER_EASY,
-    ONE_PLAYER_EASY_NAIVE,
-    ONE_PLAYER_MEDIUM,
-    ONE_PLAYER_HARD
-} GameMode;
-
-typedef struct {
-    double start_time;
-    double active;
-} ActiveTransition;
-
-
-typedef struct {
-    bool needs_redraw;
-    GameState state;
-    GameMode selected_game_mode;
-    player_t player_1;
-    bool computer_enabled;
-    bool audio_disabled;
-    ActiveTransition transition;
-    bool start_screen_shown;
-    int p1_score;
-    int p2_score;
-
-} GameContext;
-
 
 
 void initialize_game(const GameResources* res, GameContext* context);

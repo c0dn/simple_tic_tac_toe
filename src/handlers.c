@@ -2,7 +2,6 @@
 
 #include <buttons.h>
 #include <computer.h>
-#include <menu.h>
 #include <render.h>
 #include <stddef.h>
 
@@ -17,16 +16,8 @@
  */
 void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
-    const float grid_size = (float)GetScreenWidth() < (float)GetScreenHeight()
-                                ? (float)GetScreenWidth() * 0.6f
-                                : (float)GetScreenHeight() * 0.6f;
-    const int cell_size = (int)grid_size / 3;
-    const int start_x = (int)((float)GetScreenWidth() - grid_size) / 2;
-    const int start_y = (int)((float)GetScreenHeight() - grid_size) / 2;
-
-    // Convert mouse position to board coordinates
-    const int row = ((int)mouse_pos.y - start_y) / cell_size;
-    const int col = ((int)mouse_pos.x - start_x) / cell_size;
+    const int row = ((int)mouse_pos.y - context->grid.start_y) / context->grid.cell_size;
+    const int col = ((int)mouse_pos.x - context->grid.start_x) / context->grid.cell_size;
 
     // Check if click is within board and cell is empty
     if (row >= 0 && row < 3 && col >= 0 && col < 3 && is_cell_empty(row, col))
@@ -54,7 +45,7 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
             // Toggle to the next player if the game is still ongoing
             current_player = current_player == PLAYER_X ? PLAYER_O : PLAYER_X;
         }
-        // Handle computer move if enabled and it’s the computer’s turn
+        // Handle computer move if enabled and it's the computer's turn
         if (context->computer_enabled &&
             current_player == get_computer_player(context))
         {
@@ -79,17 +70,21 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
                 current_player = current_player == PLAYER_X ? PLAYER_O : PLAYER_X;
             }
         }
-    } else
+    }
+    else
     {
         const size_t button_count = sizeof(IN_GAME_BUTTONS) / sizeof(Button);
 
         for (int i = 0; i < button_count; i++)
         {
             const Button btn = IN_GAME_BUTTONS[i];
-            if (CheckCollisionPointRec(mouse_pos, btn.rect) &&
-                IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            if (btn.rect)
             {
-                btn.action(resources, context);
+                if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
+                    IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                {
+                    btn.action(resources, context);
+                }
             }
         }
     }
@@ -112,18 +107,21 @@ void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resour
     for (int i = 0; i < button_count; i++)
     {
         const Button btn = EXIT_CONFIRMATION_BUTTONS[i];
-        if (CheckCollisionPointRec(mouse_pos, btn.rect) &&
-            IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        if (btn.rect)
         {
-            PlaySound(resources->fx_click);
-            switch (i)
+            if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
+                IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-            case 0: // Close window
-                *exit_flag = true;
-                break;
-            case 1: // Back to main menu
-                context->state = GAME_STATE_MENU;
-                break;
+                PlaySound(resources->fx_click);
+                switch (i)
+                {
+                case 0: // Close window
+                    *exit_flag = true;
+                    break;
+                case 1: // Back to main menu
+                    context->state = GAME_STATE_MENU;
+                    break;
+                }
             }
         }
     }
@@ -142,11 +140,14 @@ void handle_game_mode_menu_click(const Vector2 mouse_pos, const GameResources* r
     for (int i = 0; i < button_count; i++)
     {
         const Button btn = GAME_MODE_BUTTONS[i];
-        if (CheckCollisionPointRec(mouse_pos, btn.rect) &&
-            IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-            btn.action)
+        if (btn.rect)
         {
-            btn.action(resources, context);
+            if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
+                IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+                btn.action)
+            {
+                btn.action(resources, context);
+            }
         }
     }
 }
@@ -160,22 +161,20 @@ void handle_game_mode_menu_click(const Vector2 mouse_pos, const GameResources* r
  */
 void handle_instructions_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
-    static const float btn_width = 330.0f;
-    static const float btn_height = 100.0f;
-    static const float FIRST_BUTTON_OFFSET = 300.0f;
-
-    const Rectangle btnRect = {
-        (float)GetScreenWidth() / 2.0f - btn_width / 2.0f,
-        (float)GetScreenHeight() / 2 - btn_height / 2 + FIRST_BUTTON_OFFSET,
-        btn_width,
-        btn_height
-    };
-
-    if (CheckCollisionPointRec(mouse_pos, btnRect) &&
-        IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    const size_t button_count = sizeof(INSTRUCTIONS_BUTTONS) / sizeof(Button);
+    for (int i = 0; i < button_count; i++)
     {
-        PlaySound(resources->fx_click);
-        context->state = GAME_STATE_MENU;
+        const Button btn = INSTRUCTIONS_BUTTONS[i];
+        if (btn.rect)
+        {
+            if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
+                IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+                btn.action)
+            {
+                PlaySound(resources->fx_click);
+                btn.action(resources, context);
+            }
+        }
     }
 }
 
@@ -195,13 +194,16 @@ void handle_game_over_menu_click(const Vector2 mouse_pos, const GameResources* r
     {
         const Button btn = GAME_OVER_BUTTONS[i];
 
-        if (CheckCollisionPointRec(mouse_pos, btn.rect) &&
-            IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-            btn.action)
+        if (btn.rect)
         {
-            context->transition.start_time = 0;
-            context->transition.active = false;
-            btn.action(resources, context);
+            if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
+                IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+                btn.action)
+            {
+                context->transition.start_time = 0;
+                context->transition.active = false;
+                btn.action(resources, context);
+            }
         }
     }
 }
@@ -240,12 +242,14 @@ void handle_menu_click(const Vector2 mouse_pos, const GameResources* resources, 
     for (int i = 0; i < button_count; i++)
     {
         const Button btn = MAIN_MENU_BUTTONS[i];
-
-        if (CheckCollisionPointRec(mouse_pos, btn.rect) &&
-            IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-            btn.action)
+        if (btn.rect)
         {
-            btn.action(resources, context);
+            if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
+                IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+                btn.action)
+            {
+                btn.action(resources, context);
+            }
         }
     }
 }

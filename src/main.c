@@ -6,12 +6,13 @@
  * for the Tic-Tac-Toe game implemented with a text-based user interface.
  */
 
-#include <game.h>
 #include <render.h>
 #include <handlers.h>
+#include <memo.h>
 #include <menu.h>
 #include <raylib.h>
 #include <stdlib.h>
+#include <uthash.h>
 
 int main(void)
 {
@@ -20,8 +21,18 @@ int main(void)
     const float screen_width = 1000;
     const float screen_height = 1000;
 
+
+    MemoCache* memo_cache = init_memo_cache();
+    if (!memo_cache) {
+        TraceLog(LOG_ERROR, "Failed to initialize memo cache\n");
+        return EXIT_FAILURE;
+    }
+
+    GridDimensions default_grid = {0};
+
     GameContext context = {
-        .needs_redraw = true,
+        .needs_recalculation = false,
+        .grid = default_grid,
         .state = GAME_STATE_MENU,
         .selected_game_mode = TWO_PLAYER,
         .player_1 = PLAYER_X,
@@ -34,6 +45,7 @@ int main(void)
         .start_screen_shown = false,
         .p1_score = 0,
         .p2_score = 0,
+        .memo_cache = memo_cache,
     };
 
     const UiOptions render_options = {
@@ -45,13 +57,19 @@ int main(void)
     InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
     InitAudioDevice();
 
-    GameResources resources = load_game_resources((int)screen_width, (int)screen_height);
+    GameResources resources = load_game_resources();
+
+    update_grid_dimensions(&context);
 
     SetTargetFPS(60);
     PlayMusicStream(resources.background_music);
     bool exit_flag = false;
     while (!exit_flag) // Detect window close button
     {
+        if (IsWindowResized()) {
+            context.needs_recalculation = true;
+            update_grid_dimensions(&context);
+        }
         UpdateMusicStream(resources.background_music);
         // Updates
         const Vector2 mouse_pos = GetMousePosition();
@@ -61,14 +79,12 @@ int main(void)
         case GAME_STATE_MENU:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                context.needs_redraw = true;
                 handle_menu_click(mouse_pos, &resources, &context);
             }
             break;
         case GAME_STATE_PLAYING:
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && context.start_screen_shown)
             {
-                context.needs_redraw = true;
                 handle_game_click(mouse_pos, &resources, &context);
             }
             break;
@@ -77,7 +93,6 @@ int main(void)
         case GAME_STATE_DRAW:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                context.needs_redraw = true;
                 handle_game_over_menu_click(mouse_pos, &resources, &context);
             }
             break;
@@ -86,7 +101,6 @@ int main(void)
         case GAME_STATE_EXIT:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                context.needs_redraw = true;
                 handle_exit_menu_click(mouse_pos, &resources, &context, &exit_flag);
             }
             break;
@@ -94,14 +108,12 @@ int main(void)
         case MENU_DIFF_CHOICE:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                context.needs_redraw = true;
                 handle_game_mode_menu_click(mouse_pos, &resources, &context);
             }
             break;
         case MENU_INSTRUCTIONS:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                context.needs_redraw = true;
                 handle_instructions_menu_click(mouse_pos, &resources, &context);
             }
             break;
@@ -128,15 +140,15 @@ int main(void)
             break;
 
         case MENU_INSTRUCTIONS:
-            render_instructions(&resources, &render_options);
+            render_instructions(&resources, &render_options, &context);
             break;
 
         case GAME_STATE_EXIT:
-            render_exit(&render_options);
+            render_exit(&render_options, &context);
             break;
 
         case MENU_DIFF_CHOICE:
-            render_game_mode_choice(&render_options);
+            render_game_mode_choice(&render_options, &context);
             break;
 
         default:
@@ -145,6 +157,7 @@ int main(void)
         EndDrawing();
     }
     unload_game_resources(&resources);
+    cleanup_memo_cache(context.memo_cache);
     CloseAudioDevice();
     CloseWindow();
     return EXIT_SUCCESS;

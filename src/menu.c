@@ -1,7 +1,8 @@
 #include <menu.h>
+#include <neural.h>
 #include <stdlib.h>
 
-GameResources load_game_resources(int screen_width, int screen_height) {
+GameResources load_game_resources() {
     GameResources resources = { 0 };
 
     // Load audio resources
@@ -13,7 +14,7 @@ GameResources load_game_resources(int screen_width, int screen_height) {
 
     // Load and resize background
     Image background = LoadImage("assets/main1.png");
-    ImageResize(&background, screen_width, screen_height);
+    ImageResize(&background, GetScreenWidth(), GetScreenHeight());
     resources.main_menu_img = LoadTextureFromImage(background);
     UnloadImage(background);
 
@@ -43,6 +44,19 @@ GameResources load_game_resources(int screen_width, int screen_height) {
     BayesModel* bayes_model = load_naive_bayes();
     resources.models->bayes_model = bayes_model;
     return resources;
+}
+
+
+void update_grid_dimensions(GameContext* context) {
+    const int screen_width = GetScreenWidth();
+    const int screen_height = GetScreenHeight();
+
+    context->grid.grid_size = (float)screen_width < (float)screen_height
+                             ? (float)screen_width * 0.6f
+                             : (float)screen_height * 0.6f;
+    context->grid.cell_size = (int)context->grid.grid_size / 3;
+    context->grid.start_x = (int)((float)screen_width - context->grid.grid_size) / 2;
+    context->grid.start_y = (int)((float)screen_height - context->grid.grid_size) / 2;
 }
 
 void unload_game_resources(GameResources* resources) {

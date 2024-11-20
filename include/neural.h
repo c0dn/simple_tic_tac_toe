@@ -55,14 +55,8 @@ typedef struct
     double v_bias_output[OUTPUT_NODES];                  // Second moment estimate for output biases
 } NeuralNetwork;
 
-typedef struct
-{
-    NeuralNetwork* neural_network;
-    BayesModel* bayes_model;
-} AiModels;
-
 typedef struct {
-    int score;
+    double score;
     int move;
 } EvalResult;
 

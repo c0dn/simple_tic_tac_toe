@@ -1,5 +1,5 @@
-#include "buttons.h"
-
+#include <buttons.h>
+#include <game.h>
 // Button click handlers
 static void start_easy_mode(const GameResources* res, GameContext* context)
 {
@@ -82,41 +82,45 @@ static void show_exit_confirmation(const GameResources* res, GameContext* contex
 
 Button GAME_MODE_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "Easiest",
         .width = 300.0f,
         .height = 50.0f,
         .first_render_offset = -75.0f,
-        .padding = PaddingY(10.0f),
+        .padding = {0, 0, 10.0f, 10.0f},
         .rounded = true,
         .font_size = 30,
         .action = start_easy_mode
     },
     {
+        .rect = NULL,
         .text = "Easy",
         .width = 300.0f,
         .height = 50.0f,
+        .padding = {0, 0, 10.0f, 10.0f},
         .first_render_offset = -75.0f,
-        .padding = PaddingY(10.0f),
         .rounded = true,
         .font_size = 30,
         .action = start_easy_mode_naive
     },
     {
+        .rect = NULL,
         .text = "Medium",
         .width = 300.0f,
         .height = 50.0f,
         .first_render_offset = -75.0f,
-        .padding = PaddingY(10.0f),
+        .padding = {0, 0, 10.0f, 10.0f},
         .rounded = true,
         .font_size = 30,
         .action = start_medium_mode
     },
     {
+        .rect = NULL,
         .text = "Hard",
         .width = 300.0f,
         .height = 50.0f,
         .first_render_offset = -75.0f,
-        .padding = PaddingY(10.0f),
+        .padding = {0, 0, 10.0f, 10.0f},
         .rounded = true,
         .font_size = 30,
         .action = start_hard_mode
@@ -125,20 +129,22 @@ Button GAME_MODE_BUTTONS[] = {
 
 Button EXIT_CONFIRMATION_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "Yes",
         .width = 330.0f,
         .height = 100.0f,
         .first_render_offset = -40.0f,
-        .padding = PaddingY(10.0f),
+        .padding = {0, 0, 10.0f, 10.0f},
         .rounded = true,
         .font_size = 30
     },
     {
+        .rect = NULL,
         .text = "No",
         .width = 330.0f,
         .height = 100.0f,
         .first_render_offset = -40.0f,
-        .padding = PaddingY(10.0f),
+        .padding = {0, 0, 10.0f, 10.0f},
         .rounded = true,
         .font_size = 30
     }
@@ -146,10 +152,11 @@ Button EXIT_CONFIRMATION_BUTTONS[] = {
 
 Button INSTRUCTIONS_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "Back",
         .width = 330.0f,
         .height = 100.0f,
-        .padding = PaddingY(10.0f),
+        .padding = {0, 0, 10.0f, 10.0f},
         .first_render_offset = 300.0f,
         .rounded = true,
         .font_size = 70,
@@ -159,21 +166,23 @@ Button INSTRUCTIONS_BUTTONS[] = {
 
 Button GAME_OVER_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "Continue Playing",
         .width = 200,
         .height = 60,
         .first_render_offset = 0,
-        .padding = PaddingY(15.0f),
+        .padding = {0, 0, 15.0f, 15.0f},
         .rounded = true,
         .font_size = 20,
         .action = continue_playing
     },
     {
+        .rect = NULL,
         .text = "End Game",
         .width = 200,
         .height = 60,
         .first_render_offset = 0,
-        .padding = PaddingY(15.0f),
+        .padding = {0, 0, 15.0f, 15.0f},
         .rounded = true,
         .font_size = 20,
         .action = return_to_menu
@@ -183,6 +192,7 @@ Button GAME_OVER_BUTTONS[] = {
 
 Button MAIN_MENU_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "1 Player",
         .width = 200.0f,
         .height = 60.0f,
@@ -193,6 +203,7 @@ Button MAIN_MENU_BUTTONS[] = {
         .action = start_1player
     },
     {
+        .rect = NULL,
         .text = "2 Player",
         .width = 200.0f,
         .height = 60.0f,
@@ -203,6 +214,7 @@ Button MAIN_MENU_BUTTONS[] = {
         .action = start_2player
     },
     {
+        .rect = NULL,
         .text = "How To Play",
         .width = 200.0f,
         .height = 60.0f,
@@ -213,6 +225,7 @@ Button MAIN_MENU_BUTTONS[] = {
         .action = show_instructions
     },
     {
+        .rect = NULL,
         .text = "Exit",
         .width = 200.0f,
         .height = 60.0f,
@@ -227,10 +240,11 @@ Button MAIN_MENU_BUTTONS[] = {
 
 Button IN_GAME_BUTTONS[] = {
     {
+        .rect = NULL,
         .text = "Return to menu",
         .width = 330.0f,
         .height = 100.0f,
-        .padding = PaddingY(10.0f),
+        .padding = {0, 0, 10.0f, 10.0f},
         .first_render_offset = 400.0f,
         .rounded = true,
         .font_size = 40,
