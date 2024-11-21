@@ -111,6 +111,7 @@ typedef struct {
 
 typedef struct {
     bool needs_recalculation;
+    bool exit_flag;
     GameState state;
     GameMode selected_game_mode;
     player_t player_1;

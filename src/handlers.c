@@ -3,7 +3,34 @@
 #include <buttons.h>
 #include <computer.h>
 #include <render.h>
-#include <stddef.h>
+
+/**
+ * @brief Handle mouse clicks during active game play
+ *
+ * Manages player moves, game state transitions, and computer turns
+ *
+ * @param click_pos Click position
+ * @param resources Game asset resources
+ * @param context Current game context
+ * @param buttons Button array
+ * @param count Number of buttons in array
+ */
+void handle_clicks(const Vector2 click_pos, const GameResources* resources, GameContext* context, const Button* buttons, const size_t count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        const Button btn = buttons[i];
+        if (btn.rect)
+        {
+            if (CheckCollisionPointRec(click_pos, *btn.rect) &&
+                IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                btn.action(resources, context);
+            }
+        }
+    }
+}
+
 
 /**
  * @brief Handle mouse clicks during active game play
@@ -73,140 +100,11 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
     }
     else
     {
-        const size_t button_count = sizeof(IN_GAME_BUTTONS) / sizeof(Button);
-
-        for (int i = 0; i < button_count; i++)
-        {
-            const Button btn = IN_GAME_BUTTONS[i];
-            if (btn.rect)
-            {
-                if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
-                    IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-                {
-                    btn.action(resources, context);
-                }
-            }
-        }
-    }
-}
-
-/**
- * @brief Handle clicks in the exit confirmation menu
- *
- * @param mouse_pos Current mouse position
- * @param resources Game asset resources
- * @param context Current game context
- * @param exit_flag Pointer to flag controlling game exit
- */
-void handle_exit_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context,
-                            bool* exit_flag)
-{
-    const size_t button_count = sizeof(EXIT_CONFIRMATION_BUTTONS) / sizeof(Button);
-
-
-    for (int i = 0; i < button_count; i++)
-    {
-        const Button btn = EXIT_CONFIRMATION_BUTTONS[i];
-        if (btn.rect)
-        {
-            if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
-                IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-            {
-                PlaySound(resources->fx_click);
-                switch (i)
-                {
-                case 0: // Close window
-                    *exit_flag = true;
-                    break;
-                case 1: // Back to main menu
-                    context->state = GAME_STATE_MENU;
-                    break;
-                }
-            }
-        }
-    }
-}
-
-/**
- * @brief Handle game mode selection menu interactions
- *
- * @param mouse_pos Current mouse position
- * @param resources Game asset resources
- * @param context Current game context
- */
-void handle_game_mode_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
-{
-    const size_t button_count = sizeof(GAME_MODE_BUTTONS) / sizeof(Button);
-    for (int i = 0; i < button_count; i++)
-    {
-        const Button btn = GAME_MODE_BUTTONS[i];
-        if (btn.rect)
-        {
-            if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
-                IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-                btn.action)
-            {
-                btn.action(resources, context);
-            }
-        }
-    }
-}
-
-/**
- * @brief Handle clicks in the instructions menu
- *
- * @param mouse_pos Current mouse position
- * @param resources Game asset resources
- * @param context Current game context
- */
-void handle_instructions_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
-{
-    const size_t button_count = sizeof(INSTRUCTIONS_BUTTONS) / sizeof(Button);
-    for (int i = 0; i < button_count; i++)
-    {
-        const Button btn = INSTRUCTIONS_BUTTONS[i];
-        if (btn.rect)
-        {
-            if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
-                IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-                btn.action)
-            {
-                PlaySound(resources->fx_click);
-                btn.action(resources, context);
-            }
-        }
+        handle_clicks(mouse_pos, resources, context, IN_GAME_BUTTONS, 1);
     }
 }
 
 
-/**
- * @brief Handle interactions in game over screen
- *
- * @param mouse_pos Current mouse position
- * @param resources Game asset resources
- * @param context Current game context
- */
-void handle_game_over_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
-{
-    const size_t button_count = sizeof(GAME_OVER_BUTTONS) / sizeof(Button);
-
-    for (int i = 0; i < button_count; i++)
-    {
-        const Button btn = GAME_OVER_BUTTONS[i];
-
-        if (btn.rect)
-        {
-            if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
-                IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-                btn.action)
-            {
-                context->transition.start_time = 0;
-                context->transition.active = false;
-                btn.action(resources, context);
-            }
-        }
-    }
-}
 
 void handle_music_toggle(const GameResources* resources, GameContext* context)
 {
@@ -231,25 +129,13 @@ void handle_music_toggle(const GameResources* resources, GameContext* context)
  */
 void handle_menu_click(const Vector2 mouse_pos, const GameResources* resources, GameContext* context)
 {
-    const size_t button_count = sizeof(MAIN_MENU_BUTTONS) / sizeof(Button);
     const Rectangle audio_ico_rect = calc_music_icon_rect(context, resources);
     if (CheckCollisionPointRec(mouse_pos, audio_ico_rect) &&
         IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
         handle_music_toggle(resources, context);
-    }
-
-    for (int i = 0; i < button_count; i++)
+    } else
     {
-        const Button btn = MAIN_MENU_BUTTONS[i];
-        if (btn.rect)
-        {
-            if (CheckCollisionPointRec(mouse_pos, *btn.rect) &&
-                IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-                btn.action)
-            {
-                btn.action(resources, context);
-            }
-        }
+        handle_clicks(mouse_pos, resources, context, MAIN_MENU_BUTTONS, 4);
     }
 }

@@ -40,6 +40,8 @@ static void start_hard_mode(const GameResources* res, GameContext* context)
 
 static void continue_playing(const GameResources* res, GameContext* context)
 {
+    context->transition.start_time = 0;
+    context->transition.active = false;
     context->player_1 = context->player_1 == PLAYER_X ? PLAYER_O : PLAYER_X;
     initialize_game(res,  context);
 }
@@ -47,10 +49,19 @@ static void continue_playing(const GameResources* res, GameContext* context)
 
 static void return_to_menu(const GameResources* res, GameContext* context)
 {
+    context->transition.start_time = 0;
+    context->transition.active = false;
     PlaySound(res->fx_click);
     context->p2_score = 0;
     context->p1_score = 0;
     context->state = GAME_STATE_MENU;
+}
+
+
+static void exit_game(const GameResources* res, GameContext* context)
+{
+    PlaySound(res->fx_click);
+    context->exit_flag = true;
 }
 
 static void start_1player(const GameResources* res, GameContext* context)
@@ -136,7 +147,8 @@ Button EXIT_CONFIRMATION_BUTTONS[] = {
         .first_render_offset = -40.0f,
         .padding = {0, 0, 10.0f, 10.0f},
         .rounded = true,
-        .font_size = 30
+        .font_size = 30,
+        .action = exit_game
     },
     {
         .rect = NULL,
@@ -146,7 +158,8 @@ Button EXIT_CONFIRMATION_BUTTONS[] = {
         .first_render_offset = -40.0f,
         .padding = {0, 0, 10.0f, 10.0f},
         .rounded = true,
-        .font_size = 30
+        .font_size = 30,
+        .action = return_to_menu
     }
 };
 

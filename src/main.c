@@ -32,6 +32,7 @@ int main(void)
 
     GameContext context = {
         .needs_recalculation = false,
+        .exit_flag = false,
         .grid = default_grid,
         .state = GAME_STATE_MENU,
         .selected_game_mode = TWO_PLAYER,
@@ -63,8 +64,7 @@ int main(void)
 
     SetTargetFPS(60);
     PlayMusicStream(resources.background_music);
-    bool exit_flag = false;
-    while (!exit_flag) // Detect window close button
+    while (!context.exit_flag) // Detect window close button
     {
         if (IsWindowResized()) {
             context.needs_recalculation = true;
@@ -73,7 +73,7 @@ int main(void)
         UpdateMusicStream(resources.background_music);
         // Updates
         const Vector2 mouse_pos = GetMousePosition();
-        if (WindowShouldClose()) exit_flag = true;
+        if (WindowShouldClose()) context.exit_flag = true;
         switch (context.state)
         {
         case GAME_STATE_MENU:
@@ -93,7 +93,8 @@ int main(void)
         case GAME_STATE_DRAW:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                handle_game_over_menu_click(mouse_pos, &resources, &context);
+                handle_clicks(mouse_pos, &resources, &context, GAME_OVER_BUTTONS, 2);
+
             }
             break;
 
@@ -101,20 +102,20 @@ int main(void)
         case GAME_STATE_EXIT:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                handle_exit_menu_click(mouse_pos, &resources, &context, &exit_flag);
+                handle_clicks(mouse_pos, &resources, &context, EXIT_CONFIRMATION_BUTTONS, 2);
             }
             break;
 
         case MENU_DIFF_CHOICE:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                handle_game_mode_menu_click(mouse_pos, &resources, &context);
+                handle_clicks(mouse_pos, &resources, &context, GAME_MODE_BUTTONS, 4);
             }
             break;
         case MENU_INSTRUCTIONS:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                handle_instructions_menu_click(mouse_pos, &resources, &context);
+                handle_clicks(mouse_pos, &resources, &context, INSTRUCTIONS_BUTTONS, 1);
             }
             break;
         default:
