@@ -109,7 +109,7 @@ int main(void)
         case MENU_DIFF_CHOICE:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                handle_clicks(mouse_pos, &resources, &context, GAME_MODE_BUTTONS, 4);
+                handle_clicks(mouse_pos, &resources, &context, GAME_MODE_BUTTONS, 5);
             }
             break;
         case MENU_INSTRUCTIONS:

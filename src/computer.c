@@ -4,11 +4,11 @@
 #include <tgmath.h>
 #include <utils.h>
 
-NeuralNetwork* load_model()
+NeuralNetwork *load_model()
 {
     const static char weights_path[] = "assets/nn_weights.dat";
-    NeuralNetwork* nn = malloc(sizeof(NeuralNetwork));
-    FILE* file = fopen(weights_path, "rb");
+    NeuralNetwork *nn = malloc(sizeof(NeuralNetwork));
+    FILE *file = fopen(weights_path, "rb");
     if (file == NULL)
     {
         TraceLog(LOG_ERROR, "Failed to load Neural net\n");
@@ -26,13 +26,14 @@ NeuralNetwork* load_model()
     return nn;
 }
 
-BayesModel* load_naive_bayes()
+BayesModel *load_naive_bayes()
 {
     const static char model_path[] = "assets/bayes_model.dat";
-    BayesModel* model = malloc(sizeof(BayesModel));
-    FILE* file = fopen(model_path, "rb");
+    BayesModel *model = malloc(sizeof(BayesModel));
+    FILE *file = fopen(model_path, "rb");
 
-    if (!file) {
+    if (!file)
+    {
         TraceLog(LOG_ERROR, "Fail to load Bayes model");
         return NULL;
     }
@@ -51,7 +52,7 @@ BayesModel* load_naive_bayes()
     return model;
 }
 
-void forward_pass(NeuralNetwork* nn, const double input[])
+void forward_pass(NeuralNetwork *nn, const double input[])
 {
     for (int i = 0; i < HIDDEN_NODES; i++)
     {
@@ -76,33 +77,40 @@ void forward_pass(NeuralNetwork* nn, const double input[])
     }
 }
 
-double predict_naive_bayes(const BayesModel* model, int const computer_player) {
+double predict_naive_bayes(const BayesModel *model, int const computer_player)
+{
     double win_probability = model->prob_win;
     double lose_probability = model->prob_lose;
     uint16_t input_x_board = 0;
     uint16_t input_o_board = 0;
 
-    if(computer_player == PLAYER_O) {
+    if (computer_player == PLAYER_O)
+    {
         input_x_board = o_board;
         input_o_board = x_board;
-    } else
+    }
+    else
     {
         input_x_board = x_board;
         input_o_board = o_board;
     }
 
-    for(int pos = 0; pos < 9; pos++) {
+    for (int pos = 0; pos < 9; pos++)
+    {
         const uint16_t bit = 1 << pos;
 
-        if(input_x_board & bit) {
+        if (input_x_board & bit)
+        {
             win_probability *= model->prob_x[pos];
             lose_probability *= model->prob_x[pos];
         }
-        else if(input_o_board & bit) {
+        else if (input_o_board & bit)
+        {
             win_probability *= model->prob_o[pos];
             lose_probability *= model->prob_o[pos];
         }
-        else {
+        else
+        {
             win_probability *= model->prob_b[pos];
             lose_probability *= model->prob_b[pos];
         }
@@ -111,7 +119,7 @@ double predict_naive_bayes(const BayesModel* model, int const computer_player) {
     return win_probability / (win_probability + lose_probability);
 }
 
-EvalResult nn_move(NeuralNetwork* nn)
+EvalResult nn_move(NeuralNetwork *nn)
 {
     int best_move = -1;
     double best_score = -1;
@@ -127,9 +135,12 @@ EvalResult nn_move(NeuralNetwork* nn)
         double input[INPUT_NODES];
         for (int i = 0; i < INPUT_NODES; i++)
         {
-            if (x_board & 1 << i) input[i] = 1.0;
-            else if (o_board & 1 << i) input[i] = -1.0;
-            else input[i] = 0.0;
+            if (x_board & 1 << i)
+                input[i] = 1.0;
+            else if (o_board & 1 << i)
+                input[i] = -1.0;
+            else
+                input[i] = 0.0;
         }
 
         forward_pass(nn, input);
@@ -149,7 +160,7 @@ EvalResult nn_move(NeuralNetwork* nn)
     return (EvalResult){(int)best_score, best_move};
 }
 
-EvalResult nb_move(const BayesModel* model, const player_t computer_player)
+EvalResult nb_move(const BayesModel *model, const player_t computer_player)
 {
     int best_move = -1;
     double best_score = -1;
@@ -165,12 +176,11 @@ EvalResult nb_move(const BayesModel* model, const player_t computer_player)
         if (computer_player == PLAYER_X)
         {
             x_board |= 1 << move;
-        } else
+        }
+        else
         {
             o_board |= 1 << move;
         }
-
-
 
         const double score = predict_naive_bayes(model, computer_player);
 
@@ -183,7 +193,8 @@ EvalResult nb_move(const BayesModel* model, const player_t computer_player)
         if (computer_player == PLAYER_X)
         {
             x_board &= ~(1 << move);
-        } else
+        }
+        else
         {
             o_board &= ~(1 << move);
         }
@@ -207,14 +218,17 @@ EvalResult nb_move(const BayesModel* model, const player_t computer_player)
  * @param context Pointer to game context
  * @return EvalResult containing best score and move
  */
-EvalResult minimax(const player_t current_player, int alpha, int beta, const int depth, const GameContext* context)
+EvalResult minimax(const player_t current_player, int alpha, int beta, const int depth, const GameContext *context)
 {
     const player_t human = get_human_player(context);
     const player_t computer = get_computer_player(context);
     // Check win conditions
-    if (check_win(human) != -1) return (EvalResult){-1, -1};
-    if (check_win(computer) != -1) return (EvalResult){1, -1};
-    if (check_draw() || depth == 0) return (EvalResult){0, -1};
+    if (check_win(human) != -1)
+        return (EvalResult){-1, -1};
+    if (check_win(computer) != -1)
+        return (EvalResult){1, -1};
+    if (check_draw() || depth == 0)
+        return (EvalResult){0, -1};
 
     double bestScore = current_player == computer ? -2 : 2;
     int bestMove = -1;
@@ -232,8 +246,7 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, const int
         set_cell(row, col, current_player);
 
         const EvalResult result = minimax(
-            current_player == human ? computer : human, alpha, beta, depth -1, context
-        );
+            current_player == human ? computer : human, alpha, beta, depth - 1, context);
 
         // Undo move
         if (current_player == PLAYER_X)
@@ -247,21 +260,27 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, const int
 
         // Update best score and move
         // maximizing for computer
-        if (current_player == computer) {
-            if (result.score > bestScore) {
+        if (current_player == computer)
+        {
+            if (result.score > bestScore)
+            {
                 bestScore = result.score;
                 bestMove = move;
             }
             alpha = (alpha > bestScore) ? alpha : bestScore;
-        } else {
-            if (result.score < bestScore) {
+        }
+        else
+        {
+            if (result.score < bestScore)
+            {
                 bestScore = result.score;
                 bestMove = move;
             }
             beta = (beta < bestScore) ? beta : bestScore;
         }
 
-        if (alpha >= beta) {
+        if (alpha >= beta)
+        {
             break;
         }
 
@@ -271,6 +290,52 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, const int
     return (EvalResult){bestScore, bestMove};
 }
 
+void nn_vs_nb(const GameContext *context, const AiModels *models)
+{
+
+    // const player_t nn = get_human_player(context);
+    // const player_t mini = get_computer_player(context);
+
+    player_t current_player = get_computer_player(context);     // Start with one AI
+    const player_t nn = current_player;                         // Assume NN is the computer player
+    const player_t nb = (nn == PLAYER_X) ? PLAYER_O : PLAYER_X; // Opponent is minimax
+
+    while (true)
+    {
+        if (check_win(nn) != -1)
+        {
+            break;
+        }
+        if (check_win(nb) != -1)
+        {
+            // context->state = GAME_STATE_P1_WIN;
+            break;
+        }
+        if (check_draw())
+        {
+            break;
+        }
+
+        EvalResult result;
+
+        if (current_player == nn)
+        {
+            result = nn_move(models->neural_network);
+        }
+        else
+        {
+            result = nb_move(models->bayes_model, current_player);
+        }
+
+        if (result.move != -1)
+        {
+            const int row = result.move / 3;
+            const int col = result.move % 3;
+            set_cell(row, col, current_player);
+        }
+        current_player = (current_player == nn) ? nb : nn;
+    }
+}
 
 /**
  * @brief Execute computer's move using various algorithms selected by current game difficulty
@@ -278,7 +343,8 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, const int
  * @param context Current game context
  * @param models struct containing ML model parameters
  */
-void computer_move(const GameContext* context, const AiModels* models) {
+void computer_move(const GameContext *context, const AiModels *models)
+{
     const player_t computer_player = get_computer_player(context);
     EvalResult result;
 
@@ -300,6 +366,10 @@ void computer_move(const GameContext* context, const AiModels* models) {
         result = minimax(computer_player, -2, 2, 9, context);
         break;
 
+    case NN_AND_NB:
+        nn_vs_nb(context, models);
+        return; 
+
     default:
         return;
     }
@@ -309,43 +379,5 @@ void computer_move(const GameContext* context, const AiModels* models) {
         const int row = result.move / 3;
         const int col = result.move % 3;
         set_cell(row, col, computer_player);
-    }
-}
-
-void nn_vs_nb(const GameContext* context, const AiModels* models) {
-
-    // const player_t nn = get_human_player(context);
-    // const player_t mini = get_computer_player(context);
-
-    player_t current_player = get_computer_player(context); // Start with one AI
-    const player_t nn = current_player; // Assume NN is the computer player
-    const player_t nb = (nn == PLAYER_X) ? PLAYER_O : PLAYER_X; // Opponent is minimax
-
-    while (true) {
-        if (check_win(nn) != -1) {
-            break;
-        }
-        if (check_win(nb) != -1) {
-            // context->state = GAME_STATE_P1_WIN;
-            break;
-        }
-        if (check_draw()) {
-            break;
-        }
-
-        EvalResult result;
-
-        if (current_player == nn) {
-            result = nn_move(models->neural_network);
-        } else {
-            result = nb_move(models->bayes_model, current_player);
-        }
-
-        if (result.move != -1) {
-            const int row = result.move / 3;
-            const int col = result.move % 3;
-            set_cell(row, col, current_player);
-        }
-        current_player = (current_player == nn) ? nb : nn;
     }
 }
