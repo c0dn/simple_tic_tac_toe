@@ -38,6 +38,15 @@ static void start_hard_mode(const GameResources* res, GameContext* context)
     context->state = GAME_STATE_PLAYING;
 }
 
+static void start_nn_vs_nb(const GameResources* res, GameContext* context)
+{
+    PlaySound(res->fx_click);
+    context->selected_game_mode = NN_AND_NB;
+    context->computer_enabled = true;
+    initialize_game(res, context);
+    context->state = GAME_STATE_PLAYING;
+}
+
 static void continue_playing(const GameResources* res, GameContext* context)
 {
     context->transition.start_time = 0;
@@ -135,6 +144,17 @@ Button GAME_MODE_BUTTONS[] = {
         .rounded = true,
         .font_size = 30,
         .action = start_hard_mode
+    },
+    {
+        .rect = NULL,
+        .text = "AI vs AI",
+        .width = 300.0f,
+        .height = 50.0f,
+        .first_render_offset = -75.0f,
+        .padding = {0, 0, 10.0f, 10.0f},
+        .rounded = true,
+        .font_size = 30,
+        .action = start_nn_vs_nb
     }
 };
 

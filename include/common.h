@@ -29,7 +29,8 @@ typedef enum {
     ONE_PLAYER_EASY,
     ONE_PLAYER_EASY_NAIVE,
     ONE_PLAYER_MEDIUM,
-    ONE_PLAYER_HARD
+    ONE_PLAYER_HARD,
+    NN_AND_NB,
 } GameMode;
 
 // UI-related structures

@@ -312,3 +312,40 @@ void computer_move(const GameContext* context, const AiModels* models) {
     }
 }
 
+void nn_vs_nb(const GameContext* context, const AiModels* models) {
+
+    // const player_t nn = get_human_player(context);
+    // const player_t mini = get_computer_player(context);
+
+    player_t current_player = get_computer_player(context); // Start with one AI
+    const player_t nn = current_player; // Assume NN is the computer player
+    const player_t nb = (nn == PLAYER_X) ? PLAYER_O : PLAYER_X; // Opponent is minimax
+
+    while (true) {
+        if (check_win(nn) != -1) {
+            break;
+        }
+        if (check_win(nb) != -1) {
+            // context->state = GAME_STATE_P1_WIN;
+            break;
+        }
+        if (check_draw()) {
+            break;
+        }
+
+        EvalResult result;
+
+        if (current_player == nn) {
+            result = nn_move(models->neural_network);
+        } else {
+            result = nb_move(models->bayes_model, current_player);
+        }
+
+        if (result.move != -1) {
+            const int row = result.move / 3;
+            const int col = result.move % 3;
+            set_cell(row, col, current_player);
+        }
+        current_player = (current_player == nn) ? nb : nn;
+    }
+}

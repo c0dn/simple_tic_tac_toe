@@ -399,7 +399,7 @@ void render_game_mode_choice(const UiOptions* render_opts, const GameContext* co
     const int screen_height = GetScreenHeight();
 
     // Calculate message box dimensions
-    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.4f, screen_height, screen_width,
+    const BoxDimensions box_dim = calculate_centered_box_dimensions(0.5f, 0.6f, screen_height, screen_width,
                                                                     context->memo_cache);
 
     // Draw message box
