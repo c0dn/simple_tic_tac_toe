@@ -114,7 +114,7 @@ double predict_naive_bayes(const BayesModel* model, int const computer_player) {
 EvalResult nn_move(NeuralNetwork* nn, const player_t computer_player)
 {
     int best_move = -1;
-    double best_score = -1;
+    double best_score = -INFINITY;
 
     const uint16_t occupied = x_board | o_board;
     uint16_t legal_moves = ~occupied & 0b111111111;
