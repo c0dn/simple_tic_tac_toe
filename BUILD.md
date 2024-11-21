@@ -4,6 +4,7 @@
 
 - Cmake version 3.13+
 - libraylib version 5+
+- uthash version 2+
 - gcc version 13+
 - WSL with Ubuntu 22.04+
 - MSYS2 version 3.5.4+
@@ -15,11 +16,12 @@ https://documentation.ubuntu.com/wsl/en/latest/guides/install-ubuntu-wsl2/ \
 It is recommended to update Ubuntu to the latest LTS release 
 
 ## Compiling for Windows
-### Installing raylib
+### Installing raylib and uthash
 1. Open MSYS2 UCRT64 shell and run the following commands inside it
 2. Run the command
 ```shell
-pacman -S pacman -S ucrt64/mingw-w64-ucrt-x86_64-raylib
+pacman -S ucrt64/mingw-w64-ucrt-x86_64-raylib
+pacman -S mingw-w64-ucrt-x86_64-uthash
 ```
 3. Ensure include and lib directory is in your PATH
 ![img.png](screenshots/build_guide.png)
@@ -32,10 +34,10 @@ cmake --build ./
 ```
 
 ## Compiling for Linux on WSL
-1. Install libraylib5-dev on your WSL install
+1. Install libraylib5-dev and uthash-dev on your WSL install
 ```shell
 sudo add-apt-repository ppa:texus/raylib
-sudo apt-get install libraylib5-dev -y
+sudo apt-get install libraylib5-dev uthash-dev -y
 ```
 2. Build, run commands in project directory
 ```shell
@@ -69,7 +71,7 @@ Codename:       noble
 ```shell
 sudo dpkg --add-architecture arm64
 sudo add-apt-repository ppa:texus/raylib
-sudo apt-get install crossbuild-essential-arm64 libraylib5-dev:arm64 build-essential -y
+sudo apt-get install crossbuild-essential-arm64 libraylib5-dev:arm64 uthash-dev:arm64 build-essential -y
 ```
 2. Build, run commands in project directory
 ```shell
