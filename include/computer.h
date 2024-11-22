@@ -8,6 +8,6 @@ EvalResult minimax(player_t current_player, int alpha, int beta, int depth, cons
 
 void computer_move(const GameContext* context, const AiModels* models);
 EvalResult nb_move(const BayesModel* model, player_t computer_player);
-EvalResult nn_move(NeuralNetwork* nn);
+EvalResult nn_move(NeuralNetwork* nn, player_t computer_player);
 
 #endif //COMPUTER_H

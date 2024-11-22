@@ -111,10 +111,10 @@ double predict_naive_bayes(const BayesModel* model, int const computer_player) {
     return win_probability / (win_probability + lose_probability);
 }
 
-EvalResult nn_move(NeuralNetwork* nn)
+EvalResult nn_move(NeuralNetwork* nn, const player_t computer_player)
 {
     int best_move = -1;
-    double best_score = -1;
+    double best_score = -INFINITY;
 
     const uint16_t occupied = x_board | o_board;
     uint16_t legal_moves = ~occupied & 0b111111111;
@@ -122,20 +122,45 @@ EvalResult nn_move(NeuralNetwork* nn)
     while (legal_moves)
     {
         const int move = count_trailing_zeros(legal_moves);
-        o_board |= 1 << move; // Try move
+        if (computer_player == PLAYER_X)
+        {
+            x_board |= 1 << move; // Try move as X
+        }
+        else
+        {
+            o_board |= 1 << move; // Try move as O
+        }
 
         double input[INPUT_NODES];
         for (int i = 0; i < INPUT_NODES; i++)
         {
-            if (x_board & 1 << i) input[i] = 1.0;
-            else if (o_board & 1 << i) input[i] = -1.0;
-            else input[i] = 0.0;
+            if (computer_player == PLAYER_X)
+            {
+                // X is the computer
+                if (x_board & 1 << i) input[i] = 1.0;
+                else if (o_board & 1 << i) input[i] = -1.0;
+                else input[i] = 0.0;
+            }
+            else
+            {
+                // O is the computer, adjust input encoding
+                if (o_board & 1 << i) input[i] = 1.0;
+                else if (x_board & 1 << i) input[i] = -1.0;
+                else input[i] = 0.0;
+            }
         }
 
         forward_pass(nn, input);
         const double score = nn->output_layer[0];
 
-        o_board &= ~(1 << move); // Undo move
+        if (computer_player == PLAYER_X)
+        {
+            x_board &= ~(1 << move); // Undo move for X
+        }
+        else
+        {
+            o_board &= ~(1 << move); // Undo move for O
+        }
 
         if (score > best_score)
         {
@@ -148,6 +173,7 @@ EvalResult nn_move(NeuralNetwork* nn)
 
     return (EvalResult){(int)best_score, best_move};
 }
+
 
 EvalResult nb_move(const BayesModel* model, const player_t computer_player)
 {
@@ -284,12 +310,13 @@ void computer_move(const GameContext* context, const AiModels* models) {
 
     switch (context->selected_game_mode)
     {
-    case ONE_PLAYER_EASY:
-        result = nn_move(models->neural_network);
-        break;
 
     case ONE_PLAYER_EASY_NAIVE:
         result = nb_move(models->bayes_model, computer_player);
+        break;
+
+    case ONE_PLAYER_EASY_NN:
+        result = nn_move(models->neural_network, computer_player);
         break;
 
     case ONE_PLAYER_MEDIUM:
