@@ -6,6 +6,15 @@ player_t current_player;
 
 
 
+/**
+ * @brief Initializes a new game session
+ *
+ * @param res Pointer to game resources
+ * @param context Pointer to game's current context data
+ *
+ * @details
+ * This function resets the relevant variables to prep for the next game
+ */
 void initialize_game(const GameResources* res, GameContext* context)
 {
     x_board = 0;
