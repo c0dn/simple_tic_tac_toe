@@ -19,6 +19,7 @@ extern player_t current_player;
 
 
 // void both_(const GameResources* res, GameContext* context);
+void initialize_game(const GameResources* res, GameContext* context);
 bool is_cell_empty(int row, int col);
 int check_win(player_t player);
 bool check_draw(void);
