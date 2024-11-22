@@ -310,12 +310,13 @@ void computer_move(const GameContext* context, const AiModels* models) {
 
     switch (context->selected_game_mode)
     {
-    case ONE_PLAYER_EASY:
-        result = nn_move(models->neural_network, computer_player);
-        break;
 
     case ONE_PLAYER_EASY_NAIVE:
         result = nb_move(models->bayes_model, computer_player);
+        break;
+
+    case ONE_PLAYER_EASY_NN:
+        result = nn_move(models->neural_network, computer_player);
         break;
 
     case ONE_PLAYER_MEDIUM:
