@@ -46,6 +46,7 @@ int main(void)
         .start_screen_shown = false,
         .p1_score = 0,
         .p2_score = 0,
+        .draw_score = 0, //xx added scoring
         .memo_cache = memo_cache,
     };
 
