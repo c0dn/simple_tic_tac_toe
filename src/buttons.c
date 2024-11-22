@@ -1,20 +1,20 @@
 #include <buttons.h>
 #include <game.h>
 // Button click handlers
-static void start_easy_mode(const GameResources* res, GameContext* context)
-{
-    PlaySound(res->fx_click);
-    context->selected_game_mode = ONE_PLAYER_EASY;
-    context->computer_enabled = true;
-    initialize_game(res, context);
-    context->state = GAME_STATE_PLAYING;
-}
-
 
 static void start_easy_mode_naive(const GameResources* res, GameContext* context)
 {
     PlaySound(res->fx_click);
     context->selected_game_mode = ONE_PLAYER_EASY_NAIVE;
+    context->computer_enabled = true;
+    initialize_game(res, context);
+    context->state = GAME_STATE_PLAYING;
+}
+
+static void start_easy_mode_NN(const GameResources* res, GameContext* context)
+{
+    PlaySound(res->fx_click);
+    context->selected_game_mode = ONE_PLAYER_EASY_NN;
     context->computer_enabled = true;
     initialize_game(res, context);
     context->state = GAME_STATE_PLAYING;
@@ -101,7 +101,7 @@ Button GAME_MODE_BUTTONS[] = {
         .padding = {0, 0, 10.0f, 10.0f},
         .rounded = true,
         .font_size = 30,
-        .action = start_easy_mode
+        .action = start_easy_mode_naive
     },
     {
         .rect = NULL,
@@ -112,7 +112,7 @@ Button GAME_MODE_BUTTONS[] = {
         .first_render_offset = -75.0f,
         .rounded = true,
         .font_size = 30,
-        .action = start_easy_mode_naive
+        .action = start_easy_mode_NN
     },
     {
         .rect = NULL,

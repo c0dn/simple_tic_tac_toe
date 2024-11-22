@@ -30,7 +30,7 @@ typedef struct {
 /***************************************************************/
 
 #define INPUT_NODES 9
-#define HIDDEN_NODES 12
+#define HIDDEN_NODES 14
 #define OUTPUT_NODES 1
 
 typedef struct
