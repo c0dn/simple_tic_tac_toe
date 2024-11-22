@@ -98,6 +98,11 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
             }
         }
     }
+    const Rectangle audio_ico_rect = calc_music_icon_rect(context, resources);
+    if (CheckCollisionPointRec(mouse_pos, audio_ico_rect) &&
+        IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        handle_music_toggle(resources, context);
+    }
     else
     {
         handle_clicks(mouse_pos, resources, context, IN_GAME_BUTTONS, 1);
