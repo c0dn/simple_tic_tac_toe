@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <tgmath.h>
+#include <game.h>
+#include <time.h>
 #include <utils.h>
 
 NeuralNetwork *load_model()
@@ -290,41 +292,48 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, const int
     return (EvalResult){bestScore, bestMove};
 }
 
-void nn_vs_nb(const GameContext *context, const AiModels *models)
+void nn_vs_nb(GameContext *context, const AiModels *models)
 {
 
     // const player_t nn = get_human_player(context);
     // const player_t mini = get_computer_player(context);
 
     player_t current_player = get_computer_player(context);     // Start with one AI
-    const player_t nn = current_player;                         // Assume NN is the computer player
-    const player_t nb = (nn == PLAYER_X) ? PLAYER_O : PLAYER_X; // Opponent is minimax
+    const player_t nn = current_player;                         
+    const player_t nb = (nn == PLAYER_X) ? PLAYER_O : PLAYER_X; 
 
     while (true)
     {
         if (check_win(nn) != -1)
         {
+            context->state = GAME_STATE_NN_WIN;
+            update_score(nn, context);
             break;
         }
         if (check_win(nb) != -1)
-        {
-            // context->state = GAME_STATE_P1_WIN;
+        {   
+            context->state = GAME_STATE_NB_WIN;
+            update_score(nb, context);
             break;
         }
         if (check_draw())
-        {
+        {   
+            context->state = GAME_STATE_DRAW;
             break;
         }
 
         EvalResult result;
 
-        if (current_player == nn)
+        if (context->both_computers_enabled) 
         {
-            result = nn_move(models->neural_network);
-        }
-        else
-        {
-            result = nb_move(models->bayes_model, current_player);
+            if (current_player == nn) 
+            {
+                result = nn_move(models->neural_network);
+            }
+            else
+            {
+                result = nb_move(models->bayes_model, current_player);
+            }
         }
 
         if (result.move != -1)
@@ -343,7 +352,7 @@ void nn_vs_nb(const GameContext *context, const AiModels *models)
  * @param context Current game context
  * @param models struct containing ML model parameters
  */
-void computer_move(const GameContext *context, const AiModels *models)
+void computer_move(GameContext *context, const AiModels *models)
 {
     const player_t computer_player = get_computer_player(context);
     EvalResult result;

@@ -38,6 +38,7 @@ int main(void)
         .selected_game_mode = TWO_PLAYER,
         .player_1 = PLAYER_X,
         .computer_enabled = false,
+        .both_computers_enabled = true,
         .audio_disabled = false,
         .transition = {
             .start_time = 0,
@@ -91,6 +92,8 @@ int main(void)
         case GAME_STATE_P1_WIN:
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
+        case GAME_STATE_NN_WIN:
+        case GAME_STATE_NB_WIN:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 handle_clicks(mouse_pos, &resources, &context, GAME_OVER_BUTTONS, 2);
@@ -137,6 +140,8 @@ int main(void)
         case GAME_STATE_P1_WIN:
         case GAME_STATE_P2_WIN:
         case GAME_STATE_DRAW:
+        case GAME_STATE_NN_WIN:
+        case GAME_STATE_NB_WIN:
             do_game_over_transition(&resources, &render_options, &context);
             break;
 

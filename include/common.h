@@ -19,6 +19,8 @@ typedef enum {
     GAME_STATE_P1_WIN,
     GAME_STATE_P2_WIN,
     GAME_STATE_DRAW,
+    GAME_STATE_NN_WIN,
+    GAME_STATE_NB_WIN,
     MENU_INSTRUCTIONS,
     MENU_SETTINGS,
     GAME_STATE_EXIT
@@ -117,6 +119,7 @@ typedef struct {
     GameMode selected_game_mode;
     player_t player_1;
     bool computer_enabled;
+    bool both_computers_enabled;
     bool audio_disabled;
     ActiveTransition transition;
     bool start_screen_shown;

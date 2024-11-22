@@ -43,6 +43,7 @@ static void start_nn_vs_nb(const GameResources* res, GameContext* context)
     PlaySound(res->fx_click);
     context->selected_game_mode = NN_AND_NB;
     context->computer_enabled = true;
+    context->both_computers_enabled = true;
     initialize_game(res, context);
     context->state = GAME_STATE_PLAYING;
 }

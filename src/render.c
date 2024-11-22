@@ -282,6 +282,8 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
     static const char PLAYER2_WIN_MSG[] = "Player 2 Wins!";
     static const char DRAW_MSG[] = "It's a DRAW";
     static const char LOSE_MSG[] = "You lose!";
+    static const char NN_WIN_MSG[] = "Neural Network Wins!";
+    static const char NB_WIN_MSG[] = "Naive Bayes Wins!"; 
 
     const int screen_width = GetScreenWidth();
 
@@ -315,6 +317,10 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
     case GAME_STATE_DRAW:
         message = DRAW_MSG;
         break;
+    case GAME_STATE_NN_WIN:
+        message = NN_WIN_MSG;
+    case GAME_STATE_NB_WIN:
+        message = NB_WIN_MSG;
     default:
         TraceLog(LOG_WARNING, "Invalid game state in render_game_over");
         message = "";

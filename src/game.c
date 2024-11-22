@@ -212,7 +212,10 @@ void update_game_state_and_score(GameContext* context)
 }
 
 void display_score(const GameContext* context) {
-    if (context->computer_enabled) {
+    if (context->both_computers_enabled) {
+        DrawText(TextFormat("Neural Network: %d", context->p1_score), 10, 0, 40, BLACK);
+        DrawText(TextFormat("Naive Bayes: %d", context->p2_score), 700, 0, 40, BLACK);
+    } else if (context->computer_enabled) {
         DrawText(TextFormat("Human: %d", context->p1_score), 10, 0, 40, BLACK);
         DrawText(TextFormat("Computer: %d", context->p2_score), 760, 0, 40, BLACK);
     } else {
