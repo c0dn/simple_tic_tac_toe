@@ -15,6 +15,10 @@ static void render_buttons(Button* buttons, const size_t button_count, const int
     {
         if (buttons[i].rect == NULL || need_recalc)
         {
+            if (buttons[i].rect != NULL)
+            {
+                free(buttons[i].rect);
+            }
             buttons[i].rect = (Rectangle*)malloc(sizeof(Rectangle));
             *buttons[i].rect = calculate_button_rectangle(buttons[i].width, buttons[i].padding, buttons[i].height,
                                                          buttons[i].first_render_offset, i, buttons_per_row,
