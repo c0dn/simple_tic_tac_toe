@@ -175,46 +175,31 @@ player_t get_computer_player(const GameContext *context)
 
 void update_score(const GameState state, GameContext *context)
 {
-    if (state == GAME_STATE_DRAW)
+    switch (state)
     {
-        // if draw, increment the draw score
-        context->draw_score++;
-    }
-    // 1 player mode
-    else if (context->computer_enabled)
-    {
-        if (state == GAME_STATE_P1_WIN)
-        {
-            // if player 1 win, increment p1 score
-            context->p1_score++;
-        }
-        else if (state == GAME_STATE_P2_WIN)
-        {
-            // if player 2 (computer) win, increment p2 score
-            context->p2_score++;
-        }
-    }
-    else
-    {
-        // 2 player mode
-        if (state == GAME_STATE_P1_WIN)
-        {
-            // if player 1 win, increment p1 score
-            context->p1_score++;
-        }
-        else if (state == GAME_STATE_P2_WIN)
-        {
-            // if player 2 (computer) win, increment p2 score
-            context->p2_score++;
-        }
+        case GAME_STATE_DRAW:
+            context->draw_score++; // Increment draw score
+            break;
+
+        case GAME_STATE_P1_WIN:
+            context->p1_score++; // Increment Player 1 score
+            break;
+
+        case GAME_STATE_P2_WIN:
+            context->p2_score++; // Increment Player 2 (or Computer) score
+            break;
+
+        default:
+            // Invalid state - no action
+            break;
     }
 }
 
-void update_game_state_and_score(GameContext *context)
+void update_game_state_score(GameContext *context)
 {
-    const int result = check_win(current_player); // Check if the current player has won
+    const int result = check_win(current_player); // check for win 
 
-    if (result != -1) // A win is detected
+    if (result != -1) // if player won
     {
         if (current_player == context->player_1)
         {
@@ -227,7 +212,7 @@ void update_game_state_and_score(GameContext *context)
             context->state = GAME_STATE_P2_WIN;
         }
     }
-    else if (check_draw()) // Check if the game is a draw
+    else if (check_draw()) // check draw
     {
         // Set game state to draw when all positions are filled with no winner
         context->state = GAME_STATE_DRAW;

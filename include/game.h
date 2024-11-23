@@ -29,7 +29,7 @@ player_t get_human_player(const GameContext* context);
 player_t get_computer_player(const GameContext* context);
 void display_score(const GameContext* context);
 void update_score(const GameState state, GameContext* context);
-void update_game_state_and_score(GameContext* context);
+void update_game_state_score(GameContext* context);
 
 
 #endif // GAME_H

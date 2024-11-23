@@ -52,8 +52,8 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
         PlaySound(resources->fx_symbol);
         set_cell(row, col, current_player);
 
-        // Update game state and score after player's move
-        update_game_state_and_score(context);
+        // Update game state score after player move
+        update_game_state_score(context);
 
         // Play specific sounds based on game state
         if (context->state == GAME_STATE_DRAW)
@@ -79,8 +79,8 @@ void handle_game_click(const Vector2 mouse_pos, const GameResources* resources, 
             computer_move(context, resources->models);
             PlaySound(resources->fx_symbol);
 
-            // Update game state and score after computer's move
-            update_game_state_and_score(context);
+            // Update game state score after computer move
+            update_game_state_score(context);
 
             // Play specific sounds based on game state
             if (context->state == GAME_STATE_DRAW)
