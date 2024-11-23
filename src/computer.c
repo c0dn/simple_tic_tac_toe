@@ -294,57 +294,68 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, const int
 
 void nn_vs_nb(GameContext *context, const AiModels *models)
 {
+    static player_t current_player = PLAYER_X; // Track which AI is currently playing
+    static bool initialized = false;
 
-    // const player_t nn = get_human_player(context);
-    // const player_t mini = get_computer_player(context);
-
-    player_t current_player = get_computer_player(context);     // Start with one AI
-    const player_t nn = current_player;                         
-    const player_t nb = (nn == PLAYER_X) ? PLAYER_O : PLAYER_X; 
-
-    while (true)
+    // Initialize players once at the start
+    if (!initialized)
     {
-        if (check_win(nn) != -1)
-        {
-            context->state = GAME_STATE_NN_WIN;
-            update_score(nn, context);
-            break;
-        }
-        if (check_win(nb) != -1)
-        {   
-            context->state = GAME_STATE_NB_WIN;
-            update_score(nb, context);
-            break;
-        }
-        if (check_draw())
-        {   
-            context->state = GAME_STATE_DRAW;
-            break;
-        }
-
-        EvalResult result;
-
-        if (context->both_computers_enabled) 
-        {
-            if (current_player == nn) 
-            {
-                result = nn_move(models->neural_network);
-            }
-            else
-            {
-                result = nb_move(models->bayes_model, current_player);
-            }
-        }
-
-        if (result.move != -1)
-        {
-            const int row = result.move / 3;
-            const int col = result.move % 3;
-            set_cell(row, col, current_player);
-        }
-        current_player = (current_player == nn) ? nb : nn;
+        // Initialize first player as Neural Network, and the second as Naive Bayes
+        current_player = PLAYER_X;
+        initialized = true;
     }
+
+    const player_t nn = current_player;                           // Neural Network plays first
+    const player_t nb = (nn == PLAYER_X) ? PLAYER_O : PLAYER_X;   // Naive Bayes plays second
+
+    EvalResult result;
+
+    // Perform the current player's move
+    if (current_player == nn)
+    {
+        result = nn_move(models->neural_network);
+    }
+    else
+    {
+        result = nb_move(models->bayes_model, current_player);
+    }
+
+    if (result.move != -1)
+    {
+        const int row = result.move / 3;
+        const int col = result.move % 3;
+        set_cell(row, col, current_player);
+    }
+
+    // Check for game state after each move
+    if (check_win(nn) != -1)
+    {
+        context->state = GAME_STATE_NN_WIN;
+        update_score(nn, context);
+        initialized = false; // Reset for the next game
+        return;
+    }
+    if (check_win(nb) != -1)
+    {
+        context->state = GAME_STATE_NB_WIN;
+        update_score(nb, context);
+        initialized = false; // Reset for the next game
+        return;
+    }
+    if (check_draw())
+    {
+        context->state = GAME_STATE_DRAW;
+        initialized = false; // Reset for the next game
+        return;
+    }
+
+    // Switch to the next player (alternating between nn and nb)
+    current_player = (current_player == nn) ? nb : nn;
 }
+
+
+
+
 
 /**
  * @brief Execute computer's move using various algorithms selected by current game difficulty
@@ -377,7 +388,7 @@ void computer_move(GameContext *context, const AiModels *models)
 
     case NN_AND_NB:
         nn_vs_nb(context, models);
-        return; 
+        return;
 
     default:
         return;

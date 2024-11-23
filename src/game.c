@@ -4,17 +4,16 @@ uint16_t x_board;
 uint16_t o_board;
 player_t current_player;
 
-
-
-void initialize_game(const GameResources* res, GameContext* context)
+void initialize_game(const GameResources *res, GameContext *context)
 {
     x_board = 0;
     o_board = 0;
     context->state = GAME_STATE_PLAYING;
     current_player = PLAYER_X;
     context->start_screen_shown = false;
+    // Enable both_computers_enabled if NN_AND_NB mode is selected
+    context->both_computers_enabled = (context->selected_game_mode == NN_AND_NB);
 }
-
 
 /**
  * @brief Checks if a specific cell is empty using bitwise operations
@@ -57,9 +56,8 @@ int check_win(const player_t player)
         0b010010010, // Col 2    (middle column)
         0b001001001, // Col 3    (right column)
         0b100010001, // Diagonal (top left to bottom right)
-        0b001010100 // Diagonal (top right to bottom left)
+        0b001010100  // Diagonal (top right to bottom left)
     };
-
 
     // Get the current player's board
     const uint16_t current = player == PLAYER_X ? x_board : o_board;
@@ -75,7 +73,6 @@ int check_win(const player_t player)
 
     return -1;
 }
-
 
 /**
  * @brief Checks if the game is a draw using bitwise OR
@@ -94,7 +91,6 @@ bool check_draw(void)
 }
 #endif
 
-
 /**
  * @brief Gets the player occupying a specific cell
  *
@@ -105,11 +101,12 @@ bool check_draw(void)
 player_t get_cell(const int row, const int col)
 {
     const uint16_t pos = BIT_POS(row, col);
-    if (x_board & pos) return PLAYER_X;
-    if (o_board & pos) return PLAYER_O;
+    if (x_board & pos)
+        return PLAYER_X;
+    if (o_board & pos)
+        return PLAYER_O;
     return PLAYER_NONE;
 }
-
 
 /**
  * @brief Sets a cell to a specific player
@@ -144,7 +141,8 @@ void set_cell(const int row, const int col, const player_t player)
  *
  * @note Assumes computer is always Player 2 in single-player modes
  */
-bool is_computer_win(const GameContext* context) {
+bool is_computer_win(const GameContext *context)
+{
     return context->computer_enabled &&
            context->state == GAME_STATE_P2_WIN;
 }
@@ -157,7 +155,8 @@ bool is_computer_win(const GameContext* context) {
  *
  * @note Returns the player set as player_1 in the game context
  */
-player_t get_human_player(const GameContext* context) {
+player_t get_human_player(const GameContext *context)
+{
     return context->player_1;
 }
 
@@ -169,58 +168,91 @@ player_t get_human_player(const GameContext* context) {
  *
  * @note Returns the player not set as player_1 in the game context
  */
-player_t get_computer_player(const GameContext* context) {
+player_t get_computer_player(const GameContext *context)
+{
     return context->player_1 == PLAYER_X ? PLAYER_O : PLAYER_X;
 }
 
 // Scoring part
 
-void update_score(const player_t winner, GameContext* context) {
-    if (context->computer_enabled) {
-        // One-player mode
-        if (winner == context->player_1) {
-            context->p1_score++;
-        } else if (winner == get_computer_player(context)) {
-            context->p2_score++;
+void update_score(const player_t winner, GameContext *context)
+{
+    if (context->both_computers_enabled)
+    {
+        // AI-vs-AI mode
+        if (winner == get_computer_player(context))
+        {
+            context->p1_score++; // NN score
         }
-    } else {
+        else
+        {
+            context->p2_score++; // NB score
+        }
+    }
+    else if (context->computer_enabled)
+    {
+        // Single-player mode
+        if (winner == context->player_1)
+        {
+            context->p1_score++; // Human score
+        }
+        else
+        {
+            context->p2_score++; // Computer score
+        }
+    }
+    else
+    {
         // Two-player mode
-        if (winner == context->player_1) {
+        if (winner == context->player_1)
+        {
             context->p1_score++;
-        } else {
+        }
+        else
+        {
             context->p2_score++;
         }
     }
 }
 
-
-void update_game_state_and_score(GameContext* context)
+void update_game_state_and_score(GameContext *context)
 {
     const int result = check_win(current_player);
 
-    if (result != -1) {
-        if (current_player == context->player_1) {
+    if (result != -1)
+    {
+        if (current_player == context->player_1)
+        {
             context->state = GAME_STATE_P1_WIN;
             update_score(current_player, context);
-        } else {
+        }
+        else
+        {
             context->state = GAME_STATE_P2_WIN;
             update_score(current_player, context);
         }
-    } else if (check_draw()) {
+    }
+    else if (check_draw())
+    {
         context->state = GAME_STATE_DRAW;
     }
 }
 
-void display_score(const GameContext* context) {
-    if (context->both_computers_enabled) {
+void display_score(const GameContext *context)
+{
+    if (context->both_computers_enabled)
+    {
         DrawText(TextFormat("Neural Network: %d", context->p1_score), 10, 0, 40, BLACK);
         DrawText(TextFormat("Naive Bayes: %d", context->p2_score), 700, 0, 40, BLACK);
-    } else if (context->computer_enabled) {
+    }
+    else if (context->computer_enabled)
+    {
         DrawText(TextFormat("Human: %d", context->p1_score), 10, 0, 40, BLACK);
         DrawText(TextFormat("Computer: %d", context->p2_score), 760, 0, 40, BLACK);
-    } else {
+    }
+    else
+    {
         DrawText(TextFormat("Player 1: %d", context->p1_score), 10, 0, 40, BLACK);
         DrawText(TextFormat("Player 2: %d", context->p2_score), 760, 0, 40, BLACK);
     }
 }
-

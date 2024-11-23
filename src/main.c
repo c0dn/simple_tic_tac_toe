@@ -1,5 +1,5 @@
 /**
-* @file main.c
+ * @file main.c
  * @brief Main entry point for the Tic-Tac-Toe game, game created using raylib
  *
  * This file contains the main game loop, initialization, and event handling
@@ -13,6 +13,7 @@
 #include <raylib.h>
 #include <stdlib.h>
 #include <uthash.h>
+#include <computer.h>
 
 int main(void)
 {
@@ -21,9 +22,9 @@ int main(void)
     const float screen_width = 1000;
     const float screen_height = 1000;
 
-
-    MemoCache* memo_cache = init_memo_cache();
-    if (!memo_cache) {
+    MemoCache *memo_cache = init_memo_cache();
+    if (!memo_cache)
+    {
         TraceLog(LOG_ERROR, "Failed to initialize memo cache\n");
         return EXIT_FAILURE;
     }
@@ -42,8 +43,7 @@ int main(void)
         .audio_disabled = false,
         .transition = {
             .start_time = 0,
-            .active = false
-        },
+            .active = false},
         .start_screen_shown = false,
         .p1_score = 0,
         .p2_score = 0,
@@ -51,10 +51,9 @@ int main(void)
     };
 
     const UiOptions render_options = {
-        .background_color = { 226, 232, 240, 255 },
+        .background_color = {226, 232, 240, 255},
         .btn_clicked_color = ORANGE,
-        .primary_btn_color = GOLD
-    };
+        .primary_btn_color = GOLD};
 
     InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
     InitAudioDevice();
@@ -67,14 +66,16 @@ int main(void)
     PlayMusicStream(resources.background_music);
     while (!context.exit_flag) // Detect window close button
     {
-        if (IsWindowResized()) {
+        if (IsWindowResized())
+        {
             context.needs_recalculation = true;
             update_grid_dimensions(&context);
         }
         UpdateMusicStream(resources.background_music);
         // Updates
         const Vector2 mouse_pos = GetMousePosition();
-        if (WindowShouldClose()) context.exit_flag = true;
+        if (WindowShouldClose())
+            context.exit_flag = true;
         switch (context.state)
         {
         case GAME_STATE_MENU:
@@ -84,7 +85,11 @@ int main(void)
             }
             break;
         case GAME_STATE_PLAYING:
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && context.start_screen_shown)
+            if (context.both_computers_enabled)
+            {
+                nn_vs_nb(&context, &resources.models);
+            }
+            else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && context.start_screen_shown)
             {
                 handle_game_click(mouse_pos, &resources, &context);
             }
@@ -97,10 +102,8 @@ int main(void)
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 handle_clicks(mouse_pos, &resources, &context, GAME_OVER_BUTTONS, 2);
-
             }
             break;
-
 
         case GAME_STATE_EXIT:
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -131,9 +134,12 @@ int main(void)
             render_menu(&resources, &render_options, &context);
             break;
         case GAME_STATE_PLAYING:
-            if (!context.start_screen_shown) {
+            if (!context.start_screen_shown)
+            {
                 do_game_start_transition(&resources, &render_options, &context);
-            } else {
+            }
+            else
+            {
                 render_grid(&resources, &render_options, &context, true);
             }
             break;

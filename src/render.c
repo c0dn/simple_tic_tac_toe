@@ -133,15 +133,16 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
         const int draw_x = grid->start_x + col * grid->cell_size + (grid->cell_size - symbol_size) / 2;
         const int draw_y = grid->start_y + row * grid->cell_size + (grid->cell_size - symbol_size) / 2;
 
+        // Render "X" and "O" based on the current board state
         if (x_board & mask)
         {
-            DrawText("X", draw_x, draw_y, symbol_size, SKYBLUE);
+            DrawText("X", draw_x, draw_y, symbol_size, SKYBLUE);  // Blue color for "X"
         }
         else if (o_board & mask)
         {
-            DrawText("O", draw_x, draw_y, symbol_size, GOLD);
+            DrawText("O", draw_x, draw_y, symbol_size, GOLD);  // Gold color for "O"
         }
-        mask <<= 1;
+        mask <<= 1;  // Move to the next cell
     }
 
     if (show_buttons)
@@ -150,8 +151,10 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
     }
 
     display_score(context);
+
     if (context->state == GAME_STATE_P1_WIN || context->state == GAME_STATE_P2_WIN)
     {
+        // Display the winning line if there is a winner
         const int winning_pattern = check_win(current_player);
         int line_start_x = 0, line_start_y = 0, line_end_x = 0, line_end_y = 0;
         const float line_width = 10;
@@ -211,11 +214,13 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
             break;
         }
 
+        // Draw the winning line
         DrawLineEx((Vector2){(float)line_start_x, (float)line_start_y},
                    (Vector2){(float)line_end_x, (float)line_end_y},
                    line_width, RED);
     }
 }
+
 
 
 void render_menu(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
@@ -319,8 +324,10 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
         break;
     case GAME_STATE_NN_WIN:
         message = NN_WIN_MSG;
+        break; // Add this break
     case GAME_STATE_NB_WIN:
         message = NB_WIN_MSG;
+        break; // Add this break
     default:
         TraceLog(LOG_WARNING, "Invalid game state in render_game_over");
         message = "";
