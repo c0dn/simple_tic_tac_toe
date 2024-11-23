@@ -103,6 +103,21 @@ void do_game_start_transition(const GameResources* resources, const UiOptions* r
     }
 }
 
+const char* get_game_mode_name(GameMode mode) {
+    switch (mode) {
+        case ONE_PLAYER_EASY_NN:
+            return "Easy Mode (Neural Network)";
+        case ONE_PLAYER_EASY_NAIVE:
+            return "Easy Mode (Naive)";
+        case ONE_PLAYER_MEDIUM:
+            return "Medium Mode (Imperfect Minimax)";
+        case ONE_PLAYER_HARD:
+            return "Hard Mode (Perfect Minimax)";
+        default:
+            return "Two Player Mode";
+    }
+}
+
 void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context,
                  const bool show_buttons)
 {
@@ -126,6 +141,16 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
     DrawRectangle(grid->start_x,
                   grid->start_y + grid->cell_size * 2 - line_thickness / 2,
                   (int)grid->grid_size, line_thickness, BLACK);
+
+    // Display the current game mode
+    const char* game_mode = get_game_mode_name(context->selected_game_mode);
+    const int font_size = 30;
+    const int text_width = MeasureText(game_mode, font_size);
+    const int grid_center_x = grid->start_x + grid->grid_size / 2;
+    const int text_x = grid_center_x - text_width / 2;;
+    const int text_y = grid->start_y - 160;
+
+    DrawText(game_mode, text_x, text_y, font_size, DARKGRAY);
 
     const int symbol_size = grid->cell_size / 2;
 

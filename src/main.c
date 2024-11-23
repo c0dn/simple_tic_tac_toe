@@ -56,7 +56,7 @@ int main(void)
         .primary_btn_color = GOLD
     };
 
-    InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
+    InitWindow((int)screen_width, (int)screen_height, "THE BEST --- Tic Tac Toe");
     InitAudioDevice();
 
     GameResources resources = load_game_resources();

@@ -1,6 +1,6 @@
 # Tic-Tac-Toe Game
 
-This is a simple tic tae toe game created using raylib.
+This is a simple tic tac toe game created using raylib.
 
 ## Features
 

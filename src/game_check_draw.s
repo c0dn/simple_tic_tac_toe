@@ -15,7 +15,7 @@ check_draw:
 
     orr w0, w0, w1 // Bitwise OR: x0 = x0 | x1 to combine boards
 
-    mov w1, #0x1FF        // Load 0b111111111 into x1, the representation of a full tic tae toe board
+    mov w1, #0x1FF        // Load 0b111111111 into x1, the representation of a full tic tac toe board
     cmp w0, w1            // Compare result with 0x1FF, if this is true it means the board is full
 
     cset x0, EQ           // Set x0 to 1 if equal, 0 if not
