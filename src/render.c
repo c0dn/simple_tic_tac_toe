@@ -281,7 +281,7 @@ Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* 
     const Texture2D music_icon = context->audio_disabled ? resources->music_off : resources->music_on;
 
     const float icon_scale = 0.08f;
-    const Vector2 icon_pos = {(float)GetScreenWidth() - (float)music_icon.width * icon_scale - 20, 800};
+    const Vector2 icon_pos = {(float)GetScreenWidth() - (float)music_icon.width * icon_scale - 20, 940};
 
     return (Rectangle){
         icon_pos.x, icon_pos.y, (float)music_icon.width * icon_scale, (float)music_icon.height * icon_scale
