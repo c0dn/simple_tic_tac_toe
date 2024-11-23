@@ -178,15 +178,15 @@ void update_score(const GameState state, GameContext *context)
     switch (state)
     {
         case GAME_STATE_DRAW:
-            context->draw_score++; // Increment draw score
+            context->draw_score++; // increment draw score
             break;
 
         case GAME_STATE_P1_WIN:
-            context->p1_score++; // Increment Player 1 score
+            context->p1_score++; // increment player 1 score
             break;
 
         case GAME_STATE_P2_WIN:
-            context->p2_score++; // Increment Player 2 (or Computer) score
+            context->p2_score++; // increment player2 or computer score
             break;
 
         default:
@@ -214,11 +214,11 @@ void update_game_state_score(GameContext *context)
     }
     else if (check_draw()) // check draw
     {
-        // Set game state to draw when all positions are filled with no winner
+        // set game state to draw when all positions are filled with no winner
         context->state = GAME_STATE_DRAW;
     }
 
-    // Update the score based on game state
+    // update the score based on game state
     update_score(context->state, context);
 }
 
