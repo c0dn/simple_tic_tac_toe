@@ -121,6 +121,7 @@ typedef struct {
     bool start_screen_shown;
     int p1_score;
     int p2_score;
+    int draw_score; 
     GridDimensions grid;
     MemoCache* memo_cache;
 } GameContext;

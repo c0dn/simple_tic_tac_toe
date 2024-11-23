@@ -4,9 +4,7 @@ uint16_t x_board;
 uint16_t o_board;
 player_t current_player;
 
-
-
-void initialize_game(const GameResources* res, GameContext* context)
+void initialize_game(const GameResources *res, GameContext *context)
 {
     x_board = 0;
     o_board = 0;
@@ -14,7 +12,6 @@ void initialize_game(const GameResources* res, GameContext* context)
     current_player = PLAYER_X;
     context->start_screen_shown = false;
 }
-
 
 /**
  * @brief Checks if a specific cell is empty using bitwise operations
@@ -57,9 +54,8 @@ int check_win(const player_t player)
         0b010010010, // Col 2    (middle column)
         0b001001001, // Col 3    (right column)
         0b100010001, // Diagonal (top left to bottom right)
-        0b001010100 // Diagonal (top right to bottom left)
+        0b001010100  // Diagonal (top right to bottom left)
     };
-
 
     // Get the current player's board
     const uint16_t current = player == PLAYER_X ? x_board : o_board;
@@ -75,7 +71,6 @@ int check_win(const player_t player)
 
     return -1;
 }
-
 
 /**
  * @brief Checks if the game is a draw using bitwise OR
@@ -94,7 +89,6 @@ bool check_draw(void)
 }
 #endif
 
-
 /**
  * @brief Gets the player occupying a specific cell
  *
@@ -105,11 +99,12 @@ bool check_draw(void)
 player_t get_cell(const int row, const int col)
 {
     const uint16_t pos = BIT_POS(row, col);
-    if (x_board & pos) return PLAYER_X;
-    if (o_board & pos) return PLAYER_O;
+    if (x_board & pos)
+        return PLAYER_X;
+    if (o_board & pos)
+        return PLAYER_O;
     return PLAYER_NONE;
 }
-
 
 /**
  * @brief Sets a cell to a specific player
@@ -144,7 +139,8 @@ void set_cell(const int row, const int col, const player_t player)
  *
  * @note Assumes computer is always Player 2 in single-player modes
  */
-bool is_computer_win(const GameContext* context) {
+bool is_computer_win(const GameContext *context)
+{
     return context->computer_enabled &&
            context->state == GAME_STATE_P2_WIN;
 }
@@ -157,7 +153,8 @@ bool is_computer_win(const GameContext* context) {
  *
  * @note Returns the player set as player_1 in the game context
  */
-player_t get_human_player(const GameContext* context) {
+player_t get_human_player(const GameContext *context)
+{
     return context->player_1;
 }
 
@@ -169,55 +166,93 @@ player_t get_human_player(const GameContext* context) {
  *
  * @note Returns the player not set as player_1 in the game context
  */
-player_t get_computer_player(const GameContext* context) {
+player_t get_computer_player(const GameContext *context)
+{
     return context->player_1 == PLAYER_X ? PLAYER_O : PLAYER_X;
 }
 
 // Scoring part
 
-void update_score(const player_t winner, GameContext* context) {
-    if (context->computer_enabled) {
-        // One-player mode
-        if (winner == context->player_1) {
+void update_score(const GameState state, GameContext *context)
+{
+    if (state == GAME_STATE_DRAW)
+    {
+        // if draw, increment the draw score
+        context->draw_score++;
+    }
+    // 1 player mode
+    else if (context->computer_enabled)
+    {
+        if (state == GAME_STATE_P1_WIN)
+        {
+            // if player 1 win, increment p1 score
             context->p1_score++;
-        } else if (winner == get_computer_player(context)) {
+        }
+        else if (state == GAME_STATE_P2_WIN)
+        {
+            // if player 2 (computer) win, increment p2 score
             context->p2_score++;
         }
-    } else {
-        // Two-player mode
-        if (winner == context->player_1) {
+    }
+    else
+    {
+        // 2 player mode
+        if (state == GAME_STATE_P1_WIN)
+        {
+            // if player 1 win, increment p1 score
             context->p1_score++;
-        } else {
+        }
+        else if (state == GAME_STATE_P2_WIN)
+        {
+            // if player 2 (computer) win, increment p2 score
             context->p2_score++;
         }
     }
 }
 
-
-void update_game_state_and_score(GameContext* context)
+void update_game_state_and_score(GameContext *context)
 {
-    const int result = check_win(current_player);
+    const int result = check_win(current_player); // Check if the current player has won
 
-    if (result != -1) {
-        if (current_player == context->player_1) {
+    if (result != -1) // A win is detected
+    {
+        if (current_player == context->player_1)
+        {
+            // game state is p1 win if it is current player
             context->state = GAME_STATE_P1_WIN;
-            update_score(current_player, context);
-        } else {
-            context->state = GAME_STATE_P2_WIN;
-            update_score(current_player, context);
         }
-    } else if (check_draw()) {
+        else
+        {
+            // game state is p2 win if it is current player
+            context->state = GAME_STATE_P2_WIN;
+        }
+    }
+    else if (check_draw()) // Check if the game is a draw
+    {
+        // Set game state to draw when all positions are filled with no winner
         context->state = GAME_STATE_DRAW;
     }
+
+    // Update the score based on game state
+    update_score(context->state, context);
 }
 
-void display_score(const GameContext* context) {
-    if (context->computer_enabled) {
+// Function to display the current scores on the screen
+void display_score(const GameContext *context)
+{
+    if (context->computer_enabled)
+    {
+        // Display scores for one-player mode
         DrawText(TextFormat("Human: %d", context->p1_score), 10, 0, 40, BLACK);
         DrawText(TextFormat("Computer: %d", context->p2_score), 760, 0, 40, BLACK);
-    } else {
+    }
+    else
+    {
+        // Display scores for two-player mode
         DrawText(TextFormat("Player 1: %d", context->p1_score), 10, 0, 40, BLACK);
         DrawText(TextFormat("Player 2: %d", context->p2_score), 760, 0, 40, BLACK);
     }
-}
 
+    // Display the number of games that ended in a draw
+    DrawText(TextFormat("Draws: %d", context->draw_score), 380, 0, 40, BLACK);
+}
