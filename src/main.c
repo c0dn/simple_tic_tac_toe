@@ -18,8 +18,8 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const float screen_width = 1000;
-    const float screen_height = 1000;
+    const int screen_width = 1000;
+    const int screen_height = 1000;
 
 
     MemoCache* memo_cache = init_memo_cache();
@@ -46,7 +46,7 @@ int main(void)
         .start_screen_shown = false,
         .p1_score = 0,
         .p2_score = 0,
-        .draw_score = 0, //xx added scoring
+        .draw_score = 0,
         .memo_cache = memo_cache,
     };
 
@@ -56,7 +56,7 @@ int main(void)
         .primary_btn_color = GOLD
     };
 
-    InitWindow((int)screen_width, (int)screen_height, "Tic Tae Toe");
+    InitWindow(screen_width, screen_height, "THE BEST --- Tic Tac Toe");
     InitAudioDevice();
 
     GameResources resources = load_game_resources();

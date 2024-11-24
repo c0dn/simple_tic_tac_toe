@@ -228,16 +228,16 @@ void display_score(const GameContext *context)
     if (context->computer_enabled)
     {
         // Display scores for one-player mode
-        DrawText(TextFormat("Human: %d", context->p1_score), 10, 0, 40, BLACK);
-        DrawText(TextFormat("Computer: %d", context->p2_score), 760, 0, 40, BLACK);
+        DrawText(TextFormat("Human: %d", context->p1_score), 10, 100, 40, BLACK);
+        DrawText(TextFormat("Computer: %d", context->p2_score), 760, 100, 40, BLACK);
     }
     else
     {
         // Display scores for two-player mode
-        DrawText(TextFormat("Player 1: %d", context->p1_score), 10, 0, 40, BLACK);
-        DrawText(TextFormat("Player 2: %d", context->p2_score), 760, 0, 40, BLACK);
+        DrawText(TextFormat("Player 1: %d", context->p1_score), 10, 100, 40, BLACK);
+        DrawText(TextFormat("Player 2: %d", context->p2_score), 760, 100, 40, BLACK);
     }
 
     // Display the number of games that ended in a draw
-    DrawText(TextFormat("Draws: %d", context->draw_score), 380, 0, 40, BLACK);
+    DrawText(TextFormat("Draws: %d", context->draw_score), 410, 100, 40, BLACK);
 }
