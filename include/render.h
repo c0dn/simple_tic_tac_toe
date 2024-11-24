@@ -2,7 +2,7 @@
 #define RENDER_H
 #include <game.h>
 
-
+const char* get_game_mode_name(const GameMode* mode);
 void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context, bool show_buttons);
 void render_menu(
     const GameResources* resources, const UiOptions* render_opts, const GameContext* context);
