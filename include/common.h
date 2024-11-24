@@ -26,7 +26,7 @@ typedef enum {
 
 typedef enum {
     TWO_PLAYER,
-    ONE_PLAYER_EASY,
+    ONE_PLAYER_EASY_NN,
     ONE_PLAYER_EASY_NAIVE,
     ONE_PLAYER_MEDIUM,
     ONE_PLAYER_HARD
@@ -121,6 +121,7 @@ typedef struct {
     bool start_screen_shown;
     int p1_score;
     int p2_score;
+    int draw_score; 
     GridDimensions grid;
     MemoCache* memo_cache;
 } GameContext;

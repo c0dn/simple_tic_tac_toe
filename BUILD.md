@@ -3,7 +3,7 @@
 ## Requirements
 
 - Cmake version 3.13+
-- libraylib version 5+
+- libraylib version 5.0.x+
 - uthash version 2+
 - gcc version 13+
 - WSL with Ubuntu 22.04+
@@ -73,10 +73,28 @@ sudo dpkg --add-architecture arm64
 sudo add-apt-repository ppa:texus/raylib
 sudo apt-get install crossbuild-essential-arm64 libraylib5-dev:arm64 uthash-dev:arm64 build-essential -y
 ```
-2. Build, run commands in project directory
+3. Build, run commands in project directory
 ```shell
 mkdir build
 cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=arm64-gnu-toolchain.cmake ..
 cmake --build .
 ```
+
+## Compiling for raspberry pi
+1. Download raylib release v5.0x \
+https://github.com/raysan5/raylib/releases \
+2. Follow the instructions found here to compile raylib and install it \
+https://github.com/raysan5/raylib/wiki/Working-on-Raspberry-Pi
+3. Install the necessary packages to build the app \ 
+```shell
+sudo apt-get install cmake build-essential uthash-dev
+```
+4. Run the following commands to build the project in the project directory
+```shell
+mkdir build
+cd build
+cmake ..
+cmake --build . -j4
+```
+The binary can will be found in <project_folder>/build
