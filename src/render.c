@@ -103,8 +103,8 @@ void do_game_start_transition(const GameResources* resources, const UiOptions* r
     }
 }
 
-const char* get_game_mode_name(GameMode mode) {
-    switch (mode) {
+const char* get_game_mode_name(const GameMode* mode) {
+    switch (*mode) {
         case ONE_PLAYER_EASY_NN:
             return "Easy Mode (Neural Network)";
         case ONE_PLAYER_EASY_NAIVE:
@@ -143,7 +143,7 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
                   (int)grid->grid_size, line_thickness, BLACK);
 
     // Display the current game mode
-    const char* game_mode = get_game_mode_name(context->selected_game_mode);
+    const char* game_mode = get_game_mode_name(&context->selected_game_mode);
     const int font_size = 30;
     const int text_width = MeasureText(game_mode, font_size);
     const int grid_center_x = grid->start_x + grid->grid_size / 2;
