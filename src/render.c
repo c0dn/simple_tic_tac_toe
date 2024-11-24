@@ -154,6 +154,16 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
 
     const int symbol_size = grid->cell_size / 2;
 
+    const Rectangle audio_ico_rect = calc_music_icon_rect(context, resources);
+
+    // Music toggle icon
+    const Texture2D music_icon = context->audio_disabled ? resources->music_off : resources->music_on;
+
+    const float icon_scale = 0.08f;
+    const Vector2 icon_pos = {audio_ico_rect.x, audio_ico_rect.y};
+
+    DrawTextureEx(music_icon, icon_pos, 0.0f, icon_scale, WHITE);
+
     uint16_t mask = 1;
     for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
     {
@@ -276,7 +286,8 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
 
     const size_t button_count = sizeof(MAIN_MENU_BUTTONS) / sizeof(Button);
 
-    render_buttons(MAIN_MENU_BUTTONS, button_count, 2, render_opts, context->memo_cache, context->needs_recalculation);
+    render_buttons(MAIN_MENU_BUTTONS, button_count, 2, render_opts, context->memo_cache,
+                   context->needs_recalculation);
 
     const Rectangle audio_ico_rect = calc_music_icon_rect(context, resources);
 
@@ -295,7 +306,7 @@ Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* 
     const Texture2D music_icon = context->audio_disabled ? resources->music_off : resources->music_on;
 
     const float icon_scale = 0.08f;
-    const Vector2 icon_pos = {(float)GetScreenWidth() - (float)music_icon.width * icon_scale - 20, 20};
+    const Vector2 icon_pos = {(float)GetScreenWidth() - (float)music_icon.width * icon_scale - 20, 940};
 
     return (Rectangle){
         icon_pos.x, icon_pos.y, (float)music_icon.width * icon_scale, (float)music_icon.height * icon_scale
