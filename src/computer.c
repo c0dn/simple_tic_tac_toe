@@ -4,27 +4,33 @@
 #include <tgmath.h>
 #include <utils.h>
 
+/**
+ * @brief Load the saved neural network model from nn_weights.dat.
+ * 
+ * @return Pointer to the loaded NeuralNetwork struct, or NULL on failure.
+ */
 NeuralNetwork* load_model()
 {
     const static char weights_path[] = "assets/nn_weights.dat";
-    NeuralNetwork* nn = malloc(sizeof(NeuralNetwork));
-    FILE* file = fopen(weights_path, "rb");
+    NeuralNetwork* nn = malloc(sizeof(NeuralNetwork)); // this allocates memory for the neural network
+    FILE* file = fopen(weights_path, "rb"); // open the nn_weights file that is binary read mode
     if (file == NULL)
     {
         TraceLog(LOG_ERROR, "Failed to load Neural net\n");
-        return NULL;
+        return NULL; // if file cannot open, return NULL
     }
 
-    // Read weights and biases from the file and load them into the network
+    // read weights and biases from the file and load into the neural network
     fread(nn->hidden_weights, sizeof(double), HIDDEN_NODES * INPUT_NODES, file);
     fread(nn->bias_hidden, sizeof(double), HIDDEN_NODES, file);
     fread(nn->output_weights, sizeof(double), OUTPUT_NODES * HIDDEN_NODES, file);
     fread(nn->bias_output, sizeof(double), OUTPUT_NODES, file);
 
-    fclose(file);
+    fclose(file); // close the file after loading
     TraceLog(LOG_INFO, "Model loaded successfully from %s", weights_path);
-    return nn;
+    return nn; // return pointer to the loaded neural network
 }
+
 
 BayesModel* load_naive_bayes()
 {
@@ -51,30 +57,39 @@ BayesModel* load_naive_bayes()
     return model;
 }
 
+/**
+ * @brief Performs a forward pass through the neural network.
+ * 
+ * @param nn Pointer to the neural network.
+ * @param input Array of input features.
+ */
 void forward_pass(NeuralNetwork* nn, const double input[])
 {
+    // compute the activations for the hidden layer
     for (int i = 0; i < HIDDEN_NODES; i++)
     {
-        nn->hidden_layer[i] = nn->bias_hidden[i];
+        nn->hidden_layer[i] = nn->bias_hidden[i]; // this initializes the network with bias
         for (int j = 0; j < INPUT_NODES; j++)
         {
-            nn->hidden_layer[i] += nn->hidden_weights[i][j] * input[j];
+            nn->hidden_layer[i] += nn->hidden_weights[i][j] * input[j]; // calculate weighted sum
         }
-        // ReLU activation function for the hidden layer
+        // ReLU activation function
         nn->hidden_layer[i] = nn->hidden_layer[i] > 0 ? nn->hidden_layer[i] : 0.0;
     }
 
+    // compute the activations for the output layer
     for (int i = 0; i < OUTPUT_NODES; i++)
     {
-        nn->output_layer[i] = nn->bias_output[i];
+        nn->output_layer[i] = nn->bias_output[i]; // this initializes the network with bias
         for (int j = 0; j < HIDDEN_NODES; j++)
         {
-            nn->output_layer[i] += nn->output_weights[i][j] * nn->hidden_layer[j];
+            nn->output_layer[i] += nn->output_weights[i][j] * nn->hidden_layer[j]; // calculate weighted sum
         }
-        // sigmoid activation for the output layer
-        nn->output_layer[i] = 1.0 / (1.0 + exp(-nn->output_layer[i])); // Sigmoid activation
+        // sigmoid activation function
+        nn->output_layer[i] = 1.0 / (1.0 + exp(-nn->output_layer[i]));
     }
 }
+
 
 double predict_naive_bayes(const BayesModel* model, int const computer_player) {
     double win_probability = model->prob_win;
@@ -111,24 +126,35 @@ double predict_naive_bayes(const BayesModel* model, int const computer_player) {
     return win_probability / (win_probability + lose_probability);
 }
 
+/**
+ * @brief Determines the best move for the AI using a neural network.
+ * 
+ * @param nn Pointer to the trained NeuralNetwork structure.
+ * @param computer_player The computer's player type (PLAYER_X or PLAYER_O).
+ * @return EvalResult Struct containing the best score and the index of the best move.
+ */
 EvalResult nn_move(NeuralNetwork* nn, const player_t computer_player)
 {
-    int best_move = -1;
-    double best_score = -INFINITY;
+    int best_move = -1;                     // initialize the index of the best move
+    double best_score = -INFINITY;          // initialize the best score to negative infinity
 
+    // Combine the X and O boards to determine occupied positions
     const uint16_t occupied = x_board | o_board;
-    uint16_t legal_moves = ~occupied & 0b111111111;
+    uint16_t legal_moves = ~occupied & 0b111111111; // Identify legal moves by masking occupied positions
 
+    // Iterate over all legal moves
     while (legal_moves)
     {
-        const int move = count_trailing_zeros(legal_moves);
+        const int move = count_trailing_zeros(legal_moves); // Get the index of the least significant bit
+
+        // Simulate the move for the computer player
         if (computer_player == PLAYER_X)
         {
-            x_board |= 1 << move; // Try move as X
+            x_board |= 1 << move; // Simulate move as X
         }
         else
         {
-            o_board |= 1 << move; // Try move as O
+            o_board |= 1 << move; // Simulate move as O
         }
 
         double input[INPUT_NODES];
@@ -136,44 +162,48 @@ EvalResult nn_move(NeuralNetwork* nn, const player_t computer_player)
         {
             if (computer_player == PLAYER_X)
             {
-                // X is the computer
-                if (x_board & 1 << i) input[i] = 1.0;
-                else if (o_board & 1 << i) input[i] = -1.0;
-                else input[i] = 0.0;
+                // Encode the board state for Player X as the computer
+                if (x_board & 1 << i) input[i] = 1.0;       // X occupies the position
+                else if (o_board & 1 << i) input[i] = -1.0; // O occupies the position
+                else input[i] = 0.0;                        // Position is empty
             }
             else
             {
-                // O is the computer, adjust input encoding
-                if (o_board & 1 << i) input[i] = 1.0;
-                else if (x_board & 1 << i) input[i] = -1.0;
-                else input[i] = 0.0;
+                // Encode the board state for Player O as the computer
+                if (o_board & 1 << i) input[i] = 1.0;       // O occupies the position
+                else if (x_board & 1 << i) input[i] = -1.0; // X occupies the position
+                else input[i] = 0.0;                        // Position is empty
             }
         }
 
+        // Perform a forward pass through the neural network to evaluate the move
         forward_pass(nn, input);
-        const double score = nn->output_layer[0];
+        const double score = nn->output_layer[0]; // Neural network output score for the move
 
+        // Undo the simulated move to restore the original board state
         if (computer_player == PLAYER_X)
         {
-            x_board &= ~(1 << move); // Undo move for X
+            x_board &= ~(1 << move); // Remove the move for X
         }
         else
         {
-            o_board &= ~(1 << move); // Undo move for O
+            o_board &= ~(1 << move); // Remove the move for O
         }
 
+        // Update the best score and best move if current move is better
         if (score > best_score)
         {
             best_score = score;
             best_move = move;
         }
 
+        // Remove the evaluated move from the legal moves
         legal_moves &= ~(1 << move);
     }
 
+    // Return the best score and the index of the best move
     return (EvalResult){(int)best_score, best_move};
 }
-
 
 EvalResult nb_move(const BayesModel* model, const player_t computer_player)
 {
