@@ -171,8 +171,13 @@ player_t get_computer_player(const GameContext *context)
     return context->player_1 == PLAYER_X ? PLAYER_O : PLAYER_X;
 }
 
-// Scoring part
 
+/**
+ * @brief Updates the score in the game context based on the game state.
+ *
+ * @param state The current state of the game (draw, player 1 win, or player 2 win).
+ * @param context Pointer to the GameContext structure containing the scores.
+ */
 void update_score(const GameState state, GameContext *context)
 {
     switch (state)
@@ -195,6 +200,15 @@ void update_score(const GameState state, GameContext *context)
     }
 }
 
+
+/**
+ * @brief Updates the game state and scores based on the current game conditions.
+ *
+ * This function checks for a win or a draw condition, updates the game state,
+ * and then updates the scores in the GameContext.
+ *
+ * @param context Pointer to the GameContext structure containing the game state and scores.
+ */
 void update_game_state_score(GameContext *context)
 {
     const int result = check_win(current_player); // check for win 
@@ -222,7 +236,16 @@ void update_game_state_score(GameContext *context)
     update_score(context->state, context);
 }
 
-// Function to display the current scores on the screen
+
+/**
+ * @brief Displays the current scores and number of draws on the screen.
+ *
+ * Depending on whether the computer is enabled, this function displays the scores
+ * for either one-player (human vs computer) or two-player mode. It also shows
+ * the number of games that ended in a draw.
+ *
+ * @param context Pointer to the GameContext structure containing the scores and game mode.
+ */
 void display_score(const GameContext *context)
 {
     if (context->computer_enabled)
