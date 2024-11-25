@@ -233,35 +233,47 @@ EvalResult nb_move(const BayesModel* model, const player_t computer_player)
  * @param context Pointer to game context
  * @return EvalResult containing best score and move
  */
+// Minimax Algo
+// Find the optimal move for current player
+// Computer simulates opponent's move to make the optimal move
 EvalResult minimax(const player_t current_player, int alpha, int beta, const int depth, const GameContext* context)
 {
+    // Dynamically determine the human and computer players
     const player_t human = get_human_player(context);
     const player_t computer = get_computer_player(context);
+    
     // Check win conditions
     if (check_win(human) != -1) return (EvalResult){-1, -1};
     if (check_win(computer) != -1) return (EvalResult){1, -1};
     if (check_draw() || depth == 0) return (EvalResult){0, -1};
 
-    double bestScore = current_player == computer ? -2 : 2;
-    int bestMove = -1;
+    // Ternary operator: (condition) ? (value_if_true) : (value_if_false)
+    double bestScore = current_player == computer ? -2 : 2; // Initialise bestScore based on player, human is -2, computer is 2; -2 and 2 is selected -> they act as the -inf and inf, goal is to increase -2 and decrease 2
+    int bestMove = -1; // Initialise bestMove to -1 because -1 is an invalid move, so new possible move detected will be updated
 
+    // Initialized condition to check if the chosen move is legal, meaning the cell is not occupied
     const uint16_t occupied_board = x_board | o_board;
     uint16_t legal_moves = ~occupied_board & 0b111111111;
 
     while (legal_moves)
     {
-        const int move = count_trailing_zeros(legal_moves);
-        const int row = move / 3;
-        const int col = move % 3;
+        const int move = count_trailing_zeros(legal_moves); // Count trailing zeroes of legal_moves
+        const int row = move / 3; // Determines the row number on the board by dividing move by 3
+        const int col = move % 3; // Determines the column number on the board by taking the remainder when dividing the move by 3
 
-        // try the move
+        // Try the move
         set_cell(row, col, current_player);
 
+        // Calls Minimax, if current player is computer, it passes X as the player in the next minimax call
+        // Allows minimax to simulate moves alternately for X and O, each call represents the opponent's turn
+        // Alpha: best score maximizer (computer), higher better
+        // Beta: best score minimizer (human), lower better
+        // Depth: decrements the depth every call, depth controls how far the algorithm explore the game tree
         const EvalResult result = minimax(
             current_player == human ? computer : human, alpha, beta, depth -1, context
         );
 
-        // Undo move
+        // Undo move -Reset board after trying the moves
         if (current_player == PLAYER_X)
         {
             x_board &= ~BIT_POS(row, col);
@@ -275,22 +287,28 @@ EvalResult minimax(const player_t current_player, int alpha, int beta, const int
         // maximizing for computer
         if (current_player == computer) {
             if (result.score > bestScore) {
-                bestScore = result.score;
+                bestScore = result.score; // bestscore is updated to the higher vakue of score (from minimax) and bestScore, aim to find the move with the highest possible score
                 bestMove = move;
             }
-            alpha = (alpha > bestScore) ? alpha : bestScore;
+            alpha = (alpha > bestScore) ? alpha : bestScore;// Alpha is updated to hold the maximum of alpha and bestScore, the highest value the maximizing player is assured to achieve
         } else {
             if (result.score < bestScore) {
-                bestScore = result.score;
+                bestScore = result.score; // bestScore is updated to the lower value of the score (from minimax) and bestScore, aim to find the move with the lowest possible score
                 bestMove = move;
             }
-            beta = (beta < bestScore) ? beta : bestScore;
+            beta = (beta < bestScore) ? beta : bestScore; // Beta is updated to hold the minimum of beta and bestScore, the lowest value the maximizing player is assured to achieve
         }
 
+        // Alpha-Beta Pruning
+        // Prune condition: alpha >= beta
+        // Not necessary to explore current path if alpha >= beta
+        // Because, for the maximizing player, a move with a score less than the alpha would be irrelevant because a better option already exists
+        // Optimizes minimax as the number of possible moves being evaluated is reduced
         if (alpha >= beta) {
             break;
         }
 
+        // Remove move from legal_moves
         legal_moves &= ~(1 << move);
     }
 
