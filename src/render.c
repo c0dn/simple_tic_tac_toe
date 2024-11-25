@@ -21,8 +21,8 @@ static void render_buttons(Button* buttons, const size_t button_count, const int
             }
             buttons[i].rect = (Rectangle*)malloc(sizeof(Rectangle));
             *buttons[i].rect = calculate_button_rectangle(buttons[i].width, buttons[i].padding, buttons[i].height,
-                                                         buttons[i].first_render_offset, i, buttons_per_row,
-                                                         screen_height, screen_width, cache);
+                                                          buttons[i].first_render_offset, i, buttons_per_row,
+                                                          screen_height, screen_width);
         }
         const bool overwrite_default_colors = buttons[i].override_default_colors;
         const bool is_hovering = CheckCollisionPointRec(GetMousePosition(), *buttons[i].rect);

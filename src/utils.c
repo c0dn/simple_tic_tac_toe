@@ -42,7 +42,7 @@ BoxDimensions calculate_centered_box_dimensions(const float width_percentage, co
 
 Rectangle calculate_button_rectangle(const float btn_width, const ComponentPadding btn_padding, const float btn_height,
                                      const float first_button_offset, const int index, const int buttons_per_row,
-                                     const int screen_height, const int screen_width, MemoCache* cache
+                                     const int screen_height, const int screen_width
 
 )
 {
