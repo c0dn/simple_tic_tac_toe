@@ -3,11 +3,9 @@
 // Button click handlers
 
 /**
- * @brief Function for easiest mode using Naive Bayes model
+ * @brief Click handler for easy mode selection (Naive bayes)
  * @param context Pointer to the current game context
  * @param res Pointer to the game resources
- * @detail When easiest button is clicked, initializes the game with computer enabled
- * and change the game state to Playing
  */
 static void start_easy_mode_naive(const GameResources *res, GameContext *context)
 {
@@ -19,11 +17,9 @@ static void start_easy_mode_naive(const GameResources *res, GameContext *context
 }
 
 /**
- * @brief Function for easy mode using Neural Network model
+ * @brief Click handler for easy mode selection (neural_net)
  * @param context Pointer to the current game context
  * @param res Pointer to the game resources
- * @detail When easy button is clicked, initializes the game with computer enabled
- * and change the game state to Playing
  */
 static void start_easy_mode_NN(const GameResources *res, GameContext *context)
 {
@@ -35,11 +31,9 @@ static void start_easy_mode_NN(const GameResources *res, GameContext *context)
 }
 
 /**
- * @brief Function for medium mode using Neural Network model
+ * @brief Click handler for medium mode selection
  * @param context Pointer to the current game context
  * @param res Pointer to the game resources
- * @detailWhen medium button is clicked, initializes the game with computer enabled
- * and change the game state to Playing
  */
 static void start_medium_mode(const GameResources *res, GameContext *context)
 {
@@ -51,11 +45,9 @@ static void start_medium_mode(const GameResources *res, GameContext *context)
 }
 
 /**
- * @brief Function for hard mode using Neural Network model
+ * @brief Click handler for hard mode selection
  * @param context Pointer to the current game context
  * @param res Pointer to the game resources
- * @detailhen hard button is clicked, initializes the game with computer enabled
- * and change the game state to Playing
  */
 static void start_hard_mode(const GameResources *res, GameContext *context)
 {
@@ -67,11 +59,10 @@ static void start_hard_mode(const GameResources *res, GameContext *context)
 }
 
 /**
- * @brief Function for continue game button
+ * @brief Click handler for "continue" button
  * @param context Pointer to the current game context
  * @param res Pointer to the game resources
- * @details When continue game button is clicked, initializes the game again,
- * All the scores remains
+ * @details Starts another game with previous settings, scores are preserved
  */
 static void continue_playing(const GameResources *res, GameContext *context)
 {
@@ -82,11 +73,10 @@ static void continue_playing(const GameResources *res, GameContext *context)
 }
 
 /**
- * @brief Function for return to menu button
+ * @brief Click handler for returning to menu
  * @param context Pointer to the current game context
  * @param res Pointer to the game resources
- * @detail When return to menu button is clicked, reset the score and
- * change state to GAME_STATE_MENU
+ * @detail Resets scores, set state to menu etc.
  */
 static void return_to_menu(const GameResources *res, GameContext *context)
 {
@@ -100,10 +90,9 @@ static void return_to_menu(const GameResources *res, GameContext *context)
     context->state = GAME_STATE_MENU;
 }
 /**
- * @brief Function to exit the game
+ * @brief Click handler for exit confirmation "yes"
  * @param context Pointer to the current game context
  * @param res Pointer to the game resources
- * @detail When Yes is clicked, close the window
  */
 static void exit_game(const GameResources *res, GameContext *context)
 {
@@ -111,11 +100,9 @@ static void exit_game(const GameResources *res, GameContext *context)
     context->exit_flag = true;
 }
 /**
- * @brief Function for 1 Player button
+ * @brief Click handler for "1 Player" button
  * @param context Pointer to the current game context
  * @param res Pointer to the game resources
- * @detail When 1 player button is clicked, popup box appears to allow
- * selection of difficulty
  */
 static void start_1player(const GameResources *res, GameContext *context)
 {
@@ -123,10 +110,9 @@ static void start_1player(const GameResources *res, GameContext *context)
     context->state = MENU_DIFF_CHOICE;
 }
 /**
- * @brief Function for 2 Player button
+ * @brief Click handler for "2 Player" button
  * @param context Pointer to the current game context
  * @param res Pointer to the game resources
- * @detail When 2 player button is clicked, change the game state to playing mode
  */
 static void start_2player(const GameResources *res, GameContext *context)
 {
@@ -137,10 +123,9 @@ static void start_2player(const GameResources *res, GameContext *context)
     context->state = GAME_STATE_PLAYING;
 }
 /**
- * @brief Function for how to play button
+ * @brief Click handler for "how to play" button
  * @param context Pointer to the current game context
  * @param res Pointer to the game resources
- * @detail When how to play button is clicked, go to the instructions page
  */
 static void show_instructions(const GameResources *res, GameContext *context)
 {
@@ -148,10 +133,9 @@ static void show_instructions(const GameResources *res, GameContext *context)
     context->state = MENU_INSTRUCTIONS;
 }
 /**
- * @brief Function for exit button
+ * @brief Click handler for the exit button
  * @param context Pointer to the current game context
  * @param res Pointer to the game resources
- * @detail When exit button is clicked, close the game
  */
 static void show_exit_confirmation(const GameResources *res, GameContext *context)
 {
@@ -159,21 +143,7 @@ static void show_exit_confirmation(const GameResources *res, GameContext *contex
     context->state = GAME_STATE_EXIT;
 }
 
-/**
- * @brief array for GAME_MODE_BUTTONS
- *
- * @param rect define button area
- * @param text define text in the button
- * @param width define width of the button in pixel
- * @param height define height of the button in pixel
- * @param first_render_offset define the vertical offset for the first render
- * @param padding define padding for button (left,right,up,down)
- * @param rounded boolean to determine if button should have rounded corners
- * @param font_size define size for text in button
- * @param action action to execute when button is clicked
- *
- * @details defines buttons for the game modes, when clicked, execute the function accordingly
- */
+
 Button GAME_MODE_BUTTONS[] = {
     {.rect = NULL,
      .text = "Easiest",
@@ -212,22 +182,7 @@ Button GAME_MODE_BUTTONS[] = {
      .font_size = 30,
      .action = start_hard_mode}};
 
-/**
- * @brief array for EXIT_CONFIRMATION_BUTTONS
- *
- * @param rect define button area
- * @param text define text in the button
- * @param width define width of the button in pixel
- * @param height define height of the button in pixel
- * @param first_render_offset define the vertical offset for the first render
- * @param padding define padding for button (left,right,up,down)
- * @param rounded boolean to determine if button should have rounded corners
- * @param font_size define size for text in button
- * @param action action to execute when button is clicked
- *
- * @details defines buttons for the exit confirmation
- * popup box, when clicked, execute the function accordingly
- */
+
 Button EXIT_CONFIRMATION_BUTTONS[] = {
     {.rect = NULL,
      .text = "Yes",
@@ -248,22 +203,7 @@ Button EXIT_CONFIRMATION_BUTTONS[] = {
      .font_size = 30,
      .action = return_to_menu}};
 
-/**
- * @brief array for INSTRUCTIONS_BUTTONS
- *
- * @param rect define button area
- * @param text define text in the button
- * @param width define width of the button in pixel
- * @param height define height of the button in pixel
- * @param first_render_offset define the vertical offset for the first render
- * @param padding define padding for button (left,right,up,down)
- * @param rounded boolean to determine if button should have rounded corners
- * @param font_size define size for text in button
- * @param action action to execute when button is clicked
- *
- * @details defines buttons for the instruction page
- * popup box, when clicked, return to main menu
- */
+
 Button INSTRUCTIONS_BUTTONS[] = {
     {.rect = NULL,
      .text = "Back",
@@ -274,22 +214,8 @@ Button INSTRUCTIONS_BUTTONS[] = {
      .rounded = true,
      .font_size = 70,
      .action = return_to_menu}};
-/**
- * @brief array for GAME_OVER_BUTTONS
- *
- * @param rect define button area
- * @param text define text in the button
- * @param width define width of the button in pixel
- * @param height define height of the button in pixel
- * @param first_render_offset define the vertical offset for the first render
- * @param padding define padding for button (left,right,up,down)
- * @param rounded boolean to determine if button should have rounded corners
- * @param font_size define size for text in button
- * @param action action to execute when button is clicked
- *
- * @details defines buttons for the popup box in the game when win/lose/draw
- * is decided.
-*/
+
+
 Button GAME_OVER_BUTTONS[] = {
     {.rect = NULL,
      .text = "Continue Playing",
@@ -309,20 +235,8 @@ Button GAME_OVER_BUTTONS[] = {
      .rounded = true,
      .font_size = 20,
      .action = return_to_menu}};
-/**
- * @brief array for MAIN_MENU_BUTTONS
- *
- * @param rect define button area
- * @param text define text in the button
- * @param width define width of the button in pixel
- * @param height define height of the button in pixel
- * @param first_render_offset define the vertical offset for the first render
- * @param padding define padding for button (left,right,up,down)
- * @param rounded boolean to determine if button should have rounded corners
- * @param font_size define size for text in button
- * @param action action to execute when button is clicked
- *
- * @details defines buttons for the main menu, when clicked, execute the function accordingly */
+
+
 Button MAIN_MENU_BUTTONS[] = {
     {.rect = NULL,
      .text = "1 Player",
@@ -360,20 +274,8 @@ Button MAIN_MENU_BUTTONS[] = {
      .rounded = true,
      .font_size = 30,
      .action = show_exit_confirmation}};
-/**
- * @brief array for IN_GAME_BUTTONS
- *
- * @param rect define button area
- * @param text define text in the button
- * @param width define width of the button in pixel
- * @param height define height of the button in pixel
- * @param first_render_offset define the vertical offset for the first render
- * @param padding define padding for button (left,right,up,down)
- * @param rounded boolean to determine if button should have rounded corners
- * @param font_size define size for text in button
- * @param action action to execute when button is clicked
- *
- * @details defines buttons in the game, when clicked, return to main menu*/
+
+
 Button IN_GAME_BUTTONS[] = {
     {.rect = NULL,
      .text = "Return to menu",

@@ -6,14 +6,13 @@
 #include <utils.h>
 
 /**
- * @brief Renders buttons on the window with colors, hovering effect and text centering
- * @param buttons Pointer to Button in button.c
- * @param button_count count the size of array in each button array
- * @param buttons_per_row number of buttons to be displayed
+ * @brief Renders buttons onto the window
+ * @param buttons Pointer to Button array
+ * @param button_count size of the Button array passed to function
+ * @param buttons_per_row number of buttons on a row
  * @param render_opts Pointer to UiOptions
  * @param cache Pointer to a MemoCache
- * @param need_recalc boolean to indicate whether button needs recalculation
- * @details Renders each individual buttons
+ * @param need_recalc boolean to indicate whether cached Rectangles need to be recalculated
  */
 static void render_buttons(Button* buttons, const size_t button_count, const int buttons_per_row,
                            const UiOptions* render_opts, MemoCache* cache, const bool need_recalc)
@@ -72,8 +71,7 @@ static void render_buttons(Button* buttons, const size_t button_count, const int
  * @param render_opts Pointer to the UiOptions
  * @param context Pointer to the current game context
  * @details Manage how the game transitions at the start of game.
- * Display message showing which player begins first, if it is the computer,
- * it immediately makes a move
+ * Display message showing which player begins first
  *
  */
 void do_game_start_transition(const GameResources* resources, const UiOptions* render_opts, GameContext* context)
@@ -142,13 +140,14 @@ const char* get_game_mode_name(const GameMode* mode) {
             return "Two Player Mode";
     }
 }
+
 /**
  * @brief Renders the game grid, game mode, current player symbols, and optional UI elements
  * @param resources Pointer to the GameResources
  * @param render_opts Pointer to the UiOptions
  * @param context Pointer to the current game context
- * @details This function renders the game grid
- * - Renders "X" or "O" depending on user clicks within the grid.
+ * @param show_buttons boolean to indicate if buttons should be rendered or not
+ * @details This function renders the game grid with player symbols
  * - Render music toggle button.
  * - If the boolean show_buttons is true, renders return to menu button.
  * - Draw winning grid lines if there is a winner
@@ -296,12 +295,6 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
  * @param resources Pointer to the GameResources
  * @param render_opts Pointer to the UiOptions
  * @param context Pointer to the current game context
- * @details This function renders the main menu of the game. It draws the title,
- * a background image, the menu buttons, and a music toggle icon.
- *
- * - The title "TIC-TAC-TOE" is centered and drawn at the top of the window.
- * - A tictactoe image is positioned in the middle of the window
- * - A music toggle icon is rendered in the bottom-right corner of the window
  */
 void render_menu(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
 {
@@ -374,8 +367,7 @@ Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* 
  * @details
  * This function renders the game-over screen. It displays a
  * semi-transparent background, followed by a message box
- * showing the outcome of the game (e.g., "Player 1 Wins!", It's a DRAW", "You Lose!").
- * the message box is centered on the screen, and the buttons to continue or return to menu
+ * showing the outcome of the game
  */
 void render_game_over(const GameContext* context, const UiOptions* render_opts)
 {
@@ -442,10 +434,6 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
  * @param resources Pointer to the GameResources
  * @param render_opts Pointer to the UiOptions
  * @param context Pointer to the current game context
- * @details
- * This function renders the instructions page.
- * The page displays a basic instructions on how tictactoe is played with an example of
- * a picture of a winning condition
  */
 void render_instructions(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
 {
@@ -485,9 +473,6 @@ void render_instructions(const GameResources* resources, const UiOptions* render
  * @brief Renders the exit confirmation popup box
  * @param render_opts Pointer to the UiOptions
  * @param context Pointer to the current game context
- * @details
- * - A semi-transparent message box is drawn and centered in the window.
- * - A "Do you want to exit?" text is displayed inside the message box with yes and no button
  */
 void render_exit(const UiOptions* render_opts, const GameContext* context)
 {
@@ -512,7 +497,7 @@ void render_exit(const UiOptions* render_opts, const GameContext* context)
 }
 
 /**
- * @brief Renders game mode popup bux
+ * @brief Renders game mode selection popup
  * @param render_opts Pointer to the UiOptions
  * @param context Pointer to the current game context
  *
@@ -547,7 +532,7 @@ void render_game_mode_choice(const UiOptions* render_opts, const GameContext* co
  * @param resources Pointer to the GameResources
  * @param render_opts Pointer to the UiOptions
  * @param context Pointer to the current game context
- * Wait 1 second before the popup message box appears to allow user to see the winning grid
+ * Waits 1 second before the popup message box appears to allow user to see the winning grid
  */
 void do_game_over_transition(const GameResources* resources, const UiOptions* render_opts, GameContext* context)
 {
