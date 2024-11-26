@@ -31,30 +31,30 @@ NeuralNetwork* load_model()
     return nn; // return pointer to the loaded neural network
 }
 
-
+//load the naive bayes data
 BayesModel* load_naive_bayes()
 {
-    const static char model_path[] = "assets/bayes_model.dat";
-    BayesModel* model = malloc(sizeof(BayesModel));
-    FILE* file = fopen(model_path, "rb");
+    const static char model_path[] = "assets/bayes_model.dat"; //path to where the file is 
+    BayesModel* model = malloc(sizeof(BayesModel)); //allocate memory for the naive bayes structure
+    FILE* file = fopen(model_path, "rb"); //open the file in binary mode
 
     if (!file) {
-        TraceLog(LOG_ERROR, "Fail to load Bayes model");
-        return NULL;
+        TraceLog(LOG_ERROR, "Fail to load Bayes model"); //log an error message if the file could not be opened
+        return NULL; //return null to indicate failure
     }
 
-    fread(model->prob_x, sizeof(double), 9, file);
-    fread(model->prob_o, sizeof(double), 9, file);
-    fread(model->prob_b, sizeof(double), 9, file);
-    fread(&model->prob_win, sizeof(double), 1, file);
-    fread(&model->prob_lose, sizeof(double), 1, file);
-    fread(&model->total_win, sizeof(int), 1, file);
-    fread(&model->total_lose, sizeof(int), 1, file);
+    fread(model->prob_x, sizeof(double), 9, file); //read the probability for 'X' 
+    fread(model->prob_o, sizeof(double), 9, file); //read the probability for 'O' 
+    fread(model->prob_b, sizeof(double), 9, file); //read the probability for 'B' 
+    fread(&model->prob_win, sizeof(double), 1, file); //reading the probability of winning 
+    fread(&model->prob_lose, sizeof(double), 1, file); //reading the probability of losing 
+    fread(&model->total_win, sizeof(int), 1, file); //reading the total count of wins 
+    fread(&model->total_lose, sizeof(int), 1, file); //reading the total count of losses
 
-    fclose(file);
-    TraceLog(LOG_INFO, "Model loaded from %s", model_path);
+    fclose(file); //close file
+    TraceLog(LOG_INFO, "Model loaded from %s", model_path); //logging a message to indicate that it was successful
 
-    return model;
+    return model; //return loaded model 
 }
 
 /**
@@ -90,13 +90,16 @@ void forward_pass(NeuralNetwork* nn, const double input[])
     }
 }
 
-
+//predict function for naive bayes
 double predict_naive_bayes(const BayesModel* model, int const computer_player) {
+    //initialize win and lose probabilites with prior probabilites from the model
     double win_probability = model->prob_win;
     double lose_probability = model->prob_lose;
+    //to hold board states for X and O based on the computer player
     uint16_t input_x_board = 0;
     uint16_t input_o_board = 0;
 
+    //determine which board belongs to the computer player
     if(computer_player == PLAYER_O) {
         input_x_board = o_board;
         input_o_board = x_board;
@@ -105,25 +108,27 @@ double predict_naive_bayes(const BayesModel* model, int const computer_player) {
         input_x_board = x_board;
         input_o_board = o_board;
     }
-
+    
+    //iterate over all 9 positions to update probabilites
     for(int pos = 0; pos < 9; pos++) {
+        //calculate bitmask for current position
         const uint16_t bit = 1 << pos;
 
         if(input_x_board & bit) {
-            win_probability *= model->prob_x[pos];
+            win_probability *= model->prob_x[pos]; //if position is occupied by 'X', update probabilites using 'X' values
             lose_probability *= model->prob_x[pos];
         }
         else if(input_o_board & bit) {
-            win_probability *= model->prob_o[pos];
+            win_probability *= model->prob_o[pos]; //if position is occupied by 'X', update probabilites using 'X' values
             lose_probability *= model->prob_o[pos];
         }
         else {
-            win_probability *= model->prob_b[pos];
+            win_probability *= model->prob_b[pos]; // If the position is blank, update probabilities using blank ('B') values.
             lose_probability *= model->prob_b[pos];
         }
     }
 
-    return win_probability / (win_probability + lose_probability);
+    return win_probability / (win_probability + lose_probability); //normalize the probabilities to compute the likelihood of winning
 }
 
 /**
@@ -205,49 +210,50 @@ EvalResult nn_move(NeuralNetwork* nn, const player_t computer_player)
     return (EvalResult){(int)best_score, best_move};
 }
 
+//to find best move using Naive Bayes model
 EvalResult nb_move(const BayesModel* model, const player_t computer_player)
 {
-    int best_move = -1;
-    double best_score = -1;
+    int best_move = -1; //variable to store the best move
+    double best_score = -1; //variable to store the best score
 
     // Loop through all possible moves and evaluate using Naive Bayes
     const uint16_t occupied = x_board | o_board;
     uint16_t legal_moves = ~occupied & 0b111111111;
 
-    while (legal_moves)
+    while (legal_moves) //iterate through legal moves
     {
         const int move = count_trailing_zeros(legal_moves); // Get the least significant bit
 
-        if (computer_player == PLAYER_X)
+        if (computer_player == PLAYER_X) //Temporarily play the move on the board for the computer player.
         {
-            x_board |= 1 << move;
+            x_board |= 1 << move; //mark the position as occupied by 'X'
         } else
         {
-            o_board |= 1 << move;
+            o_board |= 1 << move; //mark the position as occupied by 'X'
         }
 
 
-
+        //use naive bayes model to evaluate probabilites of winning for this move
         const double score = predict_naive_bayes(model, computer_player);
-
+        //update the best score and move
         if (score > best_score)
         {
-            best_score = score;
-            best_move = move;
+            best_score = score; //store the new best score
+            best_move = move; //store the index of the new best score
         }
 
-        if (computer_player == PLAYER_X)
+        if (computer_player == PLAYER_X) //undo the move to restore the board to its original state 
         {
-            x_board &= ~(1 << move);
+            x_board &= ~(1 << move); //clear the bit corresponding to the move
         } else
         {
-            o_board &= ~(1 << move);
+            o_board &= ~(1 << move); //clear the bit corresponding to the move
         }
 
-        legal_moves &= ~(1 << move);
+        legal_moves &= ~(1 << move); //remove the tested move from the set of legal move
     }
 
-    return (EvalResult){best_score, best_move};
+    return (EvalResult){best_score, best_move}; //return the best move and its score
 }
 
 /**

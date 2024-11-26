@@ -15,14 +15,13 @@ static void render_buttons(Button* buttons, const size_t button_count, const int
     {
         if (buttons[i].rect == NULL || need_recalc)
         {
-            if (buttons[i].rect != NULL)
+            if (buttons[i].rect == NULL)
             {
-                free(buttons[i].rect);
+                buttons[i].rect = (Rectangle*)malloc(sizeof(Rectangle));
             }
-            buttons[i].rect = (Rectangle*)malloc(sizeof(Rectangle));
             *buttons[i].rect = calculate_button_rectangle(buttons[i].width, buttons[i].padding, buttons[i].height,
-                                                         buttons[i].first_render_offset, i, buttons_per_row,
-                                                         screen_height, screen_width, cache);
+                                                          buttons[i].first_render_offset, i, buttons_per_row,
+                                                          screen_height, screen_width);
         }
         const bool overwrite_default_colors = buttons[i].override_default_colors;
         const bool is_hovering = CheckCollisionPointRec(GetMousePosition(), *buttons[i].rect);
@@ -144,14 +143,17 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
 
     // Display the current game mode
     const char* game_mode = get_game_mode_name(&context->selected_game_mode);
-    const int font_size = 30;
-    const int text_width = MeasureText(game_mode, font_size);
-    const int grid_center_x = grid->start_x + grid->grid_size / 2;
-    const int text_x = grid_center_x - text_width / 2;;
-    const int text_y = grid->start_y - 160;
+    const Coords text_coords = calculate_centered_text_xy(
+        game_mode,
+        30,
+        (float)grid->start_x,
+        (float)grid->start_y - 160,
+        grid->grid_size,
+        30,
+        context->memo_cache
+    );
 
-    DrawText(game_mode, text_x, text_y, font_size, DARKGRAY);
-
+    DrawText(game_mode, (int)text_coords.x, (int)text_coords.y, 30, DARKGRAY);
     const int symbol_size = grid->cell_size / 2;
 
     const Rectangle audio_ico_rect = calc_music_icon_rect(context, resources);
