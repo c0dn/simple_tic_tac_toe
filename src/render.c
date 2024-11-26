@@ -5,6 +5,15 @@
 #include <raylib.h>
 #include <utils.h>
 
+/**
+ * @brief Renders buttons onto the window
+ * @param buttons Pointer to Button array
+ * @param button_count size of the Button array passed to function
+ * @param buttons_per_row number of buttons on a row
+ * @param render_opts Pointer to UiOptions
+ * @param cache Pointer to a MemoCache
+ * @param need_recalc boolean to indicate whether cached Rectangles need to be recalculated
+ */
 static void render_buttons(Button* buttons, const size_t button_count, const int buttons_per_row,
                            const UiOptions* render_opts, MemoCache* cache, const bool need_recalc)
 {
@@ -55,6 +64,15 @@ static void render_buttons(Button* buttons, const size_t button_count, const int
     }
 }
 
+/**
+ * @brief Function for game start transition
+ * @param resources Pointer to the GameResources
+ * @param render_opts Pointer to the UiOptions
+ * @param context Pointer to the current game context
+ * @details Manage how the game transitions at the start of game.
+ * Display message showing which player begins first
+ *
+ */
 void do_game_start_transition(const GameResources* resources, const UiOptions* render_opts, GameContext* context)
 {
     const int screen_width = GetScreenWidth();
@@ -102,6 +120,11 @@ void do_game_start_transition(const GameResources* resources, const UiOptions* r
     }
 }
 
+/**
+ * @brief Returns a string representing the name of the game mode
+ * @param mode Pointer to a GameMode and it is constant
+ * @return string constant that indicates the game modes
+ */
 const char* get_game_mode_name(const GameMode* mode) {
     switch (*mode) {
         case ONE_PLAYER_EASY_NN:
@@ -117,6 +140,17 @@ const char* get_game_mode_name(const GameMode* mode) {
     }
 }
 
+/**
+ * @brief Renders the game grid, game mode, current player symbols, and optional UI elements
+ * @param resources Pointer to the GameResources
+ * @param render_opts Pointer to the UiOptions
+ * @param context Pointer to the current game context
+ * @param show_buttons boolean to indicate if buttons should be rendered or not
+ * @details This function renders the game grid with player symbols
+ * - Render music toggle button.
+ * - If the boolean show_buttons is true, renders return to menu button.
+ * - Draw winning grid lines if there is a winner
+ */
 void render_grid(const GameResources* resources, const UiOptions* render_opts, const GameContext* context,
                  const bool show_buttons)
 {
@@ -258,7 +292,12 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
     }
 }
 
-
+/**
+ * @brief Renders main menu of the game
+ * @param resources Pointer to the GameResources
+ * @param render_opts Pointer to the UiOptions
+ * @param context Pointer to the current game context
+ */
 void render_menu(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
 {
     const int screen_width = GetScreenWidth();
@@ -302,7 +341,15 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
     DrawTextureEx(music_icon, icon_pos, 0.0f, icon_scale, WHITE);
 }
 
-
+/**
+ * @brief Calculates dimensions and position of music toggle icon.
+ * @param resources Pointer to the GameResources
+ * @param render_opts Pointer to the UiOptions
+ * @param context Pointer to the current game context
+ * @details This function calculates dimensions and position of music toggle icon
+ * based on window size
+ *
+ */
 Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* resources)
 {
     const Texture2D music_icon = context->audio_disabled ? resources->music_off : resources->music_on;
@@ -315,7 +362,15 @@ Rectangle calc_music_icon_rect(const GameContext* context, const GameResources* 
     };
 }
 
-
+/**
+ * @brief Renders the game-over popup box
+ * @param render_opts Pointer to the UiOptions
+ * @param context Pointer to the current game context
+ * @details
+ * This function renders the game-over screen. It displays a
+ * semi-transparent background, followed by a message box
+ * showing the outcome of the game
+ */
 void render_game_over(const GameContext* context, const UiOptions* render_opts)
 {
     // Constants
@@ -376,7 +431,12 @@ void render_game_over(const GameContext* context, const UiOptions* render_opts)
     render_buttons(GAME_OVER_BUTTONS, button_count, 1, render_opts, context->memo_cache, context->needs_recalculation);
 }
 
-
+/**
+ * @brief Renders the instructions page
+ * @param resources Pointer to the GameResources
+ * @param render_opts Pointer to the UiOptions
+ * @param context Pointer to the current game context
+ */
 void render_instructions(const GameResources* resources, const UiOptions* render_opts, const GameContext* context)
 {
     const int screen_width = GetScreenWidth();
@@ -411,7 +471,11 @@ void render_instructions(const GameResources* resources, const UiOptions* render
     render_buttons(INSTRUCTIONS_BUTTONS, 1, 1, render_opts, context->memo_cache, context->needs_recalculation);
 }
 
-
+/**
+ * @brief Renders the exit confirmation popup box
+ * @param render_opts Pointer to the UiOptions
+ * @param context Pointer to the current game context
+ */
 void render_exit(const UiOptions* render_opts, const GameContext* context)
 {
     const int screen_width = GetScreenWidth();
@@ -434,7 +498,13 @@ void render_exit(const UiOptions* render_opts, const GameContext* context)
     render_buttons(EXIT_CONFIRMATION_BUTTONS, button_count, 1, render_opts, context->memo_cache, context->needs_recalculation);
 }
 
-
+/**
+ * @brief Renders game mode selection popup
+ * @param render_opts Pointer to the UiOptions
+ * @param context Pointer to the current game context
+ *
+ * 4 buttons is displayed in the popup box with the difficulty levels
+ */
 void render_game_mode_choice(const UiOptions* render_opts, const GameContext* context)
 {
     const int screen_width = GetScreenWidth();
@@ -459,6 +529,13 @@ void render_game_mode_choice(const UiOptions* render_opts, const GameContext* co
     render_buttons(GAME_MODE_BUTTONS, button_count, 1, render_opts, context->memo_cache, context->needs_recalculation);
 }
 
+/**
+ * @brief function for handling the transition after a win/lose/draw outcome
+ * @param resources Pointer to the GameResources
+ * @param render_opts Pointer to the UiOptions
+ * @param context Pointer to the current game context
+ * Waits 1 second before the popup message box appears to allow user to see the winning grid
+ */
 void do_game_over_transition(const GameResources* resources, const UiOptions* render_opts, GameContext* context)
 {
     if (!context->transition.active)
