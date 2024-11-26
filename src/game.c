@@ -238,7 +238,7 @@ void update_game_state_score(GameContext *context)
 
 
 /**
- * @brief Displays the current scores and number of draws on the screen.
+ * @brief displays current scores
  *
  * Depending on whether the computer is enabled, this function displays the scores
  * for either one-player (human vs computer) or two-player mode. It also shows

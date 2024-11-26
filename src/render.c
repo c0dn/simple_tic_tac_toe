@@ -108,7 +108,7 @@ const char* get_game_mode_name(const GameMode* mode) {
         case ONE_PLAYER_EASY_NN:
             return "Easy Mode (Neural Network)";
         case ONE_PLAYER_EASY_NAIVE:
-            return "Easy Mode (Naive)";
+            return "Easy Mode (Naive Bayes)";
         case ONE_PLAYER_MEDIUM:
             return "Medium Mode (Imperfect Minimax)";
         case ONE_PLAYER_HARD:
@@ -174,11 +174,11 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
 
         if (x_board & mask)
         {
-            DrawText("X", draw_x, draw_y, symbol_size, SKYBLUE);
+            DrawText("X", draw_x, draw_y, symbol_size, BLUE);
         }
         else if (o_board & mask)
         {
-            DrawText("O", draw_x, draw_y, symbol_size, GOLD);
+            DrawText("O", draw_x, draw_y, symbol_size, RED);
         }
         mask <<= 1;
     }
