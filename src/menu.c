@@ -2,6 +2,13 @@
 #include <neural.h>
 #include <stdlib.h>
 
+/**
+ * Loads game resources including audio, textures, and AI models
+ *
+ * @return GameResources structure
+ * @warning Requires proper asset file paths
+ * @warning Caller is responsible for unloading resources
+ */
 GameResources load_game_resources() {
     GameResources resources = { 0 };
 
@@ -46,7 +53,10 @@ GameResources load_game_resources() {
     return resources;
 }
 
-
+/**
+ * Calculates and updates grid dimensions
+ * @param context Pointer to current GameContext to update grid properties
+ */
 void update_grid_dimensions(GameContext* context) {
     const int screen_width = GetScreenWidth();
     const int screen_height = GetScreenHeight();
@@ -59,6 +69,12 @@ void update_grid_dimensions(GameContext* context) {
     context->grid.start_y = (int)((float)screen_height - context->grid.grid_size) / 2;
 }
 
+
+/**
+ * Releases all game resources
+ *
+ * @param resources Pointer to GameResources structure to unload
+ */
 void unload_game_resources(GameResources* resources) {
     UnloadMusicStream(resources->background_music);
     UnloadSound(resources->fx_click);

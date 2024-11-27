@@ -10,6 +10,11 @@ MemoCache* init_memo_cache(void)
     return cache;
 }
 
+/**
+ * Deallocates memory for a memoization cache
+ *
+ * @param cache Pointer to MemoCache structure to be freed
+ */
 void cleanup_memo_cache(MemoCache* cache)
 {
     if (!cache) return;

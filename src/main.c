@@ -65,14 +65,16 @@ int main(void)
 
     SetTargetFPS(60);
     PlayMusicStream(resources.background_music);
-    while (!context.exit_flag) // Detect window close button
+    while (!context.exit_flag)
     {
+        // Check for window resize event
         if (IsWindowResized()) {
             context.needs_recalculation = true;
             update_grid_dimensions(&context);
         }
         UpdateMusicStream(resources.background_music);
-        // Updates
+
+        // Click handling
         const Vector2 mouse_pos = GetMousePosition();
         if (WindowShouldClose()) context.exit_flag = true;
         switch (context.state)
@@ -158,6 +160,7 @@ int main(void)
         }
         EndDrawing();
     }
+    // Clean up before exit
     unload_game_resources(&resources);
     cleanup_memo_cache(context.memo_cache);
     CloseAudioDevice();

@@ -58,7 +58,7 @@ static void render_buttons(Button* buttons, const size_t button_count, const int
         // Center text
         const Coords cords =
             calculate_centered_text_xy(buttons[i].text, buttons[i].font_size, buttons[i].rect->x, buttons[i].rect->y,
-                                       buttons[i].rect->width, buttons[i].rect->height, cache);
+                                       buttons[i].rect->width, buttons[i].rect->height);
 
         DrawText(buttons[i].text, (int)cords.x, (int)cords.y, buttons[i].font_size, BLACK);
     }
@@ -101,8 +101,7 @@ void do_game_start_transition(const GameResources* resources, const UiOptions* r
 
     // Calculate centered text position
     const Coords text_coords =
-        calculate_centered_text_xy(start_msg, 40, 0, 0, (float)screen_width, (float)screen_height,
-                                   context->memo_cache);
+        calculate_centered_text_xy(start_msg, 40, 0, 0, (float)screen_width, (float)screen_height);
 
     DrawText(start_msg, (int)text_coords.x, (int)text_coords.y, 40, RAYWHITE);
 
@@ -183,8 +182,7 @@ void render_grid(const GameResources* resources, const UiOptions* render_opts, c
         (float)grid->start_x,
         (float)grid->start_y - 160,
         grid->grid_size,
-        30,
-        context->memo_cache
+        30
     );
 
     DrawText(game_mode, (int)text_coords.x, (int)text_coords.y, 30, DARKGRAY);
@@ -311,8 +309,7 @@ void render_menu(const GameResources* resources, const UiOptions* render_opts, c
 
     // Title rendering
     const Coords title_c =
-        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)screen_width, (float)FONT_SIZE,
-                                   context->memo_cache);
+        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)screen_width, (float)FONT_SIZE);
     DrawText(TITLE, (int)title_c.x, (int)title_c.y, FONT_SIZE, DARKPURPLE);
 
     const float image_scale = 0.3f;
@@ -453,7 +450,7 @@ void render_instructions(const GameResources* resources, const UiOptions* render
 
     // Title rendering
     const Coords title_c =
-        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)screen_width, (float)FONT_SIZE, context->memo_cache);
+        calculate_centered_text_xy(TITLE, FONT_SIZE, 0, 0, (float)screen_width, (float)FONT_SIZE);
     DrawText(TITLE, (int)title_c.x, (int)title_c.y, FONT_SIZE, DARKPURPLE);
 
     // Instructions render
@@ -490,7 +487,7 @@ void render_exit(const UiOptions* render_opts, const GameContext* context)
     // Draw message
     const char message[] = "Do you want to exit?";
     const Coords text_cords =
-        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height, context->memo_cache);
+        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height);
 
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 115, 30, RAYWHITE);
 
@@ -521,7 +518,7 @@ void render_game_mode_choice(const UiOptions* render_opts, const GameContext* co
     // Draw message
     const char message[] = "Choose game mode!";
     const Coords text_cords =
-        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height, context->memo_cache);
+        calculate_centered_text_xy(message, 30, box_dim.x, box_dim.y, box_dim.width, box_dim.height);
 
     DrawText(message, (int)text_cords.x, (int)text_cords.y - 140, 30, RAYWHITE);
 
