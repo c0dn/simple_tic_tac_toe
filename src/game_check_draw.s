@@ -18,6 +18,6 @@ check_draw:
     mov w1, #0x1FF        // Load 0b111111111 into x1, the representation of a full tic tac toe board
     cmp w0, w1            // Compare result with 0x1FF, if this is true it means the board is full
 
-    cset x0, EQ           // Set x0 to 1 if equal, 0 if not
+    cset x0, EQ           // Set x0 to 1 if previous cmp is equal, 0 if not
 
-    ret
+    ret // return the result, 1 = true (board is full, hence it's a draw), 0 = false (board is not full, game continues)

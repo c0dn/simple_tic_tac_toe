@@ -15,7 +15,7 @@ Coords calculate_centered_text_xy(
     float ref_x,
     float ref_y,
     float ref_width,
-    float ref_height, MemoCache* cache
+    float ref_height
 );
 
 Coords calculate_text_xy_offset(

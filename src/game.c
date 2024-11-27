@@ -4,7 +4,18 @@ uint16_t x_board;
 uint16_t o_board;
 player_t current_player;
 
-void initialize_game(const GameResources *res, GameContext *context)
+
+
+/**
+ * @brief Initializes a new game session
+ *
+ * @param res Pointer to game resources
+ * @param context Pointer to game's current context data
+ *
+ * @details
+ * This function resets the relevant variables to prep for the next game
+ */
+void initialize_game(const GameResources* res, GameContext* context)
 {
     x_board = 0;
     o_board = 0;
@@ -211,7 +222,7 @@ void update_score(const GameState state, GameContext *context)
  */
 void update_game_state_score(GameContext *context)
 {
-    const int result = check_win(current_player); // check for win 
+    const int result = check_win(current_player); // check for win
 
     if (result != -1) // if player won
     {
