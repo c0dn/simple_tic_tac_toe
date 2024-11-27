@@ -2,6 +2,11 @@
 #include <game.h>
 // Button click handlers
 
+/**
+ * @brief Click handler for easy mode selection (Naive bayes)
+ * @param context Pointer to the current game context
+ * @param res Pointer to the game resources
+ */
 static void start_easy_mode_naive(const GameResources *res, GameContext *context)
 {
     PlaySound(res->fx_click);
@@ -11,6 +16,11 @@ static void start_easy_mode_naive(const GameResources *res, GameContext *context
     context->state = GAME_STATE_PLAYING;
 }
 
+/**
+ * @brief Click handler for easy mode selection (neural_net)
+ * @param context Pointer to the current game context
+ * @param res Pointer to the game resources
+ */
 static void start_easy_mode_NN(const GameResources *res, GameContext *context)
 {
     PlaySound(res->fx_click);
@@ -20,6 +30,11 @@ static void start_easy_mode_NN(const GameResources *res, GameContext *context)
     context->state = GAME_STATE_PLAYING;
 }
 
+/**
+ * @brief Click handler for medium mode selection
+ * @param context Pointer to the current game context
+ * @param res Pointer to the game resources
+ */
 static void start_medium_mode(const GameResources *res, GameContext *context)
 {
     PlaySound(res->fx_click);
@@ -29,6 +44,11 @@ static void start_medium_mode(const GameResources *res, GameContext *context)
     context->state = GAME_STATE_PLAYING;
 }
 
+/**
+ * @brief Click handler for hard mode selection
+ * @param context Pointer to the current game context
+ * @param res Pointer to the game resources
+ */
 static void start_hard_mode(const GameResources *res, GameContext *context)
 {
     PlaySound(res->fx_click);
@@ -38,6 +58,12 @@ static void start_hard_mode(const GameResources *res, GameContext *context)
     context->state = GAME_STATE_PLAYING;
 }
 
+/**
+ * @brief Click handler for "continue" button
+ * @param context Pointer to the current game context
+ * @param res Pointer to the game resources
+ * @details Starts another game with previous settings, scores are preserved
+ */
 static void continue_playing(const GameResources *res, GameContext *context)
 {
     context->transition.start_time = 0;
@@ -46,6 +72,12 @@ static void continue_playing(const GameResources *res, GameContext *context)
     initialize_game(res, context);
 }
 
+/**
+ * @brief Click handler for returning to menu
+ * @param context Pointer to the current game context
+ * @param res Pointer to the game resources
+ * @detail Resets scores, set state to menu etc.
+ */
 static void return_to_menu(const GameResources *res, GameContext *context)
 {
     context->transition.start_time = 0;
@@ -57,19 +89,31 @@ static void return_to_menu(const GameResources *res, GameContext *context)
 
     context->state = GAME_STATE_MENU;
 }
-
+/**
+ * @brief Click handler for exit confirmation "yes"
+ * @param context Pointer to the current game context
+ * @param res Pointer to the game resources
+ */
 static void exit_game(const GameResources *res, GameContext *context)
 {
     PlaySound(res->fx_click);
     context->exit_flag = true;
 }
-
+/**
+ * @brief Click handler for "1 Player" button
+ * @param context Pointer to the current game context
+ * @param res Pointer to the game resources
+ */
 static void start_1player(const GameResources *res, GameContext *context)
 {
     PlaySound(res->fx_click);
     context->state = MENU_DIFF_CHOICE;
 }
-
+/**
+ * @brief Click handler for "2 Player" button
+ * @param context Pointer to the current game context
+ * @param res Pointer to the game resources
+ */
 static void start_2player(const GameResources *res, GameContext *context)
 {
     PlaySound(res->fx_click);
@@ -78,18 +122,27 @@ static void start_2player(const GameResources *res, GameContext *context)
     initialize_game(res, context);
     context->state = GAME_STATE_PLAYING;
 }
-
+/**
+ * @brief Click handler for "how to play" button
+ * @param context Pointer to the current game context
+ * @param res Pointer to the game resources
+ */
 static void show_instructions(const GameResources *res, GameContext *context)
 {
     PlaySound(res->fx_click);
     context->state = MENU_INSTRUCTIONS;
 }
-
+/**
+ * @brief Click handler for the exit button
+ * @param context Pointer to the current game context
+ * @param res Pointer to the game resources
+ */
 static void show_exit_confirmation(const GameResources *res, GameContext *context)
 {
     PlaySound(res->fx_click);
     context->state = GAME_STATE_EXIT;
 }
+
 
 Button GAME_MODE_BUTTONS[] = {
     {.rect = NULL,
@@ -129,6 +182,7 @@ Button GAME_MODE_BUTTONS[] = {
      .font_size = 30,
      .action = start_hard_mode}};
 
+
 Button EXIT_CONFIRMATION_BUTTONS[] = {
     {.rect = NULL,
      .text = "Yes",
@@ -149,6 +203,7 @@ Button EXIT_CONFIRMATION_BUTTONS[] = {
      .font_size = 30,
      .action = return_to_menu}};
 
+
 Button INSTRUCTIONS_BUTTONS[] = {
     {.rect = NULL,
      .text = "Back",
@@ -159,6 +214,7 @@ Button INSTRUCTIONS_BUTTONS[] = {
      .rounded = true,
      .font_size = 70,
      .action = return_to_menu}};
+
 
 Button GAME_OVER_BUTTONS[] = {
     {.rect = NULL,
@@ -179,6 +235,7 @@ Button GAME_OVER_BUTTONS[] = {
      .rounded = true,
      .font_size = 20,
      .action = return_to_menu}};
+
 
 Button MAIN_MENU_BUTTONS[] = {
     {.rect = NULL,
@@ -217,6 +274,7 @@ Button MAIN_MENU_BUTTONS[] = {
      .rounded = true,
      .font_size = 30,
      .action = show_exit_confirmation}};
+
 
 Button IN_GAME_BUTTONS[] = {
     {.rect = NULL,

@@ -5,7 +5,7 @@
 
 Rectangle calculate_button_rectangle(float btn_width, ComponentPadding btn_padding, float btn_height,
                                      float first_button_offset, int index, int buttons_per_row, int screen_height,
-                                     int screen_width, MemoCache* cache);
+                                     int screen_width);
 
 BoxDimensions calculate_centered_box_dimensions(float width_percentage, float height_percentage, int screen_height, int screen_width, MemoCache* cache);
 

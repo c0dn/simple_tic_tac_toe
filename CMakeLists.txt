@@ -20,6 +20,8 @@ if(MSVC)
          DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
     file(COPY ${CMAKE_SOURCE_DIR}/assets
          DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release)
+    file(COPY ${CMAKE_SOURCE_DIR}/assets
+         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo)
 else()
     file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
 endif()
