@@ -111,7 +111,7 @@ void do_game_start_transition(const GameResources* resources, const UiOptions* r
     {
         context->transition.active = false;
         context->start_screen_shown = true;
-        if (current_player == get_computer_player(context))
+        if (current_player == get_computer_player(context) && context->computer_enabled)
         {
             computer_move(context, resources->models);
             PlaySound(resources->fx_symbol);
